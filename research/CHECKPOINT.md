@@ -40,7 +40,7 @@ Last updated: 2026-10-26
 
 ## Completed work
 
-- Source register (53 sources), evidence ledger (E-001–E-064), hypothesis register (H-001–H-007), and compatibility matrix (33 rows).
+- Source register (54 sources), evidence ledger (E-001–E-064), hypothesis register (H-001–H-008), and compatibility matrix (34 rows).
 - Detailed entry-point matrix (`research/entry-points.json`) covering 11 surfaces and 6 public leads, including `EP-011` GameShare/`splay` and `L-006`.
 - Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a stage model, a GameShare section, bounds, and capability ceiling.
 - Stage-by-stage gap analysis (`docs/GAP-ANALYSIS.md`) identifying boot-stage execution as the decisive missing link, plus a section on why applet-level userland cannot launch NRO homebrew.
@@ -48,6 +48,7 @@ Last updated: 2026-10-26
 - Falsifiable hypothesis register (`research/hypotheses.json`, H-001–H-007) validated by the research validator.
 - capmtp boundary harness (`scripts/ptp_boundary.py`) with a dry-run default, read-only operation allowlist, and 20 mocked-pipe tests in `tests/`.
 - Captive-portal fingerprint harness (`scripts/captive_portal.py`) with ten loopback tests, used successfully against the console.
+- Image-format capability probe (`scripts/fingerprint_formats.html`, `scripts/assets/`) with an `/assets/` server route; tested on loopback, not yet run on the console.
 - Browser fingerprint observation (`research/hardware-observations/2026-10-26-browser-fingerprint.json`): WifiWebAuthApplet reached via DNS redirect, engine feature-bracketed to Safari 15.4-15.6 (WebKit 615.x, 2022), no URL whitelist, no Intl, no WebAssembly, broad applet IPC privileges.
 - First hardware boundary run (`research/hardware-observations/2026-10-26-ptp-boundary.json`): invalid handle-table identifiers were rejected with documented PTP errors (H-002 closed as a scoped negative), and GetObject returned 0x2006 for every parameter set (H-001 closed negative). A transient endpoint stall cleared after a replug and did not reproduce.
 - PTP `OpenSession` must carry transaction ID 0; sending 1 returns `0x2004 InvalidTransactionID`. Fixed in both the harness and the library, with tests.
@@ -75,7 +76,7 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 53 sources, 64 evidence entries, 11 entry-point surfaces, 6 leads, 7 hypotheses, 33 matrix rows, 5 USB modes.
+Research data OK: 54 sources, 64 evidence entries, 11 entry-point surfaces, 6 leads, 8 hypotheses, 34 matrix rows, 5 USB modes.
 ```
 
 PTP observation:
@@ -97,7 +98,8 @@ Session opened: no
 
 ## Pending work
 
-- No runnable software-only direction remains with the current materials. D1 and D2 are closed negative; D3-D6 are blocked. Further progress needs new public research or a lawful firmware source.
+- Run the image-format capability probe (D7, H-008) to confirm whether WebP and other decoders are reachable. If WebP decodes, a public crash reproducer would be the next step and needs explicit approval.
+- D1 and D2 are closed negative; D3-D6 are blocked. D7 is the only open runnable direction.
 - USB test suite and fixtures for the CLI, including a regression test for the empty-`system_profiler` fallback.
 - Generated Markdown renderer and CI workflow.
 - PTP media transfer and file operations are out of scope; the identity probe is complete.

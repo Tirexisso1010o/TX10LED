@@ -499,6 +499,20 @@
         "E-064"
       ],
       "notes": "No timing warm-up across twelve runs and no WebAssembly. Consistent with interpreter-only execution, which invalidates most public JIT-based WebKit exploitation techniques."
+    },
+    {
+      "id": "C-034",
+      "component": "Non-JS image decoder surface (WebP)",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "UNKNOWN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-058",
+        "E-064"
+      ],
+      "notes": "JIT-independent. Reachability depends on WebP support in the applet and on an unpatched decoder. The libwebp heap overflow CVE-2023-4863 is the leading candidate."
     }
   ],
   "usb_modes": [

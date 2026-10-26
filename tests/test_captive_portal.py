@@ -147,6 +147,42 @@ class PageFileTests(unittest.TestCase):
                 server.server_close()
 
 
+class AssetTests(unittest.TestCase):
+    def test_serves_an_asset_and_blocks_traversal(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "sample.bin").write_bytes(b"ASSET-BYTES")
+            (root / "secret.txt").write_text("SECRET", encoding="utf-8")
+            log = captive.make_logger(root / "log.jsonl", echo=False)
+            server = captive.HttpServer(
+                ("127.0.0.1", 0), captive.Handler, "192.168.1.5", log,
+                None, root,
+            )
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                conn = http.client.HTTPConnection(
+                    "127.0.0.1", server.server_address[1], timeout=5
+                )
+                conn.request("GET", "/assets/sample.bin")
+                response = conn.getresponse()
+                self.assertEqual(response.status, 200)
+                self.assertEqual(response.read(), b"ASSET-BYTES")
+                conn.close()
+
+                conn = http.client.HTTPConnection(
+                    "127.0.0.1", server.server_address[1], timeout=5
+                )
+                conn.request("GET", "/assets/../secret.txt")
+                response = conn.getresponse()
+                self.assertEqual(response.status, 404)
+                response.read()
+                conn.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+
+
 class LoggerTests(unittest.TestCase):
     def test_logger_appends_json_lines(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

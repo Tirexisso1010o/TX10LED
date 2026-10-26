@@ -295,6 +295,43 @@
       "results": "Documented for PS4 and Windows only; no Switch reproduction.",
       "uncertainties": "Whether an Artemis title exists on Switch with the same save-loading behavior; whether the Lua bindings expose native access; how a crafted save would reach a stock console.",
       "resolution": "blocked"
+    },
+    {
+      "id": "H-008",
+      "title": "Non-JS image decoder surface in the captive-portal applet",
+      "stage": "1",
+      "surface": "EP-003",
+      "component": "WebKit image decoders in WifiWebAuthApplet (PNG, JPEG, GIF, BMP, WebP, SVG)",
+      "hypothesis": "The applet decodes attacker-supplied images in-process, and a decoder that predates a public fix could provide JIT-independent code execution. CVE-2023-4863 (libwebp Huffman heap overflow, fixed September 2023) is the leading candidate because the engine is a 2022 WebKit generation and does not use a JIT.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "WebP decoding enabled in the applet",
+        "An unpatched libwebp (or another vulnerable decoder)",
+        "A crafted image delivered from the portal server"
+      ],
+      "expected_capability": "Code execution in the applet process, which is stage 1. Not SD homebrew and not kernel.",
+      "test_procedure": "First run scripts/fingerprint_formats.html to confirm which formats decode, especially WebP. Only with explicit approval, test a public crash reproducer against the applet and record whether it faults.",
+      "expected_signal": "A format loads successfully, establishing that its decoder is reachable. A crash or fault on a crafted file would confirm the decoder is vulnerable, not merely present.",
+      "kill_criteria": "WebP is not decoded, or the decoder rejects the crafted input without a fault and the applet stays responsive.",
+      "risks": "A crafted image may crash the browser applet or the console. Recovery is to exit the applet and reboot. Testing a public crash reproducer is exploit testing and needs explicit approval.",
+      "blocked_by": null,
+      "evidence": [
+        "E-058",
+        "E-064"
+      ],
+      "sources": [
+        "nvd-cve-2023-4863",
+        "switchbrew-internet-browser",
+        "arxiv-methodically-defeating-switch"
+      ],
+      "last_reviewed": "2026-10-26",
+      "resolution": "open",
+      "hardware": "HEG-001 (Mariko), captive-portal applet",
+      "firmware": "23.0.1",
+      "results": "Capability probe built and tested on loopback; not yet run against the console. WebP decoding is unconfirmed.",
+      "uncertainties": "Whether the applet decodes WebP at all, whether Nintendo backported the libwebp fix, and whether the engine uses libwebp or a platform decoder. A crash reproducer would be exploit testing."
     }
   ]
 }

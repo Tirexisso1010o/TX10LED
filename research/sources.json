@@ -584,6 +584,17 @@
       "snapshot": "Describes CVE-2022-32893 as an out-of-bounds write in WebKit, fixed in Safari 15.6.1, iOS 15.6.1, and macOS Monterey 12.5.1, reachable by processing maliciously crafted web content.",
       "license": "Public vulnerability record; cited as an advisory.",
       "notes": "Used as a candidate class for an unpatched Safari 15.4-15.6 engine. No public proof of concept was found."
+    },
+    {
+      "id": "nvd-cve-2023-4863",
+      "title": "NVD: CVE-2023-4863",
+      "publisher": "NIST NVD",
+      "kind": "advisory",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-4863",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Describes a heap buffer overflow in libwebp's Huffman table construction, reachable through a crafted WebP image, fixed in libwebp 1.3.2 and exploited in the wild.",
+      "license": "Public vulnerability record; cited as an advisory.",
+      "notes": "A non-JIT image decoder bug, relevant to an engine that predates the September 2023 fix."
     }
   ]
 }

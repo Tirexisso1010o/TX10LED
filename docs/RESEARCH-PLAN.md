@@ -34,6 +34,7 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary | 2 | 3 | 2 | **12** | Blocked |
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host | 1 | 3 | 2 | **6** | Blocked |
 | **D6** | Artemis save chain-load (`H-007`) | 1 | No — no Switch reproduction or save delivery | 2 | 2 | 1 | **4** | Blocked |
+| **D7** | Browser non-JS parsers: image decoding (`H-008`) | 1 | **Yes** — the portal serves the assets | 4 | 4 | 3 | **48** | **Next** |
 
 `D1` is now closed: the capmtp surface was tested on hardware and produced only documented errors. `D2` is the next runnable direction. `D3` remains the only direction that can close the decisive stage, and it is blocked because the owner cannot provide firmware artifacts.
 
@@ -121,6 +122,20 @@ The harness discovers the first storage and object handle, then sends boundary o
 - **D6 (Artemis save chain-load)**: the loader is documented for PS4 and Windows and yields game-level Lua, not native code. There is no documented way to place a crafted save on a stock console.
 
 Both stay in the register as `UNKNOWN` so they are not silently forgotten.
+
+## D7 — Browser non-JS parsers (image decoding)
+
+**Hypothesis:** `H-008`.
+
+**Why this is new.** The no-JIT result closed *JavaScript* exploitation, but the applet still decodes images in-process. Image decoders are a classic JIT-independent target, and the applet has no URL whitelist, so the portal server can serve any file.
+
+**Leading candidate.** `CVE-2023-4863` is a heap buffer overflow in libwebp's Huffman table construction, reachable through a crafted WebP, fixed in libwebp 1.3.2 in September 2023 and exploited in the wild. The target engine is a 2022 WebKit generation, so it would be unpatched unless Nintendo backported the fix.
+
+**First step (safe).** Run `scripts/fingerprint_formats.html` with `scripts/assets/`. It loads a small PNG, JPEG, GIF, BMP, WebP, and SVG and reports which decode. That establishes whether the decoders are reachable at all. It does not test any vulnerability.
+
+**Second step (needs approval).** Only if WebP decodes, test a public crash reproducer and record whether the applet faults. That is exploit testing.
+
+**Kill criterion.** WebP is not decoded, or the decoder rejects crafted input without faulting.
 
 ## Task queue
 

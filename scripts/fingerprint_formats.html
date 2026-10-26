@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Network check</title></head>
+<body>
+<h1>Network check</h1>
+<p id="status">checking formats…</p>
+<script>
+(function () {
+  var formats = ["png", "jpg", "gif", "bmp", "webp", "svg"];
+  var results = {};
+  var pending = formats.length;
+  var sent = false;
+
+  function post() {
+    if (sent) {
+      return;
+    }
+    sent = true;
+    var payload = {
+      ua: navigator.userAgent,
+      formats: results,
+      canvas: (function () {
+        try {
+          var c = document.createElement("canvas");
+          c.width = 1;
+          c.height = 1;
+          return c.getContext("2d") ? true : false;
+        } catch (e) {
+          return "error:" + (e && e.name);
+        }
+      })(),
+      createImageBitmap: (typeof createImageBitmap !== "undefined")
+    };
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/fp", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onload = function () { document.getElementById("status").textContent = "done"; };
+    xhr.onerror = function () { document.getElementById("status").textContent = "done (no reply)"; };
+    xhr.send(JSON.stringify(payload));
+  }
+
+  function finish(name, value) {
+    results[name] = value;
+    pending--;
+    if (pending <= 0) {
+      post();
+    }
+  }
+
+  formats.forEach(function (name) {
+    var img = new Image();
+    var done = false;
+    img.onload = function () {
+      if (done) { return; }
+      done = true;
+      finish(name, { ok: true, w: img.naturalWidth, h: img.naturalHeight });
+    };
+    img.onerror = function () {
+      if (done) { return; }
+      done = true;
+      finish(name, { ok: false });
+    };
+    img.src = "/assets/sample." + name;
+  });
+
+  setTimeout(post, 6000);
+})();
+</script>
+</body>
+</html>

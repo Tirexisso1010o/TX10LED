@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import mimetypes
 import socket
 import struct
 import sys
@@ -183,7 +184,33 @@ class Handler(BaseHTTPRequestHandler):
         entry.update(extra)
         self.server.record(entry)  # type: ignore[attr-defined]
 
+    def _serve_asset(self) -> None:
+        assets = self.server.assets_dir  # type: ignore[attr-defined]
+        if assets is None:
+            self.send_error(404)
+            return
+        name = self.path[len("/assets/") :].split("?", 1)[0]
+        root = assets.resolve()
+        candidate = (root / name).resolve()
+        if candidate != root and root not in candidate.parents:
+            self.send_error(404)
+            return
+        if not candidate.is_file():
+            self.send_error(404)
+            return
+        body = candidate.read_bytes()
+        content_type = mimetypes.guess_type(candidate.name)[0] or "application/octet-stream"
+        self._record(served="asset", asset=name)
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self) -> None:
+        if self.path.startswith("/assets/"):
+            self._serve_asset()
+            return
         if self.path.startswith("/portal"):
             body = self.server.page_bytes()  # type: ignore[attr-defined]
             self._record(served="portal")
@@ -223,11 +250,13 @@ class HttpServer(ThreadingHTTPServer):
         answer_ip: str,
         log,
         page_file: Path | None = None,
+        assets_dir: Path | None = None,
     ) -> None:
         super().__init__(address, handler)
         self.answer_ip = answer_ip
         self._log = log
         self.page_file = page_file
+        self.assets_dir = assets_dir
 
     def page_bytes(self) -> bytes:
         if self.page_file is not None:
@@ -277,6 +306,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=None,
         help="Serve this HTML file at /portal instead of the built-in page.",
     )
+    parser.add_argument(
+        "--assets",
+        type=Path,
+        default=None,
+        help="Serve files under /assets/ from this directory.",
+    )
     args = parser.parse_args(argv)
 
     answer_ip = args.answer_ip or detect_ip()
@@ -293,7 +328,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
     try:
         httpd = HttpServer(
-            (args.bind, args.http_port), Handler, answer_ip, log, args.page_file
+            (args.bind, args.http_port),
+            Handler,
+            answer_ip,
+            log,
+            args.page_file,
+            args.assets,
         )
     except OSError as exc:
         print(
