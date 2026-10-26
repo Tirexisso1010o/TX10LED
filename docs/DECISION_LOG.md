@@ -277,3 +277,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Repeat the stress longer (rejected: same unobservable outcome); generate a stronger trigger with `craft.c` (rejected: moves into exploit development with no path to homebrew); treat acceptance as proof of vulnerability (rejected: it is not).
 
 **Consequences:** `E-067`, `E-068`, `C-034`, the plan, and the checkpoint record the closure. The console is unchanged and stayed responsive. The local reproducer files are not committed. No software-only direction with an observable signal remains with the current materials.
+
+## 2026-10-27 — Close the SD-card filesystem surface on handled rejects
+
+**Decision:** Close `H-009` and `D8`. Record that the tested FAT32 anomalies were rejected at mount, skipped at enumeration, or handled as an applet error, with no crash report and no memory-safety signal.
+
+**Reason:** The control image mounts and a real console screenshot placed at a crafted `NINTENDO/ALBUM/YYYY/MM/DD` path is listed, so the parser is genuinely reachable. But an out-of-range file entry is skipped while a valid neighbour is listed, zero sectors-per-cluster is refused at mount, and an out-of-range directory produces `2802-9999` with the console healthy. Those are validation paths. The remaining anomalies would test hang behaviour, not code execution, and this surface is a denial-of-service path at best.
+
+**Alternatives considered:** Continue with cyclic chains and near-boundary clusters (rejected: they would produce hangs or reads of unallocated card data, not a memory-safety primitive); treat the `2802-9999` as a crash (rejected: no crash report and the console stayed responsive).
+
+**Consequences:** `E-070` through `E-077`, `C-035`, `C-036`, the plan, and the checkpoint record the result. The sacrificial card can be reformatted. The console is unchanged. No software-only direction with an observable signal remains with the available materials.

@@ -35,6 +35,7 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host | 1 | 3 | 2 | **6** | Blocked |
 | **D6** | Artemis save chain-load (`H-007`) | 1 | No — no Switch reproduction or save delivery | 2 | 2 | 1 | **4** | Blocked |
 | **D7** | Browser non-JS parsers: image decoding (`H-008`) | 1 | **Yes** — the portal serves the assets | 4 | 4 | 3 | **48** | **Closed — inconclusive** |
+| **D8** | SD-card FAT32 parser (`H-009`) | 2 | **Yes** — card reader and sacrificial card | 4 | 3 | 4 | **48** | **Closed — negative** |
 
 `D1` is now closed: the capmtp surface was tested on hardware and produced only documented errors. `D2` is the next runnable direction. `D3` remains the only direction that can close the decisive stage, and it is blocked because the owner cannot provide firmware artifacts.
 
@@ -146,6 +147,19 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 
 **Kill criterion.** WebP is not decoded, or the decoder rejects crafted input without faulting.
 
+## D8 — SD-card FAT32 parser
+
+**Hypothesis:** `H-009`.
+
+**Result (2026-10-27).** Closed negative on the tested anomalies:
+
+- A control image mounts, and a real console screenshot placed at a crafted `NINTENDO/ALBUM/YYYY/MM/DD` path is listed.
+- An out-of-range **file** entry is skipped cleanly; the valid file next to it is listed.
+- An out-of-range **directory** entry makes the Album applet hang briefly and report `2802-9999`, a handled failure with no crash report.
+- A BPB with zero sectors-per-cluster is rejected at mount with a format prompt.
+
+No memory-safety signal appeared. The tested inputs were either validated at mount, skipped at enumeration, or handled as an applet error. Remaining anomalies (cyclic chains, near-boundary clusters) would test hang behaviour rather than code execution, and the surface is a denial-of-service path at best.
+
 ## Task queue
 
 | # | Task | Depends on | Status |
@@ -159,6 +173,7 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 | T7 | Package1 differ and warmboot checklist | Legal firmware artifacts | Blocked (owner cannot provide) |
 | T8 | Switch 1 `fs` comparison | Stage-1 primitive | Blocked |
 | T9 | WebP reproducer on the console | Owner approval | **Done — no fault, inconclusive** |
+| T10 | SD FAT32 anomaly matrix | Card reader + sacrificial card | **Done — handled rejects, no memory signal** |
 
 ## Program status
 
@@ -171,6 +186,7 @@ Every direction that could be executed with the owner's hardware has now been ei
 - **D5 GameShare**: blocked on a Switch 2 host.
 - **D6 Artemis**: blocked on save delivery and native escape.
 - **D7 browser image parsers**: closed inconclusive (non-stock decoder accepted the reproducer; no observable fault).
+- **D8 SD-card FAT32 parser**: closed negative on tested anomalies (mount rejection, entry skip, handled applet error; no crash report).
 
 No runnable software-only direction remains with the current materials. Further progress requires new public research or a lawful firmware source. That is a statement about available inputs, not proof of impossibility.
 
