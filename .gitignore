@@ -32,3 +32,6 @@ research/hardware-observations/*.local.md
 .idea/
 *.swp
 *~
+
+opencode.json
+.gitignore
