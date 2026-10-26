@@ -531,6 +531,21 @@
         "E-073"
       ],
       "notes": "A crafted MBR FAT32 image mounts. An out-of-range Nintendo/Album directory cluster causes the Album applet to hang and report 2802-9999. Whether this is a handled error or an applet crash is unconfirmed. No code execution was demonstrated. Card inspection found no crash report; the applet failure was handled."
+    },
+    {
+      "id": "C-036",
+      "component": "SD-card FAT32 anomaly handling",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "DISPROVEN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-072",
+        "E-076",
+        "E-077"
+      ],
+      "notes": "Tested invalid BPB, out-of-range file entries, and out-of-range directory entries. The BPB is rejected at mount, invalid files are skipped, and an invalid directory produces a handled applet error. No memory-safety signal."
     }
   ],
   "usb_modes": [

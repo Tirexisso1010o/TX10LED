@@ -33,6 +33,9 @@ _SMALL_JPEG = base64.b64decode(
 )
 _ASSET = Path(__file__).with_name("assets") / "sample_hd.jpg"
 JPEG = _ASSET.read_bytes() if _ASSET.exists() else _SMALL_JPEG
+STAMP = (2026, 10, 27, 1, 0, 0)
+NAME_STAMP = "2026102701000000"
+VALID_NAME: str | None = None
 
 ANOMALIES = {
     "none": "Valid control image with one 16-byte file.",
@@ -332,7 +335,7 @@ def _album_date_tree(image: bytearray, layout: Layout) -> None:
         (5, b"10         ", 0x10, 6),
         (6, b"27         ", 0x10, 7),
     ]
-    stamp = (2026, 10, 27, 1, 0, 0)
+    stamp = STAMP
     for cluster, name, attr, target in entries:
         sector = bytearray(SECTOR)
         _dir_entry(sector, 0, name, attr, target, 0, stamp)
@@ -344,7 +347,7 @@ def _album_date_tree(image: bytearray, layout: Layout) -> None:
     offset = _dir_entry_long(
         day,
         0,
-        f"2026102701000000-{valid_hash}.jpg",
+        VALID_NAME or f"{NAME_STAMP}-{valid_hash}.jpg",
         1,
         0x20,
         8,
@@ -354,7 +357,7 @@ def _album_date_tree(image: bytearray, layout: Layout) -> None:
     _dir_entry_long(
         day,
         offset,
-        f"2026102701000100-{oob_hash}.jpg",
+        f"{NAME_STAMP[:-2]}01-{oob_hash}.jpg",
         2,
         0x20,
         0x0FFFFFF0,
@@ -421,6 +424,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--size-mb", type=int, default=64)
     parser.add_argument("--anomaly", choices=sorted(ANOMALIES), default="none")
     parser.add_argument("--mbr", action="store_true", help="Wrap in an MBR partition table.")
+    parser.add_argument("--jpeg", type=Path, help="Override the JPEG payload.")
+    parser.add_argument("--stamp", help="HHMM timestamp for the fabricated album entry.")
+    parser.add_argument("--valid-name", help="Exact long filename for the valid entry.")
     parser.add_argument("--mbr-start", type=int, default=8192)
     parser.add_argument("--list", action="store_true", help="List anomalies.")
     parser.add_argument("--describe", type=Path, help="Describe an image.")
@@ -438,6 +444,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not args.out:
         parser.error("--out is required unless --list or --describe is used")
 
+    if args.jpeg:
+        global JPEG
+        JPEG = args.jpeg.read_bytes()
+    if args.stamp:
+        global STAMP, NAME_STAMP
+        hour, minute = int(args.stamp[:2]), int(args.stamp[2:])
+        STAMP = (2026, 10, 27, hour, minute, 0)
+        NAME_STAMP = f"20261027{hour:02d}{minute:02d}00"
+    if args.valid_name:
+        global VALID_NAME
+        VALID_NAME = args.valid_name
     image = build_image(
         args.size_mb, args.anomaly, mbr=args.mbr, mbr_start=args.mbr_start
     )
