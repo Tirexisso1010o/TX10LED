@@ -366,14 +366,15 @@
         "E-071",
         "E-072",
         "E-073",
-        "E-074"
+        "E-074",
+        "E-075"
       ],
       "sources": [],
       "last_reviewed": "2026-10-27",
       "resolution": "open",
       "hardware": "HEG-001 (Mariko) plus a sacrificial microSD and reader",
       "firmware": "23.0.1",
-      "results": "Control image mounts. A root-level out-of-range file entry mounts but is not exercised. An out-of-range Nintendo/Album directory cluster causes the Album applet to hang and then report 2802-9999, which is the first reproducible fault from crafted filesystem metadata. Whether the applet crashed or handled the error is unconfirmed. Card inspection found console-created NINTENDO/Contents and NINTENDO/save entries with NAX0-magic files and no crash report, so the fault was a handled applet failure rather than a memory-safety crash. A valid Nintendo/Album directory with an out-of-range file entry mounted and the Album applet opened without error but listed no media, so the file entry was not exercised; the path or naming is wrong, or the console rewrote the directory.",
+      "results": "Control image mounts. A root-level out-of-range file entry mounts but is not exercised. An out-of-range Nintendo/Album directory cluster causes the Album applet to hang and then report 2802-9999, which is the first reproducible fault from crafted filesystem metadata. Whether the applet crashed or handled the error is unconfirmed. Card inspection found console-created NINTENDO/Contents and NINTENDO/save entries with NAX0-magic files and no crash report, so the fault was a handled applet failure rather than a memory-safety crash. A valid Nintendo/Album directory with an out-of-range file entry mounted and the Album applet opened without error but listed no media, so the file entry was not exercised; the path or naming is wrong, or the console rewrote the directory. A real console screenshot was compared with our generated file: its 32-hex suffix is not its MD5, and it carries a 14 KB APP1 Exif segment that ours lacks. The album's behaviour with the real file present is being checked.",
       "uncertainties": "Whether the console validates each field before use, and whether any failure would be in the driver, the fs service, or a recoverable error path."
     }
   ]

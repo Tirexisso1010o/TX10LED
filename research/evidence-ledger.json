@@ -1023,6 +1023,17 @@
       "evidence": "The image contained a valid Nintendo/Album directory with a valid OK.JPG and an out-of-range TEST.JPG. The Album applet opened normally and displayed no media from the microSD card, with no error code.",
       "limitations": "Either the album's expected path or filename format differs from our 8.3 names, or the console replaced the crafted directory during mount. The bad entry was therefore not read.",
       "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-075",
+      "claim": "The console's screenshot filename suffix is not the file's MD5, and the real JPEG contains a 14 KB APP1 Exif segment that our generated JPEG lacks.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "File comparison on the card, 2026-10-27.",
+      "sources": [],
+      "evidence": "The real screenshot 2026102700452400-57B4628D2267231D57E0FC1078C0596D.jpg has MD5 ffa6936426b64d3c1689a3352915d80d, so the 32-hex suffix is not a content hash. Its JPEG segments begin with APP1 (0xE1, length 14258) and contain the Exif marker. Our generated 1280x720 JPEG begins with APP0 and has no Exif segment. Both are 1280x720, 72 dpi, sRGB.",
+      "limitations": "The album's behaviour with the real file present was not yet confirmed when this was recorded. Exif presence is a difference, not a proven filter.",
+      "last_reviewed": "2026-10-27"
     }
   ]
 }

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import struct
 import sys
 from dataclasses import dataclass
@@ -27,9 +28,11 @@ FILE_CLUSTER = 3
 FILE_SIZE = 16
 EOC = 0x0FFFFFFF
 
-JPEG = base64.b64decode(
+_SMALL_JPEG = base64.b64decode(
     "/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAABKADAAQAAAABAAAABAAAAAD/7QA4UGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAAA4QklNBCUAAAAAABDUHYzZjwCyBOmACZjs+EJ+/8AAEQgABAAEAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMAAgICAgICAwICAwUDAwMFBgUFBQUGCAYGBgYGCAoICAgICAgKCgoKCgoKCgwMDAwMDA4ODg4ODw8PDw8PDw8PD//bAEMBAgICBAQEBwQEBxALCQsQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEP/dAAQAAf/aAAwDAQACEQMRAD8A+L6KKK/lM/38P//Z"
 )
+_ASSET = Path(__file__).with_name("assets") / "sample_hd.jpg"
+JPEG = _ASSET.read_bytes() if _ASSET.exists() else _SMALL_JPEG
 
 ANOMALIES = {
     "none": "Valid control image with one 16-byte file.",
@@ -178,6 +181,10 @@ def _build_fs(
     image[6 * SECTOR : 7 * SECTOR] = _boot_sector(layout, volume_id, hidden)
 
     chain: dict[int, int] = {}
+    if anomaly == "album_date_file_oob":
+        count = (len(JPEG) + SECTOR - 1) // SECTOR
+        for cluster in range(8, 8 + count):
+            chain[cluster] = cluster + 1 if cluster < 8 + count - 1 else EOC
     if anomaly == "cluster_oob":
         chain[FILE_CLUSTER] = 0x0FFFFFF0
     elif anomaly == "fat_loop":
@@ -205,10 +212,27 @@ def _build_fs(
     return bytes(image), layout
 
 
-def _dir_entry(sector: bytearray, offset: int, name: bytes, attr: int, cluster: int, size: int) -> None:
+def _dir_entry(
+    sector: bytearray,
+    offset: int,
+    name: bytes,
+    attr: int,
+    cluster: int,
+    size: int,
+    stamp: tuple[int, int, int, int, int, int] | None = None,
+) -> None:
     entry = bytearray(32)
     entry[0:11] = name
     entry[11] = attr
+    if stamp is not None:
+        year, month, day, hour, minute, second = stamp
+        date = ((year - 1980) << 9) | (month << 5) | day
+        time = (hour << 11) | (minute << 5) | (second // 2)
+        struct.pack_into("<H", entry, 14, time)
+        struct.pack_into("<H", entry, 16, date)
+        struct.pack_into("<H", entry, 18, date)
+        struct.pack_into("<H", entry, 22, time)
+        struct.pack_into("<H", entry, 24, date)
     struct.pack_into("<H", entry, 20, (cluster >> 16) & 0xFFFF)
     struct.pack_into("<H", entry, 26, cluster & 0xFFFF)
     struct.pack_into("<I", entry, 28, size)
@@ -231,12 +255,12 @@ def _album_tree(image: bytearray, layout: Layout, anomaly: str) -> None:
     image[at(3) : at(3) + SECTOR] = nintendo
 
     album = bytearray(SECTOR)
-    _dir_entry(album, 0, b"OK      JPG", 0x20, 5, len(JPEG))
+    _dir_entry(album, 0, b"OK      JPG", 0x20, 5, len(_SMALL_JPEG))
     file_cluster = 0x0FFFFFF0 if anomaly == "album_file_oob" else 6
-    _dir_entry(album, 32, b"TEST    JPG", 0x20, file_cluster, len(JPEG))
+    _dir_entry(album, 32, b"TEST    JPG", 0x20, file_cluster, len(_SMALL_JPEG))
     image[at(4) : at(4) + SECTOR] = album
-    image[at(5) : at(5) + len(JPEG)] = JPEG
-    image[at(6) : at(6) + len(JPEG)] = JPEG
+    image[at(5) : at(5) + len(_SMALL_JPEG)] = _SMALL_JPEG
+    image[at(6) : at(6) + len(_SMALL_JPEG)] = _SMALL_JPEG
 
 
 def _short_name(long_name: str, index: int) -> bytes:
@@ -285,12 +309,13 @@ def _dir_entry_long(
     attr: int,
     cluster: int,
     size: int,
+    stamp: tuple[int, int, int, int, int, int] | None = None,
 ) -> int:
     short = _short_name(long_name, index)
     for entry in _lfn_entries(long_name, short):
         sector[offset : offset + 32] = entry
         offset += 32
-    _dir_entry(sector, offset, short, attr, cluster, size)
+    _dir_entry(sector, offset, short, attr, cluster, size, stamp)
     return offset + 32
 
 
@@ -307,29 +332,34 @@ def _album_date_tree(image: bytearray, layout: Layout) -> None:
         (5, b"10         ", 0x10, 6),
         (6, b"27         ", 0x10, 7),
     ]
+    stamp = (2026, 10, 27, 1, 0, 0)
     for cluster, name, attr, target in entries:
         sector = bytearray(SECTOR)
-        _dir_entry(sector, 0, name, attr, target, 0)
+        _dir_entry(sector, 0, name, attr, target, 0, stamp)
         image[at(cluster) : at(cluster) + SECTOR] = sector
 
+    valid_hash = hashlib.md5(JPEG).hexdigest().upper()
+    oob_hash = hashlib.md5(b"oob").hexdigest().upper()
     day = bytearray(SECTOR)
     offset = _dir_entry_long(
         day,
         0,
-        "2026102701000000-" + "A" * 32 + ".jpg",
+        f"2026102701000000-{valid_hash}.jpg",
         1,
         0x20,
         8,
         len(JPEG),
+        stamp,
     )
     _dir_entry_long(
         day,
         offset,
-        "2026102701000100-" + "B" * 32 + ".jpg",
+        f"2026102701000100-{oob_hash}.jpg",
         2,
         0x20,
         0x0FFFFFF0,
         len(JPEG),
+        stamp,
     )
     image[at(7) : at(7) + SECTOR] = day
     image[at(8) : at(8) + len(JPEG)] = JPEG
