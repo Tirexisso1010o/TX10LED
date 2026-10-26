@@ -187,7 +187,6 @@ CONTRIBUTING.md
 SECURITY.md
 LICENSE
 pyproject.toml
-opencode.json
 
 docs/
   COMPATIBILITY.md          Compatibility findings and the ns2jb nuance

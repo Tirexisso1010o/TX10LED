@@ -149,9 +149,9 @@ def _check_opencode_config(root: Path) -> Check:
     if not path.exists():
         return Check(
             "opencode.json",
-            "warn",
-            "not found",
-            "Add the project-level permission policy if this is the repository root.",
+            "ok",
+            "not present (optional)",
+            "This file is intentionally untracked; a local permission policy is optional.",
         )
     try:
         document = json.loads(path.read_text(encoding="utf-8"))
