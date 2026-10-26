@@ -207,7 +207,8 @@
         "E-059",
         "E-060",
         "E-061",
-        "E-063"
+        "E-063",
+        "E-064"
       ],
       "sources": [
         "switchbrew-internet-browser",
@@ -220,9 +221,9 @@
       "last_reviewed": "2026-10-26",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "Reachability and engine bracket established on 2026-10-26. The WifiWebAuthApplet opens through a captive-portal DNS redirect and executes page JavaScript. Feature detection brackets the engine to Safari 15.4-15.6 (WebKit 615.x, 2022). The applet has no URL whitelist and allows ignoring invalid TLS certificates. Web-applet NPDM grants fsp-srv, nvdrv:a, hid:sys, ssl, bsd:a and SystemSaveData access, so a compromise would be a real userland foothold.",
-      "uncertainties": "The security patch level is unknown: Nintendo can backport fixes without adding features, and the NetFront build changes between firmware versions. No matching public n-day has been identified, JIT availability is unconfirmed, and no exploit was attempted. A browser compromise would still be stage 1 only. The CVE-2026-2441 lead was ruled out: it is Blink-specific and the Switch engine is WebKit-based. Determining the security patch level would require the browser binary or controlled exploit testing, neither of which is available.",
-      "resolution": "blocked"
+      "results": "Closed negative on 2026-10-26. The applet is reachable and runs JavaScript, and the engine is feature-bracketed to Safari 15.4-15.6, but a timing probe found no JIT warm-up: a 400,000-iteration loop stayed at 39-40 ms across twelve runs and the polymorphic variant at 48-49 ms, with WebAssembly unavailable. Most public WebKit exploits rely on JIT behaviour, and no public non-JIT proof of concept was found for this bracket. The patch level also remains unknown.",
+      "uncertainties": "A JIT could be disabled only for this applet, and timing is indirect. Non-JIT DOM or parser bugs could still exist, but none is public for this bracket and exploitation would be original research. A browser compromise would still be applet-level, not homebrew.",
+      "resolution": "closed-negative"
     },
     {
       "id": "H-006",

@@ -880,6 +880,20 @@
       "evidence": "The NVD record describes an out-of-bounds write in WebKit fixed in Safari 15.6.1 and reachable through crafted web content. The target engine is feature-bracketed to Safari 15.4-15.6. Searches found advisories and news coverage but no public proof of concept or exploitation write-up.",
       "limitations": "The engine bracket is feature-level, not build-level; Nintendo may have backported the fix. No PoC was available to assess, and testing would be exploit execution. Even a successful exploit would be applet-level userland.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-064",
+      "claim": "The target browser's JavaScript engine shows no measurable JIT warm-up, consistent with interpreter-only execution.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Timing measurement on the target browser applet, 2026-10-26.",
+      "sources": [
+        "arxiv-methodically-defeating-switch",
+        "switchbrew-internet-browser"
+      ],
+      "evidence": "A 400,000-iteration integer loop took 40,39,40,40,39,40,40,39,40,40,39,40 ms across twelve consecutive runs. A shape-varying variant took 49 ms on eleven runs and 48 ms on one. There was no speed-up across runs and only a small monomorphic/polymorphic gap. WebAssembly remained unavailable. For comparison, the same loop shape under Node on the host collapsed from 6-7 ms to 0-1 ms after warm-up.",
+      "limitations": "Timing inference, not a direct engine inspection. A JIT could be disabled for this applet or not triggered within twelve runs, and CPU frequency scaling was not controlled. One console and one session.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

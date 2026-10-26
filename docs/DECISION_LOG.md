@@ -257,3 +257,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Try a public WebKit PoC to test the patch level (rejected: exploit execution, crash risk, no consent); keep the direction open as if runnable (rejected: it would invite pointless retries); omit the fingerprint because it did not yield an exploit (rejected: it is a reproducible result that closes a question).
 
 **Consequences:** `E-058` through `E-062`, `C-027` through `C-031`, the browser observation file, the plan, and the checkpoint record the result. `H-005` is `UNKNOWN` with resolution `blocked`. The console's DNS entry was temporary; the owner was advised to revert it. No exploit was attempted and no console state was changed permanently.
+
+## 2026-10-26 — Close the browser direction on a no-JIT measurement
+
+**Decision:** Close direction D2. Record that the target browser shows no JIT warm-up, move `H-005` to `UNKNOWN` with resolution `closed-negative`, and add `C-033`.
+
+**Reason:** The timing probe is unambiguous: a 400,000-iteration integer loop stayed at 39-40 ms across twelve runs, the polymorphic variant at 48-49 ms, and WebAssembly is unavailable. An optimizing engine collapses those numbers; Node does, in the same loop shape. Most public WebKit exploits depend on JIT behaviour, and no public non-JIT exploit exists for the 15.4-15.6 bracket. The direction cannot produce a practical result without original exploit research that would still stop at applet-level userland.
+
+**Alternatives considered:** Keep the direction open pending patch-level information (rejected: without a JIT the patch level is secondary, and obtaining it needs the binary or exploit testing); attempt a public JIT-based PoC (rejected: would not apply and would be exploit execution); try a non-JIT fuzzing campaign (rejected: out of scope, and it would require crash testing on the owner's console).
+
+**Consequences:** `E-064`, `C-033`, the plan, and the checkpoint record the closure. The program now has no runnable software-only direction with the current materials. The console is unchanged; the DNS entry was temporary and should be reverted. No exploit was attempted.

@@ -29,7 +29,7 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | ID | Direction | Stage | Feasible now? | F | I | R | Score | Status |
 |---|---|---|---|---|---|---|---|---|
 | **D1** | capmtp PTP boundary validation (`H-001`, `H-002`) | 1 | **Yes** — console + USB host | 5 | 2 | 3 | **30** | **Closed — negative** |
-| **D2** | Browser/WebKit fingerprint (`H-005`) | 1 | **Yes**, with a captive-portal setup | 3 | 3 | 3 | **27** | **Characterized — blocked** |
+| **D2** | Browser/WebKit fingerprint (`H-005`) | 1 | **Yes**, with a captive-portal setup | 3 | 3 | 3 | **27** | **Closed — negative (no JIT)** |
 | **D3** | Mariko warmboot / package1 diff (`H-003`) | 3 | No — needs artifacts | 1 | 5 | 5 | **25** | Blocked |
 | **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary | 2 | 3 | 2 | **12** | Blocked |
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host | 1 | 3 | 2 | **6** | Blocked |
@@ -87,6 +87,8 @@ The harness discovers the first storage and object handle, then sends boundary o
 - Web-applet NPDM grants `fsp-srv`, `nvdrv:a`, `hid:sys`, `ssl`, `bsd:a`, and `SystemSaveData`, so a compromise would be a real userland foothold, not an empty sandbox.
 - `CVE-2026-2441` was ruled out: it is a Blink/Chromium CSS bug, not WebKit.
 
+**Final result: no JIT.** A timing probe on 2026-10-26 measured a 400,000-iteration integer loop at 39-40 ms on all twelve runs, and a shape-varying variant at 48-49 ms, with no warm-up. `WebAssembly` was unavailable. The same loop shape under Node collapsed from 6-7 ms to 0-1 ms after warm-up, which is the signature of an optimizing engine. The Switch browser shows no such signature, so it is executing interpreted code. Most public WebKit exploits depend on JIT behaviour, and no public non-JIT exploit was found for the 15.4-15.6 bracket.
+
 **Why it is still blocked.** Feature detection does not reveal the security patch level. Nintendo updates the NetFront shell between firmware versions (20.1.1 used `NF/6.0.3.27.11`; 23.0.1 uses `NF/6.0.3.31.11`) and can backport fixes without adding features. Determining the patch level needs the browser binary or controlled exploit testing. The arXiv analysis also reports no JIT in the Switch browser, which invalidates many public WebKit techniques. Even a full compromise is stage 1 only.
 
 **Risk.** Captive-portal testing changes temporary network settings, which are reversible. It requires the owner to add a network on the console.
@@ -129,9 +131,22 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 | T3 | Run object family on the target | T2 + one screenshot | **Done — closed negative** |
 | T4 | Record the results | T2, T3 | **Done** (`E-056`, `E-057`, `C-025`, `C-026`) |
 | T5 | Browser fingerprint via captive portal | Owner approval + network setup | **Done** — engine bracketed to WebKit 615.x |
-| T6 | Determine browser security patch level | Browser binary or controlled exploit testing | Blocked |
+| T6 | Determine browser security patch level | Browser binary or controlled exploit testing | **Closed — moot (no JIT)** |
 | T7 | Package1 differ and warmboot checklist | Legal firmware artifacts | Blocked (owner cannot provide) |
 | T8 | Switch 1 `fs` comparison | Stage-1 primitive | Blocked |
+
+## Program status
+
+Every direction that could be executed with the owner's hardware has now been either falsified or characterized:
+
+- **D1 capmtp**: closed negative (`E-056`, `E-057`).
+- **D2 browser**: closed negative, no JIT (`E-058` to `E-064`).
+- **D3 warmboot**: blocked on firmware artifacts the owner cannot provide.
+- **D4 `fs`**: blocked on a stage-1 primitive.
+- **D5 GameShare**: blocked on a Switch 2 host.
+- **D6 Artemis**: blocked on save delivery and native escape.
+
+No runnable software-only direction remains with the current materials. Further progress requires new public research or a lawful firmware source. That is a statement about available inputs, not proof of impossibility.
 
 ## How results are recorded
 

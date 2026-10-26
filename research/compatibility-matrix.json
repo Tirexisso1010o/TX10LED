@@ -486,6 +486,19 @@
         "E-063"
       ],
       "notes": "Plausible only if the build predates the backport. No public PoC, patch level unknown, and even success would be applet-level userland."
+    },
+    {
+      "id": "C-033",
+      "component": "Browser JavaScript JIT availability",
+      "version": "23.0.1",
+      "dimension": "Mitigation",
+      "status": "DISPROVEN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-064"
+      ],
+      "notes": "No timing warm-up across twelve runs and no WebAssembly. Consistent with interpreter-only execution, which invalidates most public JIT-based WebKit exploitation techniques."
     }
   ],
   "usb_modes": [
