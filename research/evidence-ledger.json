@@ -951,6 +951,21 @@
       "evidence": "scripts/fingerprint_webp_stress.html decoded /assets/nso.webp sixty times with unique query strings to defeat the cache, posting an iteration marker before each decode. Iterations 0 through 59 all advanced and the page posted stage 'done' with count 60. No timeout, crash, or missing marker occurred.",
       "limitations": "No AddressSanitizer. A silent out-of-bounds write cannot be excluded. The stress run exercised one allocation pattern; other heap layouts could behave differently. One console.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-069",
+      "claim": "Stock libwebp releases 1.0.3 through 1.6.0 all reject the CVE-2023-4863 reproducers, while the target applet decodes them, so the applet's decoder is not stock libwebp and the CVE's applicability is unproven.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Local build sweep plus the console observation.",
+      "sources": [
+        "nvd-cve-2023-4863",
+        "poc-cve-2023-4863",
+        "isosceles-webp-0day"
+      ],
+      "evidence": "Built libwebp 1.0.3, 1.1.0, 1.2.2, 1.2.3, 1.2.4, 1.3.1, and 1.6.0 and ran examples/dwebp on bad.webp and nso.webp. Every release returned BITSTREAM_ERROR for both files. The target applet decoded both to 1x1 images (E-067).",
+      "limitations": "The reproducers target a specific libwebp commit and may not generalize to every vulnerable build. The applet's decoder could still be a modified libwebp with different validation. This does not prove the applet is safe, only that the stock-libwebp trigger does not reproduce.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

@@ -323,7 +323,8 @@
         "E-065",
         "E-066",
         "E-067",
-        "E-068"
+        "E-068",
+        "E-069"
       ],
       "sources": [
         "nvd-cve-2023-4863",
@@ -336,8 +337,8 @@
       "resolution": "closed-negative",
       "hardware": "HEG-001 (Mariko), captive-portal applet",
       "firmware": "23.0.1",
-      "results": "Closed inconclusive on 2026-10-26. The surface is reachable and all six image formats decode, including lossless WebP. The console decoded both CVE-2023-4863 reproducers to 1x1 images, while stock libwebp 1.2.4, 1.3.1, and 1.6.0 reject them, so the decoder is non-stock. Sixty repeated decodes of the stronger file produced no visible fault. A silent overflow cannot be excluded without ASAN, but no observable signal exists and further repeats would not add information.",
-      "uncertainties": "Whether the decoder wrote out of bounds silently. Confirming it would need ASAN, the decoder binary, or heap-grooming work that is indistinguishable from exploit development. No path to homebrew follows from this surface alone."
+      "results": "Closed inconclusive on 2026-10-26. The surface is reachable and all six image formats decode, including lossless WebP. The console decoded both CVE-2023-4863 reproducers to 1x1 images, while stock libwebp 1.2.4, 1.3.1, and 1.6.0 reject them, so the decoder is non-stock. Sixty repeated decodes of the stronger file produced no visible fault. A silent overflow cannot be excluded without ASAN, but no observable signal exists and further repeats would not add information. A sweep of stock libwebp 1.0.3 through 1.6.0 found that every release rejects both reproducers; the console accepts them, so its decoder is not stock libwebp and the CVE is likely inapplicable.",
+      "uncertainties": "Whether the decoder wrote out of bounds silently. Confirming it would need ASAN, the decoder binary, or heap-grooming work that is indistinguishable from exploit development. No path to homebrew follows from this surface alone. The decoder may be NetFront's own implementation rather than libwebp, in which case CVE-2023-4863 does not apply at all."
     }
   ]
 }
