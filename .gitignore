@@ -22,6 +22,7 @@ htmlcov/
 *.log
 *.local.json
 *.local.md
+*.local.jsonl
 
 # Keep the observation template and README, but do not publish raw local data
 research/hardware-observations/*.local.json

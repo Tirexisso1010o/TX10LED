@@ -237,3 +237,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Mark `H-001` `DISPROVEN` (rejected: overstates what was tested); keep probing other PTP operations such as `GetThumb` (rejected for now: low expected yield and no pre-registered hypothesis); treat the transient stall as a capmtp fault (rejected: it did not reproduce and cleared after a replug).
 
 **Consequences:** `E-057`, `C-026`, the boundary observation, `docs/RESEARCH-PLAN.md`, and `research/CHECKPOINT.md` record the closure. The next runnable direction is the browser fingerprint (`D2`, `H-005`); the decisive direction (`D3`, `H-003`) remains blocked because the owner cannot provide firmware artifacts. No exploit was found. Tests remain at 20 and the validator passes.
+
+## 2026-10-26 — Add a captive-portal fingerprint harness for the browser direction
+
+**Decision:** Add `scripts/captive_portal.py`, a DNS and HTTP harness that answers A queries with the host's address, redirects unknown paths to a local page, and records request headers plus a JavaScript fingerprint. Add nine loopback tests. Keep the capture file out of version control via `*.local.jsonl`.
+
+**Reason:** The capmtp direction closed negative, and the browser is the only remaining stage-1 surface reachable with the owner's hardware. Fingerprinting is the cheapest way to decide whether a public WebKit n-day could apply: it requires no exploit, changes no console state beyond a temporary DNS entry, and produces one concrete fact (engine vintage) that either closes or opens the direction.
+
+**Alternatives considered:** Guess the engine version from public documentation (rejected: the Switch 1 browser build is not pinned in public sources); skip straight to exploit development (rejected: without a version there is nothing to target).
+
+**Consequences:** The harness is tested on loopback (29 tests total) and verified with `dig` and `curl`. Real use requires binding DNS to 53 and HTTP to 80, which needs elevated privileges, so the run must be started by the owner. The console needs a temporary manual DNS entry pointing at the Mac, which is reversible. No exploit is included and the page only reads browser properties.

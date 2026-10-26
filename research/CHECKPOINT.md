@@ -47,6 +47,7 @@ Last updated: 2026-10-26
 - Ranked research plan (`docs/RESEARCH-PLAN.md`) with scored directions and kill criteria.
 - Falsifiable hypothesis register (`research/hypotheses.json`, H-001–H-007) validated by the research validator.
 - capmtp boundary harness (`scripts/ptp_boundary.py`) with a dry-run default, read-only operation allowlist, and 20 mocked-pipe tests in `tests/`.
+- Captive-portal fingerprint harness (`scripts/captive_portal.py`) with nine loopback tests, ready for an elevated run.
 - First hardware boundary run (`research/hardware-observations/2026-10-26-ptp-boundary.json`): invalid handle-table identifiers were rejected with documented PTP errors (H-002 closed as a scoped negative), and GetObject returned 0x2006 for every parameter set (H-001 closed negative). A transient endpoint stall cleared after a replug and did not reproduce.
 - PTP `OpenSession` must carry transaction ID 0; sending 1 returns `0x2004 InvalidTransactionID`. Fixed in both the harness and the library, with tests.
 - README framing the project as a potential-jailbreak investigation plus a read-only USB tool, with GameShare in the short-version table and the surface table.
@@ -95,7 +96,7 @@ Session opened: no
 
 ## Pending work
 
-- Run the browser/WebKit fingerprint (D2, H-005): serve a controlled page through a captive portal and record the engine vintage. Needs owner approval and a temporary console network entry.
+- Run the browser/WebKit fingerprint (D2, H-005): the owner starts `sudo .venv/bin/python scripts/captive_portal.py --answer-ip 192.168.178.167`, sets the console's primary DNS to that address, reconnects, and triggers the portal. Revert the DNS entry afterwards.
 - USB test suite and fixtures for the CLI, including a regression test for the empty-`system_profiler` fallback.
 - Generated Markdown renderer and CI workflow.
 - PTP media transfer and file operations are out of scope; the identity probe is complete.
