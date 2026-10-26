@@ -1001,6 +1001,17 @@
       "evidence": "The album_dir_oob image placed a Nintendo directory at cluster 3 and an Album directory entry whose first cluster is 0x0FFFFFF0. On insertion and opening the Album applet, the console hung and then displayed error code 2802-9999. The control image mounted normally.",
       "limitations": "Whether the applet crashed or displayed a handled error is not yet established, and the console's recovery state is unconfirmed. 2802-9999 is a generic member of the album/SD error family. No crash report has been inspected.",
       "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-073",
+      "claim": "After the out-of-range Album directory test the card contained console-created NINTENDO/Contents and NINTENDO/save entries with NAX0-magic files, and no crash report, indicating a handled applet failure rather than a system crash.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Card inspection after the album_dir_oob test, 2026-10-27.",
+      "sources": [],
+      "evidence": "Mounted the card read-only from macOS. It contained NINTENDO/Contents/{registered,placehld,private,private1} and NINTENDO/save/{8000000000000000,8000000000000124}. The save entries begin with the ASCII magic 'NAX0'. No CrashReport directory or report file was present. The console remained responsive and the Album applet had displayed 2802-9999.",
+      "limitations": "The console may create these directories on any writable SD card as normal initialization. The files are encrypted and were not inspected further. Their presence is not evidence of a memory-safety bug.",
+      "last_reviewed": "2026-10-27"
     }
   ]
 }

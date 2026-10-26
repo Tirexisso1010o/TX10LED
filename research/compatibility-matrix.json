@@ -527,9 +527,10 @@
       "in_scope": true,
       "evidence": [
         "E-070",
-        "E-072"
+        "E-072",
+        "E-073"
       ],
-      "notes": "A crafted MBR FAT32 image mounts. An out-of-range Nintendo/Album directory cluster causes the Album applet to hang and report 2802-9999. Whether this is a handled error or an applet crash is unconfirmed. No code execution was demonstrated."
+      "notes": "A crafted MBR FAT32 image mounts. An out-of-range Nintendo/Album directory cluster causes the Album applet to hang and report 2802-9999. Whether this is a handled error or an applet crash is unconfirmed. No code execution was demonstrated. Card inspection found no crash report; the applet failure was handled."
     }
   ],
   "usb_modes": [
