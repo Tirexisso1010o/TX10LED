@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-26-browser-fingerprint",
+  "observed_at": "2026-10-26",
+  "observed_at_precision": "date",
+  "observation_type": "captive-portal-browser-fingerprint",
+  "operator": "scripts/captive_portal.py",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": "23.0.1",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; PTP does not detect modifications"
+  },
+  "method": {
+    "summary": "A DNS responder answered every A query with the Mac's LAN address and an HTTP server redirected unknown paths to a local page. The console's captive-portal check connected, the WifiWebAuthApplet opened, and the page posted a JavaScript fingerprint back to the server.",
+    "console_change": "Temporary manual primary DNS entry pointing at the Mac; reverted by the owner afterwards.",
+    "privileges_required": "Root on the Mac to bind DNS port 53 and HTTP port 80.",
+    "no_exploit": true
+  },
+  "network_flow": [
+    "DNS query for ctest.cdn.nintendo.net, answered with the Mac's address",
+    "HTTP GET / from 192.168.178.136 with User-Agent 'NX NIFM/00', redirected",
+    "HTTP GET / from the same client with the WifiWebAuthApplet user agent, redirected",
+    "HTTP GET /portal served the fingerprint page",
+    "HTTP POST /fp delivered the fingerprint JSON"
+  ],
+  "browser": {
+    "applet": "WifiWebAuthApplet",
+    "user_agent": "Mozilla/5.0 (Nintendo Switch; WifiWebAuthApplet) AppleWebKit/613.0 (KHTML, like Gecko) NF/6.0.3.31.11 NintendoBrowser/5.1.0.55481",
+    "netfront_build": "6.0.3.31.11",
+    "nintendo_browser_version": "5.1.0.55481",
+    "accept_language": "en-GB,en;q=0.5",
+    "screen": [1280, 720, 32, 1],
+    "hardware_concurrency": 4,
+    "features": {
+      "wasm": false,
+      "promise": true,
+      "async_functions": true,
+      "optional_chaining": true,
+      "bigint": true,
+      "webgl": null,
+      "timezone": null
+    }
+  },
+  "interpretation": "The captive-portal applet is reachable without credentials and executes attacker-supplied JavaScript, which makes it a genuine stage-1 surface. The User-Agent is not a build identifier: the same AppleWebKit/613.0 token appears with NetFront 6.0.3.27.11, 6.0.3.30.3, and 7.0.3.11.3 in public user-agent databases, so it is a frozen compatibility string. The JavaScript feature set indicates an ES2020-capable engine (async functions, optional chaining, BigInt) with WebAssembly disabled, which is consistent with the documented absence of a JIT in the Switch browser.",
+  "limitations": [
+    "One console, one applet, one session.",
+    "The User-Agent token does not identify the WebKit build, and the feature set only bounds it to ES2020 or later.",
+    "The observed applet is the captive-portal applet. Other applets such as WebApplet or the account login flow may use a different build and a URL whitelist.",
+    "Reachability and JavaScript execution are not evidence of a vulnerability.",
+    "The fingerprint page ran with the console's DNS temporarily pointed at the host; no console setting was permanently changed."
+  ],
+  "redactions": [
+    "The console's LAN address is recorded in the local JSONL only as a subnet peer and is omitted here.",
+    "No serial number is recorded."
+  ]
+}

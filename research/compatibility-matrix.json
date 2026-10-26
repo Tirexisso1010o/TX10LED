@@ -408,6 +408,32 @@
         "E-057"
       ],
       "notes": "Every GetObject request returned 0x2006 ParameterNotSupported, including a valid handle at offset 0. The operation is not a reachable read primitive on this firmware. GetThumb was not tested."
+    },
+    {
+      "id": "C-027",
+      "component": "WifiWebAuthApplet captive-portal reachability",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-058"
+      ],
+      "notes": "The applet opened from a DNS redirect and executed page JavaScript. It does not use a URL whitelist and permits ignoring invalid TLS certificates. Reachability is not exploitability."
+    },
+    {
+      "id": "C-028",
+      "component": "User-Agent as a WebKit build identifier",
+      "version": "23.0.1",
+      "dimension": "Fingerprinting",
+      "status": "DISPROVEN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-058"
+      ],
+      "notes": "AppleWebKit/613.0 is a frozen token shared across multiple NetFront builds in public user-agent databases. Engine generation must be inferred from feature detection."
     }
   ],
   "usb_modes": [

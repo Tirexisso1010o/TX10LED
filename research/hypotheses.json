@@ -202,18 +202,21 @@
       "blocked_by": "No fingerprint has been collected, and no public chain for 23.0.1 exists.",
       "evidence": [
         "E-026",
-        "E-028"
+        "E-028",
+        "E-058",
+        "E-059"
       ],
       "sources": [
         "switchbrew-internet-browser",
         "pegaswitch-repository",
-        "pepsipu-ns2jb-blog"
+        "pepsipu-ns2jb-blog",
+        "arxiv-methodically-defeating-switch"
       ],
       "last_reviewed": "2026-10-26",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "No fingerprint collected. No captive-portal test has been run.",
-      "uncertainties": "Browser engine vintage; whether the applet is reachable without a game; whether public advisories match the build.",
+      "results": "Reachability confirmed on 2026-10-26: the WifiWebAuthApplet opened through a captive-portal DNS redirect and executed the page's JavaScript, posting a fingerprint. The applet does not use a URL whitelist and allows ignoring invalid TLS certificates. The User-Agent is a frozen AppleWebKit/613.0 token (NetFront 6.0.3.31.11, NintendoBrowser 5.1.0.55481), so it does not identify the build. Feature detection shows ES2020 support, WebAssembly unavailable, and no WebGL.",
+      "uncertainties": "The actual WebKit build and patch level remain unknown. The browser has no JIT, which invalidates many public WebKit exploitation techniques. A matching public n-day has not been identified, and no exploit was attempted.",
       "resolution": "open"
     },
     {

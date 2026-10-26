@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Network check</title></head>
+<body>
+<h1>Network check</h1>
+<p id="status">collecting…</p>
+<script>
+(function () {
+  function safe(fn) {
+    try { return fn(); } catch (e) { return "error:" + (e && e.name); }
+  }
+  function has(path) {
+    return safe(function () {
+      var parts = path.split(".");
+      var cur = window;
+      for (var i = 0; i < parts.length; i++) {
+        if (cur == null) return false;
+        cur = cur[parts[i]];
+      }
+      return typeof cur !== "undefined";
+    });
+  }
+  function syntax(source) {
+    return safe(function () { return eval(source); });
+  }
+  var gl = safe(function () {
+    var c = document.createElement("canvas");
+    var g = c.getContext("webgl") || c.getContext("experimental-webgl");
+    if (!g) return null;
+    var d = g.getExtension("WEBGL_debug_renderer_info");
+    return d ? [g.getParameter(d.UNMASKED_VENDOR_WEBGL),
+                g.getParameter(d.UNMASKED_RENDERER_WEBGL)] : ["masked", "masked"];
+  });
+  var data = {
+    ua: navigator.userAgent,
+    appVersion: navigator.appVersion,
+    appName: navigator.appName,
+    appCodeName: navigator.appCodeName,
+    product: navigator.product,
+    productSub: navigator.productSub,
+    vendor: navigator.vendor,
+    platform: navigator.platform,
+    language: navigator.language,
+    languages: navigator.languages || null,
+    cookieEnabled: navigator.cookieEnabled,
+    doNotTrack: navigator.doNotTrack,
+    hardwareConcurrency: navigator.hardwareConcurrency || null,
+    maxTouchPoints: navigator.maxTouchPoints,
+    pdfViewerEnabled: navigator.pdfViewerEnabled,
+    userAgentData: typeof navigator.userAgentData,
+    screen: [screen.width, screen.height, screen.availWidth, screen.availHeight,
+             screen.colorDepth, screen.pixelDepth, devicePixelRatio],
+    window: [window.innerWidth, window.innerHeight, window.outerWidth, window.outerHeight],
+    document: [document.compatMode, document.characterSet, document.contentType],
+    timezone: safe(function () { return Intl.DateTimeFormat().resolvedOptions().timeZone; }),
+    locale: safe(function () { return Intl.DateTimeFormat().resolvedOptions().locale; }),
+    webgl: gl,
+    errorStack: safe(function () { return typeof new Error().stack; }),
+    cssSupports: safe(function () { return CSS.supports("display", "grid"); }),
+    features: {
+      promise: has("Promise"),
+      symbol: has("Symbol"),
+      proxy: has("Proxy"),
+      reflect: has("Reflect"),
+      map: has("Map"),
+      set: has("Set"),
+      weakMap: has("WeakMap"),
+      weakSet: has("WeakSet"),
+      asyncFunction: syntax("(async function(){}).constructor.name"),
+      generator: syntax("(function*(){}).constructor.name"),
+      iterator: has("Symbol.iterator"),
+      asyncIterator: has("Symbol.asyncIterator"),
+      arrayFrom: has("Array.from"),
+      objectAssign: has("Object.assign"),
+      objectEntries: has("Object.entries"),
+      objectFromEntries: has("Object.fromEntries"),
+      objectSpread: syntax("({...{a:1}}).a"),
+      exponent: syntax("2**3"),
+      flat: has("Array.prototype.flat"),
+      flatMap: has("Array.prototype.flatMap"),
+      at: has("Array.prototype.at"),
+      findLast: has("Array.prototype.findLast"),
+      findLastIndex: has("Array.prototype.findLastIndex"),
+      toSorted: has("Array.prototype.toSorted"),
+      toReversed: has("Array.prototype.toReversed"),
+      groupBy: has("Object.groupBy"),
+      matchAll: has("String.prototype.matchAll"),
+      replaceAll: has("String.prototype.replaceAll"),
+      padStart: has("String.prototype.padStart"),
+      trimStart: has("String.prototype.trimStart"),
+      optionalChaining: syntax("({})?.a"),
+      nullish: syntax("null ?? 1"),
+      bigint: has("BigInt"),
+      bigint64: has("BigInt64Array"),
+      numericSeparator: syntax("1_000===1000"),
+      globalThis: has("globalThis"),
+      promiseAllSettled: has("Promise.allSettled"),
+      promiseAny: has("Promise.any"),
+      promiseWithResolvers: has("Promise.withResolvers"),
+      weakRef: has("WeakRef"),
+      finalizationRegistry: has("FinalizationRegistry"),
+      structuredClone: has("structuredClone"),
+      errorCause: syntax('new Error("x",{cause:1}).cause===1'),
+      sharedArrayBuffer: has("SharedArrayBuffer"),
+      atomics: has("Atomics"),
+      wasm: has("WebAssembly"),
+      fetch: has("fetch"),
+      abortController: has("AbortController"),
+      url: has("URL"),
+      urlSearchParams: has("URLSearchParams"),
+      textEncoder: has("TextEncoder"),
+      queueMicrotask: has("queueMicrotask"),
+      requestAnimationFrame: has("requestAnimationFrame"),
+      localStorage: safe(function () { return !!window.localStorage; }),
+      sessionStorage: safe(function () { return !!window.sessionStorage; }),
+      indexedDB: has("indexedDB"),
+      serviceWorker: safe(function () { return "serviceWorker" in navigator; }),
+      crypto: has("crypto"),
+      cryptoSubtle: safe(function () { return !!(window.crypto && window.crypto.subtle); }),
+      webgpu: safe(function () { return "gpu" in navigator; }),
+      intl: has("Intl"),
+      intlSegmenter: safe(function () { return typeof Intl.Segmenter === "function"; }),
+      intlListFormat: safe(function () { return typeof Intl.ListFormat === "function"; }),
+      intlDisplayNames: safe(function () { return typeof Intl.DisplayNames === "function"; }),
+      intlRelativeTime: safe(function () { return typeof Intl.RelativeTimeFormat === "function"; }),
+      intlPluralRules: safe(function () { return typeof Intl.PluralRules === "function"; }),
+      intlLocale: safe(function () { return typeof Intl.Locale === "function"; }),
+      regexpDotAll: syntax('/./s.test("\\n")'),
+      regexpNamedGroups: syntax('/(?<a>x)/.exec("x").groups.a==="x"'),
+      regexpLookbehind: syntax('/(?<=x)y/.test("xy")'),
+      regexpUnicodeProps: syntax('/\\p{Letter}/u.test("a")'),
+      regexpMatchIndices: syntax('/(?<a>x)/d.exec("x").indices!==undefined'),
+      regexpEscape: has("RegExp.escape"),
+      stringWellFormed: has("String.prototype.isWellFormed"),
+      arrayBufferTransfer: has("ArrayBuffer.prototype.transfer")
+    }
+  };
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/fp", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.onload = function () { document.getElementById("status").textContent = "done"; };
+  xhr.onerror = function () { document.getElementById("status").textContent = "done (no reply)"; };
+  xhr.send(JSON.stringify(data));
+})();
+</script>
+</body>
+</html>

@@ -185,7 +185,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         if self.path.startswith("/portal"):
-            body = PAGE.encode("utf-8")
+            body = self.server.page_bytes()  # type: ignore[attr-defined]
             self._record(served="portal")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -216,10 +216,23 @@ class Handler(BaseHTTPRequestHandler):
 class HttpServer(ThreadingHTTPServer):
     allow_reuse_address = True
 
-    def __init__(self, address, handler, answer_ip: str, log) -> None:
+    def __init__(
+        self,
+        address,
+        handler,
+        answer_ip: str,
+        log,
+        page_file: Path | None = None,
+    ) -> None:
         super().__init__(address, handler)
         self.answer_ip = answer_ip
         self._log = log
+        self.page_file = page_file
+
+    def page_bytes(self) -> bytes:
+        if self.page_file is not None:
+            return self.page_file.read_bytes()
+        return PAGE.encode("utf-8")
 
     def record(self, entry: dict[str, Any]) -> None:
         self._log(entry)
@@ -258,6 +271,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--http-port", type=int, default=80)
     parser.add_argument("--answer-ip", default=None)
     parser.add_argument("--log", type=Path, default=DEFAULT_LOG)
+    parser.add_argument(
+        "--page-file",
+        type=Path,
+        default=None,
+        help="Serve this HTML file at /portal instead of the built-in page.",
+    )
     args = parser.parse_args(argv)
 
     answer_ip = args.answer_ip or detect_ip()
@@ -273,7 +292,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         return 1
     try:
-        httpd = HttpServer((args.bind, args.http_port), Handler, answer_ip, log)
+        httpd = HttpServer(
+            (args.bind, args.http_port), Handler, answer_ip, log, args.page_file
+        )
     except OSError as exc:
         print(
             f"cannot bind HTTP {args.bind}:{args.http_port}: {exc}\n"

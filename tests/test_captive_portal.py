@@ -123,6 +123,30 @@ class HttpTests(unittest.TestCase):
         self.assertTrue(any("Probe/1.0" in line for line in lines))
 
 
+class PageFileTests(unittest.TestCase):
+    def test_page_file_is_served_instead_of_the_builtin_page(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            page = Path(directory) / "deep.html"
+            page.write_text("<html>DEEP-MARKER</html>", encoding="utf-8")
+            log = captive.make_logger(Path(directory) / "log.jsonl", echo=False)
+            server = captive.HttpServer(
+                ("127.0.0.1", 0), captive.Handler, "192.168.1.5", log, page
+            )
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                conn = http.client.HTTPConnection(
+                    "127.0.0.1", server.server_address[1], timeout=5
+                )
+                conn.request("GET", "/portal")
+                body = conn.getresponse().read()
+                conn.close()
+                self.assertIn(b"DEEP-MARKER", body)
+            finally:
+                server.shutdown()
+                server.server_close()
+
+
 class LoggerTests(unittest.TestCase):
     def test_logger_appends_json_lines(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

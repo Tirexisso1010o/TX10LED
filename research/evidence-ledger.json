@@ -794,6 +794,34 @@
       "evidence": "After discovering a non-empty object, GetObject was issued with offset and length at 0/0, 0/0x1000, size-1/0x1000, size/0x1000, size+1/0x1000, 0x7FFFFFFF/0x1000, 0x80000000/0x1000, 0xFFFFFFFF/0x1000, and 0/0x00100000. Every request returned 0x2006. A follow-up test with a full-object read (0/size) and a two-parameter form (handle/size) also returned 0x2006. GetObjectInfo for the same handle returned 0x2001 with a 166-byte dataset. See research/hardware-observations/2026-10-26-ptp-boundary.json.",
       "limitations": "One session. The operation may be gated by an undocumented precondition, and GetThumb (0x100A) was not tested. The result does not prove that no other operation reads object data.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-058",
+      "claim": "The target's WifiWebAuthApplet is reachable through a captive-portal DNS redirect and executes attacker-supplied JavaScript, and its User-Agent is a frozen compatibility token rather than a build identifier.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Reproduced finding, one console, 2026-10-26.",
+      "sources": [
+        "switchbrew-internet-browser",
+        "arxiv-methodically-defeating-switch"
+      ],
+      "evidence": "With the console's primary DNS pointed at the host, the console queried ctest.cdn.nintendo.net, received the host address, and the WifiWebAuthApplet requested the portal page and posted the fingerprint JSON. The User-Agent was 'Mozilla/5.0 (Nintendo Switch; WifiWebAuthApplet) AppleWebKit/613.0 (KHTML, like Gecko) NF/6.0.3.31.11 NintendoBrowser/5.1.0.55481'. Public user-agent databases show the same AppleWebKit/613.0 token with NetFront 6.0.3.27.11, 6.0.3.30.3, and 7.0.3.11.3.",
+      "limitations": "One console and one applet. The WebApplet and account-login applets may differ and may enforce a URL whitelist. Reachability is not evidence of a vulnerability.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-059",
+      "claim": "The observed browser environment supports ES2020 JavaScript features but reports WebAssembly unavailable and no WebGL, consistent with the documented absence of a JIT in the Switch browser.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Browser capability fingerprint.",
+      "sources": [
+        "arxiv-methodically-defeating-switch",
+        "switchbrew-internet-browser"
+      ],
+      "evidence": "The page reported async functions, optional chaining, and BigInt as available, WebAssembly as unavailable, WebGL as null, hardwareConcurrency 4, and a 1280x720 screen at device pixel ratio 1. The arXiv paper states the Switch browser has no JIT.",
+      "limitations": "Feature detection bounds the engine generation but does not identify the build. WebAssembly may be disabled independently of JIT. WebGL absence may be a policy choice.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

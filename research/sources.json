@@ -518,6 +518,17 @@
       "snapshot": "Documents fsp-srv, the IFileSystem interface, and commands including GetEntryType, which takes a path buffer and returns a DirectoryEntryType. Describes the filesystem API surface used by games and sysmodules.",
       "license": "Wiki text governed by Nintendo Switch Brew's terms; cited as documentation.",
       "notes": "Used to reason about whether the ns2jb fs path-normalization bug class could apply to Switch 1, since the filesystem API is documented as largely unchanged between generations."
+    },
+    {
+      "id": "arxiv-methodically-defeating-switch",
+      "title": "Methodically Defeating Nintendo Switch Security",
+      "publisher": "arXiv",
+      "kind": "paper",
+      "url": "https://arxiv.org/abs/1905.07643",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Describes the Switch browser attack surface, the WifiWebAuthApplet captive-portal path, and states that the Switch does not have a JIT in its browser, which changes the standard WebKit exploitation approach.",
+      "license": "arXiv preprint; cited as research literature.",
+      "notes": "Used for the no-JIT constraint and the browser applet security context."
     }
   ]
 }
