@@ -791,8 +791,8 @@
         "switchbrew-capmtp",
         "libmtp-ptp-source"
       ],
-      "evidence": "After discovering a non-empty object, GetObject was issued with offset and length at 0/0, 0/0x1000, size-1/0x1000, size/0x1000, size+1/0x1000, 0x7FFFFFFF/0x1000, 0x80000000/0x1000, 0xFFFFFFFF/0x1000, and 0/0x00100000. Every request returned 0x2006. GetObjectInfo for the same handle returned 0x2001 with a 166-byte dataset. See research/hardware-observations/2026-10-26-ptp-boundary.json.",
-      "limitations": "One run. GetObject may be gated by an undocumented precondition, and GetThumb (0x100A) was not tested. The result does not prove that no other operation reads object data.",
+      "evidence": "After discovering a non-empty object, GetObject was issued with offset and length at 0/0, 0/0x1000, size-1/0x1000, size/0x1000, size+1/0x1000, 0x7FFFFFFF/0x1000, 0x80000000/0x1000, 0xFFFFFFFF/0x1000, and 0/0x00100000. Every request returned 0x2006. A follow-up test with a full-object read (0/size) and a two-parameter form (handle/size) also returned 0x2006. GetObjectInfo for the same handle returned 0x2001 with a 166-byte dataset. See research/hardware-observations/2026-10-26-ptp-boundary.json.",
+      "limitations": "One session. The operation may be gated by an undocumented precondition, and GetThumb (0x100A) was not tested. The result does not prove that no other operation reads object data.",
       "last_reviewed": "2026-10-26"
     }
   ]

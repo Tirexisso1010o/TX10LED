@@ -42,49 +42,71 @@
       {
         "name": "handles_invalid_storage",
         "operation": "0x1007",
-        "params": ["0xffffffff", "0x00000000", "0x00000000"],
+        "params": [
+          "0xffffffff",
+          "0x00000000",
+          "0x00000000"
+        ],
         "result": "0x2009 InvalidObjectHandle"
       },
       {
         "name": "handles_invalid_format",
         "operation": "0x1007",
-        "params": ["0xffffffff", "0xffffffff", "0x00000000"],
+        "params": [
+          "0xffffffff",
+          "0xffffffff",
+          "0x00000000"
+        ],
         "result": "0x200b InvalidObjectFormatCode"
       },
       {
         "name": "handles_invalid_parent",
         "operation": "0x1007",
-        "params": ["0xffffffff", "0x00000000", "0xffffffff"],
+        "params": [
+          "0xffffffff",
+          "0x00000000",
+          "0xffffffff"
+        ],
         "result": "0x2001 OK, 60-byte payload (14 handles)"
       },
       {
         "name": "info_zero",
         "operation": "0x1008",
-        "params": ["0x00000000"],
+        "params": [
+          "0x00000000"
+        ],
         "result": "0x2009 InvalidObjectHandle"
       },
       {
         "name": "info_one",
         "operation": "0x1008",
-        "params": ["0x00000001"],
+        "params": [
+          "0x00000001"
+        ],
         "result": "0x2009 InvalidObjectHandle"
       },
       {
         "name": "info_int_max",
         "operation": "0x1008",
-        "params": ["0x7fffffff"],
+        "params": [
+          "0x7fffffff"
+        ],
         "result": "0x2009 InvalidObjectHandle"
       },
       {
         "name": "info_sign_bit",
         "operation": "0x1008",
-        "params": ["0x80000000"],
+        "params": [
+          "0x80000000"
+        ],
         "result": "0x2009 InvalidObjectHandle"
       },
       {
         "name": "info_uint_max",
         "operation": "0x1008",
-        "params": ["0xffffffff"],
+        "params": [
+          "0xffffffff"
+        ],
         "result": "0x2009 InvalidObjectHandle"
       }
     ],
@@ -93,7 +115,11 @@
   "object_enumeration": {
     "top_level_associations": 14,
     "association_format": "0x3001",
-    "sampled_child_counts": [1, 20, 4],
+    "sampled_child_counts": [
+      1,
+      20,
+      4
+    ],
     "first_image_object": {
       "format": "0x3801",
       "size_bytes": 200377
@@ -110,59 +136,114 @@
       {
         "name": "read_zero_length",
         "operation": "0x1009",
-        "params": ["discovered handle", "0x00000000", "0x00000000"],
+        "params": [
+          "discovered handle",
+          "0x00000000",
+          "0x00000000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_head",
         "operation": "0x1009",
-        "params": ["discovered handle", "0x00000000", "0x00001000"],
+        "params": [
+          "discovered handle",
+          "0x00000000",
+          "0x00001000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_last_byte",
         "operation": "0x1009",
-        "params": ["discovered handle", "size - 1", "0x00001000"],
+        "params": [
+          "discovered handle",
+          "size - 1",
+          "0x00001000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_at_size",
         "operation": "0x1009",
-        "params": ["discovered handle", "size", "0x00001000"],
+        "params": [
+          "discovered handle",
+          "size",
+          "0x00001000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_past_size",
         "operation": "0x1009",
-        "params": ["discovered handle", "size + 1", "0x00001000"],
+        "params": [
+          "discovered handle",
+          "size + 1",
+          "0x00001000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_offset_int_max",
         "operation": "0x1009",
-        "params": ["discovered handle", "0x7fffffff", "0x00001000"],
+        "params": [
+          "discovered handle",
+          "0x7fffffff",
+          "0x00001000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_offset_sign_bit",
         "operation": "0x1009",
-        "params": ["discovered handle", "0x80000000", "0x00001000"],
+        "params": [
+          "discovered handle",
+          "0x80000000",
+          "0x00001000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_offset_uint_max",
         "operation": "0x1009",
-        "params": ["discovered handle", "0xffffffff", "0x00001000"],
+        "params": [
+          "discovered handle",
+          "0xffffffff",
+          "0x00001000"
+        ],
         "result": "0x2006 ParameterNotSupported"
       },
       {
         "name": "read_length_large",
         "operation": "0x1009",
-        "params": ["discovered handle", "0x00000000", "0x00100000"],
+        "params": [
+          "discovered handle",
+          "0x00000000",
+          "0x00100000"
+        ],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_full_object",
+        "operation": "0x1009",
+        "params": [
+          "discovered handle",
+          "0x00000000",
+          "size"
+        ],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_two_params",
+        "operation": "0x1009",
+        "params": [
+          "discovered handle",
+          "size"
+        ],
         "result": "0x2006 ParameterNotSupported"
       }
     ],
-    "outcome": "Negative. GetObject returned 0x2006 for every parameter set, including a valid handle with offset 0. Object data could not be read, so offset and length validation was never exercised. This meets the pre-registered kill criterion for H-001."
+    "outcome": "Negative. GetObject returned 0x2006 for every parameter set, including a valid handle at offset 0, a full-object read (offset 0, length equal to size), and a two-parameter form. Object data could not be read, so offset and length validation was never exercised. This meets the pre-registered kill criterion for H-001."
   },
   "stall": {
     "where": "GetObjectHandles on the fourth association during the first enumeration attempt",
