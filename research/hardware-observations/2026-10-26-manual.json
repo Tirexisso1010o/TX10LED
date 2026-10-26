@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-26-manual",
+  "observed_at": "2026-10-26",
+  "observed_at_precision": "date",
+  "observation_type": "manual-owner-report",
+  "operator": "console owner",
+  "console": {
+    "model": "HEG-001",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false
+  },
+  "connection": {
+    "mode": "manual-console-settings",
+    "note": "Read from the console's System Settings. No USB connection was used."
+  },
+  "commands": [
+    {
+      "command": "manual inspection of the console model and System Settings",
+      "exit_code": null,
+      "result": "Model HEG-001; firmware 23.0.1; serial prefix XTJ; no modification history reported."
+    }
+  ],
+  "interpretation": "The owner manually confirmed the target identity and reports no prior opening or modchip. The firmware was read, not updated. This is owner-reported and has not been independently observed.",
+  "limitations": [
+    "Owner-reported manual confirmation, not an independent or tool-attested observation.",
+    "A PTP GetDeviceInfo observation is still pending.",
+    "Manual confirmation does not establish exploitability, boot state, or integrity."
+  ],
+  "redactions": [
+    "Serial number truncated to a three-character prefix."
+  ]
+}

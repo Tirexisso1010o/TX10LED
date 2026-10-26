@@ -167,3 +167,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Keep the research-only title and describe the USB tool as an appendix; claim the project is a jailbreak (rejected as false); remove the USB tool.
 
 **Consequences:** README, `pyproject.toml`, `SECURITY.md`, `docs/USB_INTEGRATION.md`, and `research/CHECKPOINT.md` use the new framing. The entry-point conclusion is unchanged: no publicly documented, reproducible software-only path to Atmosphère was found. The README keeps an explicit "not a working jailbreak" boundary and the five evidence statuses.
+
+## 2026-10-26 — Treat owner manual confirmation as `PARTIALLY VERIFIED`
+
+**Decision:** Record the owner's manual confirmation of the model, firmware, serial prefix, and no-modification history as `PARTIALLY VERIFIED`, not `VERIFIED`. Keep `firmware_verified: false` until a PTP `GetDeviceInfo` observation or another independent check is recorded.
+
+**Reason:** The owner read the values from the console's System Settings, which is direct testimony and stronger than the initial report. It is still owner-reported and not independently observed or tool-attested. The project's `VERIFIED` label is reserved for authoritative or primary sources with no reviewed contradiction, so manual testimony does not meet that bar by itself.
+
+**Alternatives considered:** Leave the identity `UNVERIFIED` until PTP; mark it `VERIFIED` because the owner read it from the console.
+
+**Consequences:** `E-009`, matrix row `C-011`, `docs/COMPATIBILITY.md`, the README summary, and `research/known-limitations.md` now say `PARTIALLY VERIFIED` with the limitation stated. The observation is recorded in `research/hardware-observations/2026-10-26-manual.json`. A PTP observation is still pending and would strengthen, but not prove, exploitability or integrity.

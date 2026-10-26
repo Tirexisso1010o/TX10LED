@@ -7,7 +7,7 @@ This document records what the research and tooling cannot establish. It is part
 - **Public sources only.** The conclusion is based on public releases, documentation, source code, and maintained guides reviewed on 2026-10-26. It is not an audit of private research, unpublished exploits, or every firmware binary.
 - **No proof of impossibility.** "No publicly documented software-only path" is not the same as "no software-only path can exist". The ledger labels the existence of an undisclosed exploit `UNKNOWN`.
 - **Hardware family, not a laboratory teardown.** The OLED is identified as Mariko/Tegra X1+ from public hardware documentation. This project has not opened the console or inspected its board.
-- **User-reported target identity.** The model `HEG-001` and firmware `23.0.1` are user-reported until manually confirmed and, optionally, observed through PTP.
+- **Owner-confirmed target identity.** The model `HEG-001`, firmware `23.0.1`, serial prefix `XTJ`, and no-modification history were manually confirmed by the owner on 2026-10-26. They are owner-reported, not independently observed; a PTP observation is pending.
 - **No exploit development.** The project does not attempt to find, develop, or validate a new vulnerability. It records what is publicly documented.
 
 ## Firmware and release limitations

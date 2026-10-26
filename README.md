@@ -17,7 +17,7 @@ This repository does not contain a working exploit, a payload, or a flashing too
 | Is a modchip the documented route? | Yes, but it is a hardware modification and out of scope. | **VERIFIED** |
 | Is there a real software-only userland/sysmodule chain? | Yes: `ns2jb`, but it is Switch 2-packaged, Switch 1-unpackaged, and not a path to Atmosphère. | **PARTIALLY VERIFIED** |
 | Could an undisclosed software-only method exist? | Cannot be established from public sources. | **UNKNOWN** |
-| Is this exact console an OLED on 23.0.1? | User-reported; not independently observed. | **UNVERIFIED** |
+| Is this exact console an OLED on 23.0.1, and is it unmodified? | Owner-confirmed from Settings; no modification history reported. Not independently observed. | **PARTIALLY VERIFIED** |
 
 The important distinction is between **firmware support** and **entry-point support**. Atmosphère and hekate can support the firmware's system modules and boot process, while the console's bootROM still refuses to run an unsigned payload.
 

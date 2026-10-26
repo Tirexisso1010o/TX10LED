@@ -42,7 +42,7 @@
         "nintendo-support-oled-serial"
       ],
       "evidence": "Switchbrew's hardware page lists the OLED motherboard as ODNX10-A1 and identifies the OLED SoC family as Tegra X1+ / Mariko. Nintendo's support page lists the OLED model number as HEG-001.",
-      "limitations": "The user's specific console has not been opened or independently identified; model and firmware remain user-reported until manual confirmation.",
+      "limitations": "The user's specific console has not been opened or independently identified. The owner manually confirmed the model and firmware on 2026-10-26, but that confirmation is owner-reported and not independently observed.",
       "last_reviewed": "2026-10-26"
     },
     {
@@ -119,13 +119,13 @@
     },
     {
       "id": "E-009",
-      "claim": "The target console is a Nintendo Switch OLED (HEG-001) running firmware 23.0.1.",
-      "status": "UNVERIFIED",
-      "confidence": "low",
-      "scope": "User-reported target identity.",
+      "claim": "The target console is a Nintendo Switch OLED (HEG-001) running firmware 23.0.1, with no prior opening or modchip reported.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Owner-confirmed target identity.",
       "sources": [],
-      "evidence": "The console model and firmware were reported by the user at the start of the project. No manual or USB observation has been recorded yet.",
-      "limitations": "Requires manual confirmation of the model number, firmware display, and serial prefix, followed by an opt-in USB observation. Do not update the firmware to check.",
+      "evidence": "On 2026-10-26 the owner manually confirmed the model as HEG-001 and the firmware as 23.0.1 from the console's System Settings, reported the serial prefix XTJ, and reported no prior opening or modchip. The firmware was read, not updated. See research/hardware-observations/2026-10-26-manual.json.",
+      "limitations": "Owner-reported and not independently observed or tool-attested. A PTP GetDeviceInfo observation is pending. Manual confirmation does not establish exploitability, boot state, or integrity.",
       "last_reviewed": "2026-10-26"
     },
     {

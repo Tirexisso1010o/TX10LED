@@ -8,7 +8,12 @@
     "firmware_reported": "23.0.1",
     "firmware_verified": false,
     "user_reported": true,
-    "notes": "Model and firmware are user-reported until manually confirmed and, optionally, observed through PTP. Do not update the firmware to verify it."
+    "manually_confirmed": true,
+    "manually_confirmed_at": "2026-10-26",
+    "serial_prefix": "XTJ",
+    "modification_history": "none reported",
+    "identity_status": "PARTIALLY VERIFIED",
+    "notes": "The owner manually confirmed the model, firmware, serial prefix, and no modification history on 2026-10-26. The firmware was read from System Settings, not updated. This is owner-reported and not independently observed; a PTP GetDeviceInfo observation is still pending. Do not update the firmware to verify it."
   },
   "conclusion": {
     "claim": "A publicly documented, reproducible software-only path to Atmosphère exists for an unmodified Switch OLED on firmware 23.0.1.",
@@ -177,13 +182,13 @@
       "component": "Target model and firmware",
       "version": "HEG-001 / 23.0.1",
       "dimension": "target_identity",
-      "status": "UNVERIFIED",
+      "status": "PARTIALLY VERIFIED",
       "applies_to_target": true,
       "in_scope": true,
       "evidence": [
         "E-009"
       ],
-      "notes": "User-reported. Manual confirmation is required before any state-changing operation; no state-changing operation is currently authorized."
+      "notes": "Owner-confirmed manually on 2026-10-26: HEG-001, firmware 23.0.1, serial prefix XTJ, no modification history reported. Not independently observed; PTP DeviceInfo observation pending. No state-changing operation is currently authorized."
     },
     {
       "id": "C-012",

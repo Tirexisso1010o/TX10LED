@@ -7,7 +7,11 @@
     "soc": "NVIDIA Tegra X1+ (Mariko)",
     "firmware_reported": "23.0.1",
     "firmware_verified": false,
-    "note": "User-reported. See research/compatibility-matrix.json for the canonical target record. Do not update the firmware to verify it."
+    "manually_confirmed": true,
+    "manually_confirmed_at": "2026-10-26",
+    "serial_prefix": "XTJ",
+    "modification_history": "none reported",
+    "note": "Owner-confirmed manually on 2026-10-26; not independently observed. See research/hardware-observations/2026-10-26-manual.json and research/compatibility-matrix.json for the canonical target record. A PTP GetDeviceInfo observation is pending. Do not update the firmware to verify it."
   },
   "summary": {
     "question": "Is there a publicly documented, reproducible, software-only entry point to Atmosphère on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",

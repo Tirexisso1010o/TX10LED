@@ -6,10 +6,11 @@ Last updated: 2026-10-26
 
 - Research snapshot: **2026-10-26**.
 - Repository: `Tirexisso1010o/TX10LED`, branch `main`, pre-existing commit `8e828a8`.
-- Target: Nintendo Switch OLED, user-reported `HEG-001`, firmware `23.0.1`.
+- Target: Nintendo Switch OLED, owner-confirmed `HEG-001`, firmware `23.0.1`, serial prefix `XTJ`, no modification history reported.
 - Console state: unchanged by this project.
-- Hardware validation: **pending**. No USB observation has been recorded.
-- Publication: **pushed** to `origin/main` at commit `a043b89` on 2026-10-26.
+- Hardware validation: **pending**. No USB observation has been recorded; the target identity is owner-confirmed only.
+- Target identity: **PARTIALLY VERIFIED**. Owner-confirmed manually on 2026-10-26; not independently observed.
+- Publication: **pushed** to `origin/main` on 2026-10-26; see `git log` for the latest commit.
 - Focus: potential software-only jailbreak research and the read-only USB tool.
 
 ## Verified conclusions
@@ -36,6 +37,7 @@ Last updated: 2026-10-26
 - PTP response-code correction (`0x2001`) in `docs/USB_INTEGRATION.md`.
 - Removed the dead `render_research.py` permission rule from `opencode.json`; deny rules remain last in the ordered list.
 - Read-only USB inspection package and CLI.
+- Manual target observation (`research/hardware-observations/2026-10-26-manual.json`): HEG-001, firmware 23.0.1, serial prefix XTJ, no modification history reported.
 - Repository-local `.venv` with `pyusb` 1.3.1 installed via `pip install -e '.[ptp]'`.
 - `ptp-info --dry-run` verified: it exits with code `2` and opens nothing when no PTP device is connected.
 
@@ -56,7 +58,7 @@ Research data OK: 30 sources, 36 evidence entries, 10 entry-point surfaces, 5 le
 
 ## Pending approvals
 
-- Connect the console in PTP mode and confirm its identity before opening it.
+- Open the PTP device for a read-only `GetDeviceInfo` probe after the dry run confirms the selected device.
 - Any console state change, firmware update, RCM entry, or payload attempt requires explicit approval and is currently not authorized.
 
 ## Pending work
@@ -67,9 +69,7 @@ Research data OK: 30 sources, 36 evidence entries, 10 entry-point surfaces, 5 le
 
 ## Unresolved questions
 
-- Does the target console report `HEG-001` and firmware `23.0.1` in Settings?
-- What is the serial prefix (three characters only)?
-- Has the console ever been opened or modchipped?
+- Does PTP `DeviceInfo` agree with the owner-reported model and firmware?
 - Does the OLED enumerate as `057e:201d` in Copy to PC via USB mode?
 - Does the OLED answer PTP `GetDeviceInfo` without `OpenSession`, or does it require `--allow-session`?
 - What Switch 1 model and firmware did the `ns2jb` author test, and is a Switch 1 package planned?
@@ -77,9 +77,10 @@ Research data OK: 30 sources, 36 evidence entries, 10 entry-point surfaces, 5 le
 
 ## Next safe action
 
-Run the research validator and the local CLI checks. The repository is published to `origin/main`. Then ask the user for:
+The target identity is owner-confirmed. Next, connect the console in PTP mode and run the read-only identity probe:
 
-1. the manual console details (model, firmware confirmation without updating, serial prefix only, and whether it has ever been opened or modchipped);
-2. confirmation that the console is connected in PTP mode and ready for a read-only `GetDeviceInfo` probe.
+1. Confirm the console is in **Copy to PC via USB** mode with the screen open.
+2. Run `.venv/bin/python -m switch_usb_probe ptp-info --dry-run`.
+3. After the dry run confirms the selected device, run `.venv/bin/python -m switch_usb_probe ptp-info --confirm`.
 
 The `.venv` and `pyusb` install was approved and completed. Do not update firmware, enter RCM, inject a payload, or change console state.
