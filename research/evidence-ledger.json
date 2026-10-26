@@ -1012,6 +1012,17 @@
       "evidence": "Mounted the card read-only from macOS. It contained NINTENDO/Contents/{registered,placehld,private,private1} and NINTENDO/save/{8000000000000000,8000000000000124}. The save entries begin with the ASCII magic 'NAX0'. No CrashReport directory or report file was present. The console remained responsive and the Album applet had displayed 2802-9999.",
       "limitations": "The console may create these directories on any writable SD card as normal initialization. The files are encrypted and were not inspected further. Their presence is not evidence of a memory-safety bug.",
       "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-074",
+      "claim": "The album_file_oob image mounts and the Album applet opens without error but shows no media from the card, so the crafted file entry was not exercised.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Owner observation, one console, 2026-10-27.",
+      "sources": [],
+      "evidence": "The image contained a valid Nintendo/Album directory with a valid OK.JPG and an out-of-range TEST.JPG. The Album applet opened normally and displayed no media from the microSD card, with no error code.",
+      "limitations": "Either the album's expected path or filename format differs from our 8.3 names, or the console replaced the crafted directory during mount. The bad entry was therefore not read.",
+      "last_reviewed": "2026-10-27"
     }
   ]
 }
