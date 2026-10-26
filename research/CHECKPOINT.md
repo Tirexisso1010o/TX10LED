@@ -40,10 +40,10 @@ Last updated: 2026-10-26
 
 ## Completed work
 
-- Source register (52 sources), evidence ledger (E-001–E-062), hypothesis register (H-001–H-007), and compatibility matrix (31 rows).
+- Source register (53 sources), evidence ledger (E-001–E-063), hypothesis register (H-001–H-007), and compatibility matrix (32 rows).
 - Detailed entry-point matrix (`research/entry-points.json`) covering 11 surfaces and 6 public leads, including `EP-011` GameShare/`splay` and `L-006`.
 - Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a stage model, a GameShare section, bounds, and capability ceiling.
-- Stage-by-stage gap analysis (`docs/GAP-ANALYSIS.md`) identifying boot-stage execution as the decisive missing link.
+- Stage-by-stage gap analysis (`docs/GAP-ANALYSIS.md`) identifying boot-stage execution as the decisive missing link, plus a section on why applet-level userland cannot launch NRO homebrew.
 - Ranked research plan (`docs/RESEARCH-PLAN.md`) with scored directions and kill criteria.
 - Falsifiable hypothesis register (`research/hypotheses.json`, H-001–H-007) validated by the research validator.
 - capmtp boundary harness (`scripts/ptp_boundary.py`) with a dry-run default, read-only operation allowlist, and 20 mocked-pipe tests in `tests/`.
@@ -75,7 +75,7 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 52 sources, 62 evidence entries, 11 entry-point surfaces, 6 leads, 7 hypotheses, 31 matrix rows, 5 USB modes.
+Research data OK: 53 sources, 63 evidence entries, 11 entry-point surfaces, 6 leads, 7 hypotheses, 32 matrix rows, 5 USB modes.
 ```
 
 PTP observation:

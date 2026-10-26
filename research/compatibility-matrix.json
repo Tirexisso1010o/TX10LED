@@ -473,6 +473,19 @@
         "E-062"
       ],
       "notes": "The CVE is a Blink/Chromium CSS use-after-free. The Switch browser is WebKit-based NetFront NX, so the issue does not apply."
+    },
+    {
+      "id": "C-032",
+      "component": "WebKit OOB write class (CVE-2022-32893) against the 15.4-15.6 bracket",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "UNKNOWN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-063"
+      ],
+      "notes": "Plausible only if the build predates the backport. No public PoC, patch level unknown, and even success would be applet-level userland."
     }
   ],
   "usb_modes": [

@@ -573,6 +573,17 @@
       "snapshot": "Describes CVE-2026-2441 as a use-after-free in CSS in Google Chrome before 145.0.7632.75, allowing remote code execution inside the sandbox via a crafted HTML page.",
       "license": "Public vulnerability record; cited as an advisory.",
       "notes": "Blink/Chromium-specific, therefore not applicable to a WebKit-based NetFront NX engine."
+    },
+    {
+      "id": "nvd-cve-2022-32893",
+      "title": "NVD: CVE-2022-32893",
+      "publisher": "NIST NVD",
+      "kind": "advisory",
+      "url": "https://nvd.nist.gov/vuln/detail/cve-2022-32893",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Describes CVE-2022-32893 as an out-of-bounds write in WebKit, fixed in Safari 15.6.1, iOS 15.6.1, and macOS Monterey 12.5.1, reachable by processing maliciously crafted web content.",
+      "license": "Public vulnerability record; cited as an advisory.",
+      "notes": "Used as a candidate class for an unpatched Safari 15.4-15.6 engine. No public proof of concept was found."
     }
   ]
 }

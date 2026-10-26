@@ -866,6 +866,20 @@
       "evidence": "The NVD record names Google Chrome and the CSS component of Blink. Switchbrew identifies the Switch browser as NetFront NX, which is WebKit-based. A public PS4 test of the same CVE against NetFront NX also reported that the engine was not vulnerable, which is consistent with the different engine.",
       "limitations": "This rules out one CVE, not the WebKit engine. It says nothing about WebKit-specific issues in the 15.4-15.6 bracket.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-063",
+      "claim": "CVE-2022-32893 is the class of WebKit out-of-bounds write that would affect an unpatched Safari 15.4-15.6 engine, but no public proof of concept or technical analysis was found and Nintendo's backport status is unknown.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "scope": "Candidate vulnerability class for the browser surface.",
+      "sources": [
+        "nvd-cve-2022-32893",
+        "switchbrew-internet-browser"
+      ],
+      "evidence": "The NVD record describes an out-of-bounds write in WebKit fixed in Safari 15.6.1 and reachable through crafted web content. The target engine is feature-bracketed to Safari 15.4-15.6. Searches found advisories and news coverage but no public proof of concept or exploitation write-up.",
+      "limitations": "The engine bracket is feature-level, not build-level; Nintendo may have backported the fix. No PoC was available to assess, and testing would be exploit execution. Even a successful exploit would be applet-level userland.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

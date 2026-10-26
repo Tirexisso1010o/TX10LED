@@ -61,6 +61,25 @@ The modchip performs stage 3 **physically**. It glitches the CPU during boot so 
 
 So `ns2jb` is genuinely valuable research, and it still leaves this console with no stage 1 and every Mariko console with no stage 3.
 
+## What "userland homebrew" would actually require
+
+"Homebrew" covers two different goals, and they need different amounts of access:
+
+| Goal | What it needs | Is applet-level userland enough? |
+|---|---|---|
+| Run custom code inside an existing process (a browser payload, a game script) | Code execution in that process | **In principle yes**, given a vulnerability |
+| Run separate homebrew apps (NRO files) from the SD card | SD filesystem access, a loader that accepts unsigned code, and usually kernel patches | **No** |
+
+The captive-portal applet illustrates the gap:
+
+- Its filesystem permission is **SystemSaveData**, not the SD card, so it cannot browse or read `sd:/`.
+- It has **`ldr:ro`** (read-only loader) and **`ns:web`**, not `ldr:s` or `pm`, so it cannot start a new process.
+- It has no kernel access, so it cannot patch the loader or the filesystem checks.
+
+That is why `ns2jb` can run homebrew on Switch 2: it reaches **sysmodule** code execution, including the `fs` sysmodule, and can launch a custom process with an ordinary sysmodule's NPDM. A browser bug alone does not reach that. Reaching NRO homebrew from a browser compromise would need a second, separate sysmodule or kernel exploit.
+
+So "userland is fine" is true only for the first meaning. For the second meaning, the browser is step 1 of 3, and steps 2 and 3 have no public implementation on Mariko 23.0.1.
+
 ## Other candidate triggers examined
 
 | Candidate | What it actually gives | Why it does not close stage 1 |
