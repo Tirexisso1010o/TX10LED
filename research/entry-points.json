@@ -6,12 +6,16 @@
     "family": "Nintendo Switch OLED",
     "soc": "NVIDIA Tegra X1+ (Mariko)",
     "firmware_reported": "23.0.1",
-    "firmware_verified": false,
+    "firmware_verified": true,
     "manually_confirmed": true,
     "manually_confirmed_at": "2026-10-26",
     "serial_prefix": "XTJ",
     "modification_history": "none reported",
-    "note": "Owner-confirmed manually on 2026-10-26; not independently observed. See research/hardware-observations/2026-10-26-manual.json and research/compatibility-matrix.json for the canonical target record. A PTP GetDeviceInfo observation is pending. Do not update the firmware to verify it."
+    "ptp_observed_at": "2026-10-26",
+    "ptp_device_version": "23.0.1",
+    "ptp_operations_count": 10,
+    "ptp_session_opened": false,
+    "note": "Owner-confirmed manually on 2026-10-26. PTP GetDeviceInfo on the same date observed firmware 23.0.1 and serial prefix XTJ*** with 10 operations and no session. The DeviceInfo model string is generic; the HEG-001 model number and no-modification history remain owner-reported. See research/hardware-observations/2026-10-26-manual.json, research/hardware-observations/2026-10-26-ptp.json, and research/compatibility-matrix.json. Do not update the firmware to verify it."
   },
   "summary": {
     "question": "Is there a publicly documented, reproducible, software-only entry point to Atmosphère on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",

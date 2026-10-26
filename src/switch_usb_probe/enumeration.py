@@ -1,8 +1,8 @@
 """Read-only USB enumeration backends for macOS.
 
 The primary backend is ``system_profiler``.  ``ioreg`` is a fallback when the
-primary command fails.  Neither backend opens a USB device or claims an
-interface.
+primary command fails, times out, or returns an empty device list.  Neither
+backend opens a USB device or claims an interface.
 """
 
 from __future__ import annotations
@@ -255,10 +255,14 @@ def enumerate_usb_devices(
         try:
             raw = command_runner(_SYSTEM_PROFILER_ARGS, timeout_s)
             devices = parse_system_profiler_json(raw)
-            return EnumerationResult(
-                devices=devices,
-                backend="system_profiler",
-                warnings=tuple(warnings),
+            if devices or source == "system_profiler":
+                return EnumerationResult(
+                    devices=devices,
+                    backend="system_profiler",
+                    warnings=tuple(warnings),
+                )
+            warnings.append(
+                "system_profiler returned no devices; falling back to ioreg"
             )
         except (OperationTimeout, EnumerationError) as exc:
             if source == "system_profiler":

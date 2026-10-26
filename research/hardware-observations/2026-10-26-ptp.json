@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-26-ptp",
+  "observed_at": "2026-10-26",
+  "observed_at_precision": "date",
+  "observation_type": "ptp-getdeviceinfo",
+  "operator": "switch-usb-probe",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": "23.0.1",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; PTP does not detect modifications"
+  },
+  "connection": {
+    "mode": "copy-to-pc-via-usb",
+    "cable": "USB-C; enumerated successfully",
+    "port": "not recorded",
+    "host_os": "macOS",
+    "host_arch": "arm64"
+  },
+  "usb": {
+    "vid_pid": "057e:201d",
+    "backend": "ioreg",
+    "device_name": "Nintendo Switch",
+    "location_id": "0x01100000"
+  },
+  "commands": [
+    {
+      "command": ".venv/bin/python -m switch_usb_probe ptp-info --source ioreg --confirm",
+      "exit_code": 0,
+      "result": "Manufacturer Nintendo; Model Nintendo Switch; Device version 23.0.1; Serial prefix XTJ***; Operations supported 10; Session opened no."
+    }
+  ],
+  "ptp": {
+    "opened": true,
+    "session_opened": false,
+    "manufacturer": "Nintendo",
+    "model": "Nintendo Switch",
+    "device_version": "23.0.1",
+    "serial_prefix": "XTJ",
+    "operations_count": 10
+  },
+  "interpretation": "The target OLED enumerated as 057e:201d in Copy to PC via USB mode and answered PTP GetDeviceInfo without opening a session. The observed firmware and serial prefix match the owner's manual confirmation. The DeviceInfo model string is generic and does not distinguish OLED from LCD.",
+  "limitations": [
+    "PTP DeviceInfo is what the console reports; modified firmware could spoof it.",
+    "The model number HEG-001 and the no-modification history remain owner-reported; PTP does not establish either.",
+    "The observation does not prove integrity, boot state, exploitability, or CFW access.",
+    "This is one console and one observation, not a general OLED compatibility proof."
+  ],
+  "redactions": [
+    "Serial number truncated to a three-character prefix."
+  ]
+}

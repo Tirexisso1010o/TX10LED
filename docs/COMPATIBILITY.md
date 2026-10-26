@@ -4,15 +4,15 @@
 
 | Field | Value | Evidence status |
 |---|---|---|
-| Model | Nintendo Switch OLED, `HEG-001` | Hardware family **VERIFIED**; this unit owner-confirmed |
+| Model | Nintendo Switch OLED, `HEG-001` | Hardware family **VERIFIED**; this unit owner-confirmed; PTP model string is generic |
 | SoC | NVIDIA Tegra X1+ (Mariko), `ODNX10-A1` motherboard | **VERIFIED** |
-| Firmware | 23.0.1 | **PARTIALLY VERIFIED** — read from Settings by the owner; not independently observed |
-| Serial prefix | `XTJ` (Japan) | Owner-reported; three characters only |
-| Modification history | None reported | Owner-reported |
+| Firmware | 23.0.1 | **VERIFIED** via PTP `GetDeviceInfo` on 2026-10-26 |
+| Serial prefix | `XTJ` (Japan) | **VERIFIED** via PTP; three characters only |
+| Modification history | None reported | Owner-reported; PTP cannot establish it |
 | Preferred CFW | Atmosphère | User preference |
 | Entry point | No public software-only path to Atmosphère; closest lead is a userland/sysmodule chain (`ns2jb`) | **DISPROVEN** for the target; **PARTIALLY VERIFIED** for the primitive |
 
-The model, firmware, serial prefix, and no-modification history were manually confirmed by the owner on 2026-10-26. They are owner-reported, not independently observed; a PTP observation is pending. The compatibility conclusion does not depend on the exact unit being on 23.0.1: the OLED hardware family is the limiting factor.
+The owner manually confirmed the model, firmware, serial prefix, and no-modification history on 2026-10-26. PTP `GetDeviceInfo` on the same date independently observed firmware `23.0.1` and serial prefix `XTJ`, with 10 operations and no session opened. The DeviceInfo model string is generic (`Nintendo Switch`), so the exact `HEG-001` model number and the no-modification history remain owner-reported. PTP does not distinguish OLED from LCD or prove integrity. The compatibility conclusion does not depend on the exact unit being on 23.0.1: the OLED hardware family is the limiting factor.
 
 ## Two different questions
 
@@ -48,7 +48,9 @@ Atmosphère's release notes describe support for the firmware's kernel, system m
 | E-006 | The maintained guide routes patched/Mariko consoles to a modchip. | **VERIFIED** | NH Switch Guide, Getting Started and Modchip pages |
 | E-007 | A publicly documented, reproducible software-only OLED entry point exists. | **DISPROVEN** within reviewed docs | Absence of any such method; explicit modchip guidance |
 | E-008 | The documented route requires a hardware modchip. | **VERIFIED** | NH Switch Guide, Modchip |
-| E-009 | This unit is an OLED on 23.0.1, with no modification history reported. | **PARTIALLY VERIFIED** | Owner manual confirmation; PTP pending |
+| E-009 | This unit is an OLED on 23.0.1, with no modification history reported. | **PARTIALLY VERIFIED** | PTP observed 23.0.1 and serial prefix XTJ; model and mod history owner-reported |
+| E-012 | The target OLED enumerates as 0x057e:0x201d and answers PTP GetDeviceInfo. | **VERIFIED** | Hardware observation, 2026-10-26 |
+| E-037 | The target console reports firmware 23.0.1 and serial prefix XTJ through PTP, without a session. | **VERIFIED** | `ptp-info --source ioreg --confirm`, 2026-10-26 |
 | E-016 | An undisclosed software-only exploit exists. | **UNKNOWN** | Not establishable from public sources |
 | E-017 | Firmware support does not imply an entry point. | **VERIFIED** | Derived from the sources above |
 

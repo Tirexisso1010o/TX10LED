@@ -67,7 +67,7 @@ ioreg -a -p IOUSB -l -w 0
 
 `ioreg` emits an XML property list. The parser walks `IORegistryEntryChildren` recursively and keeps dictionaries that contain both `idVendor` and `idProduct`. It reads `USB Product Name`, `USB Vendor Name`, `USB Serial Number`, `locationID`, and `bDeviceClass` when available.
 
-The fallback is used when `system_profiler` fails or times out. An empty but successful `system_profiler` result is treated as a valid empty bus, not as a reason to retry.
+The fallback is used when `system_profiler` fails, times out, or returns an empty device list. The empty-result fallback was added after macOS 26.3 returned no devices while `ioreg` still saw the connected console; a warning records that the fallback ran.
 
 ### What enumeration does not do
 
@@ -303,7 +303,8 @@ No real hardware is required for CI. Until the test suite exists, `python3 scrip
 
 ## Limitations
 
-- OLED enumeration as `057e:201d` is only partially verified until hardware validation is recorded.
+- OLED enumeration as `057e:201d` and `GetDeviceInfo` were observed on the target console on 2026-10-26 (10 operations, no session). This is one console and one observation, not a general OLED compatibility proof.
+- On the observation host, `system_profiler SPUSBDataType` returned no devices while `ioreg` saw the console. The `auto` source now falls back to `ioreg` when `system_profiler` returns an empty list.
 - PTP behavior may vary by firmware revision.
 - `ptpcamerad` behavior is a macOS implementation detail and can change.
 - A PTP response can be spoofed by modified firmware; it is an observation, not an integrity attestation.

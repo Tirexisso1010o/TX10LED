@@ -7,7 +7,7 @@ This document records what the research and tooling cannot establish. It is part
 - **Public sources only.** The conclusion is based on public releases, documentation, source code, and maintained guides reviewed on 2026-10-26. It is not an audit of private research, unpublished exploits, or every firmware binary.
 - **No proof of impossibility.** "No publicly documented software-only path" is not the same as "no software-only path can exist". The ledger labels the existence of an undisclosed exploit `UNKNOWN`.
 - **Hardware family, not a laboratory teardown.** The OLED is identified as Mariko/Tegra X1+ from public hardware documentation. This project has not opened the console or inspected its board.
-- **Owner-confirmed target identity.** The model `HEG-001`, firmware `23.0.1`, serial prefix `XTJ`, and no-modification history were manually confirmed by the owner on 2026-10-26. They are owner-reported, not independently observed; a PTP observation is pending.
+- **Partially observed target identity.** The owner manually confirmed the model `HEG-001`, firmware `23.0.1`, serial prefix `XTJ`, and no-modification history on 2026-10-26. PTP `GetDeviceInfo` on the same date observed firmware `23.0.1` and serial prefix `XTJ***`. The `HEG-001` model number and the no-modification history remain owner-reported; PTP reports a generic `Nintendo Switch` model and cannot detect a modchip.
 - **No exploit development.** The project does not attempt to find, develop, or validate a new vulnerability. It records what is publicly documented.
 
 ## Firmware and release limitations
@@ -30,7 +30,7 @@ This document records what the research and tooling cannot establish. It is part
 
 ## USB limitations
 
-- The OLED's enumeration as `057e:201d` is only **partially verified** until a real hardware observation is recorded.
+- The target OLED's enumeration as `057e:201d` and its `GetDeviceInfo` response were observed on 2026-10-26. That is one console and one observation, not a general OLED compatibility proof. `system_profiler` returned no devices on that host; the tool fell back to `ioreg`.
 - PTP behavior is documented by reverse engineering and can vary by firmware revision.
 - The PTP interface may be claimed by `ptpcamerad` or another macOS process. The tool reports a busy device rather than killing the process.
 - A PTP `DeviceInfo` response can be spoofed by modified firmware. It is an observation, not an integrity attestation.
@@ -56,9 +56,8 @@ This document records what the research and tooling cannot establish. It is part
 
 ## What would improve confidence
 
-- A redacted hardware observation from the target OLED in PTP mode, recording the model, firmware display version, and serial prefix.
-- A manual confirmation of the model and firmware from the console settings.
-- A maintained source that documents an OLED-specific PTP product ID or behavior.
+- A maintained source that documents an OLED-specific PTP product ID or behavior, or a way for `DeviceInfo` to distinguish OLED from LCD.
+- Independent reproduction of the PTP observation on a second OLED, or a maintained note that the `DeviceInfo` model string is always generic.
 - Independent reproduction of the compatibility conclusion on another OLED.
 - A packaged, reproducible Switch 1 version of the `ns2jb` chain, with the model and firmware identified.
 - An independent OLED/Mariko 23.0.1 test of a userland/sysmodule chain.

@@ -177,3 +177,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Leave the identity `UNVERIFIED` until PTP; mark it `VERIFIED` because the owner read it from the console.
 
 **Consequences:** `E-009`, matrix row `C-011`, `docs/COMPATIBILITY.md`, the README summary, and `research/known-limitations.md` now say `PARTIALLY VERIFIED` with the limitation stated. The observation is recorded in `research/hardware-observations/2026-10-26-manual.json`. A PTP observation is still pending and would strengthen, but not prove, exploitability or integrity.
+
+## 2026-10-26 — Record the PTP identity observation and the empty-`system_profiler` fallback
+
+**Decision:** Record the read-only PTP `GetDeviceInfo` observation as evidence (E-037) and mark the target's PTP enumeration and identity query `VERIFIED`. Keep the overall target identity `PARTIALLY VERIFIED`, because `DeviceInfo` reports the generic model `Nintendo Switch` and cannot establish `HEG-001`, OLED-versus-LCD hardware, or the absence of a modchip. Change `auto` enumeration to fall back to `ioreg` when `system_profiler` succeeds but returns no devices.
+
+**Reason:** The console enumerated as `057e:201d` and answered `GetDeviceInfo` without opening a session, reporting firmware `23.0.1`, serial prefix `XTJ***`, and 10 operations. That is direct tool observation of the firmware and serial prefix, so the earlier `firmware_verified: false` gate is satisfied for those fields. It is still not a model or integrity attestation. On the same host, `system_profiler SPUSBDataType` returned an empty list while `ioreg` saw the console, so treating an empty result as a valid empty bus made the tool miss a connected device.
+
+**Alternatives considered:** Mark the whole target `VERIFIED` (rejected: the model and modchip history remain owner-reported); keep `firmware_verified: false` (rejected: contradicts the observation); leave the enumeration behavior unchanged (rejected: it hides a real device on this macOS version).
+
+**Consequences:** `E-009`, `E-010`, `E-012`, `E-037`, matrix rows `C-008`, `C-011`, `U-001`, the target record, `docs/COMPATIBILITY.md`, `docs/USB_INTEGRATION.md`, the README, `research/known-limitations.md`, and `research/CHECKPOINT.md` are updated. The observation is recorded in `research/hardware-observations/2026-10-26-ptp.json` with the serial truncated to a three-character prefix. The entry-point conclusion is unchanged, and no console state was modified.

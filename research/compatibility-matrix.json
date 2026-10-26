@@ -6,14 +6,18 @@
     "family": "Nintendo Switch OLED",
     "soc": "NVIDIA Tegra X1+ (Mariko), ODNX10-A1 motherboard",
     "firmware_reported": "23.0.1",
-    "firmware_verified": false,
+    "firmware_verified": true,
     "user_reported": true,
     "manually_confirmed": true,
     "manually_confirmed_at": "2026-10-26",
     "serial_prefix": "XTJ",
     "modification_history": "none reported",
     "identity_status": "PARTIALLY VERIFIED",
-    "notes": "The owner manually confirmed the model, firmware, serial prefix, and no modification history on 2026-10-26. The firmware was read from System Settings, not updated. This is owner-reported and not independently observed; a PTP GetDeviceInfo observation is still pending. Do not update the firmware to verify it."
+    "ptp_observed_at": "2026-10-26",
+    "ptp_device_version": "23.0.1",
+    "ptp_operations_count": 10,
+    "ptp_session_opened": false,
+    "notes": "The owner manually confirmed the model, firmware, serial prefix, and no modification history on 2026-10-26. PTP GetDeviceInfo on the same date observed firmware 23.0.1 and serial prefix XTJ*** with 10 operations and no session. The DeviceInfo model string is generic ('Nintendo Switch'), so the HEG-001 model number and no-modification history remain owner-reported. PTP does not prove OLED-versus-LCD hardware, integrity, or exploitability. Do not update the firmware to verify it."
   },
   "conclusion": {
     "claim": "A publicly documented, reproducible software-only path to Atmosphère exists for an unmodified Switch OLED on firmware 23.0.1.",
@@ -141,14 +145,15 @@
       "component": "PTP DeviceInfo identity query",
       "version": "PTP operation 0x1001",
       "dimension": "usb",
-      "status": "PARTIALLY VERIFIED",
+      "status": "VERIFIED",
       "applies_to_target": true,
       "in_scope": true,
       "evidence": [
         "E-010",
-        "E-012"
+        "E-012",
+        "E-037"
       ],
-      "notes": "Protocol behavior is documented; OLED hardware observation is pending. This is read-only and does not establish exploitability."
+      "notes": "Observed on the target OLED on 2026-10-26: enumerated as 057e:201d, answered GetDeviceInfo without a session, 10 operations supported. This is read-only and does not establish exploitability or integrity."
     },
     {
       "id": "C-009",
@@ -186,9 +191,10 @@
       "applies_to_target": true,
       "in_scope": true,
       "evidence": [
-        "E-009"
+        "E-009",
+        "E-037"
       ],
-      "notes": "Owner-confirmed manually on 2026-10-26: HEG-001, firmware 23.0.1, serial prefix XTJ, no modification history reported. Not independently observed; PTP DeviceInfo observation pending. No state-changing operation is currently authorized."
+      "notes": "PTP observed firmware 23.0.1 and serial prefix XTJ on 2026-10-26. The HEG-001 model number and no-modification history remain owner-reported. PTP does not distinguish OLED from LCD or prove integrity. No state-changing operation is currently authorized."
     },
     {
       "id": "C-012",
@@ -296,11 +302,12 @@
       "mode": "switch_ptp",
       "vid_pid": "057e:201d",
       "label": "Nintendo Switch / Switch Lite PTP album mode",
-      "status": "PARTIALLY VERIFIED",
+      "status": "VERIFIED",
       "target_model": true,
       "evidence": [
         "E-011",
-        "E-012"
+        "E-012",
+        "E-037"
       ],
       "can_establish": [
         "USB presence and product identity",
@@ -309,7 +316,8 @@
       "cannot_establish": [
         "Exploitability or entry-point availability",
         "Boot state, CFW access, or NAND contents"
-      ]
+      ],
+      "notes": "Observed on the target OLED on 2026-10-26: 057e:201d, DeviceInfo answered without a session, 10 operations. Identity only; not integrity or exploitability."
     },
     {
       "id": "U-002",

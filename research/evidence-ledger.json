@@ -121,11 +121,11 @@
       "id": "E-009",
       "claim": "The target console is a Nintendo Switch OLED (HEG-001) running firmware 23.0.1, with no prior opening or modchip reported.",
       "status": "PARTIALLY VERIFIED",
-      "confidence": "medium",
-      "scope": "Owner-confirmed target identity.",
+      "confidence": "high",
+      "scope": "Target identity; firmware and serial prefix observed via PTP.",
       "sources": [],
-      "evidence": "On 2026-10-26 the owner manually confirmed the model as HEG-001 and the firmware as 23.0.1 from the console's System Settings, reported the serial prefix XTJ, and reported no prior opening or modchip. The firmware was read, not updated. See research/hardware-observations/2026-10-26-manual.json.",
-      "limitations": "Owner-reported and not independently observed or tool-attested. A PTP GetDeviceInfo observation is pending. Manual confirmation does not establish exploitability, boot state, or integrity.",
+      "evidence": "The owner manually confirmed HEG-001, firmware 23.0.1, serial prefix XTJ, and no modification history on 2026-10-26. PTP GetDeviceInfo on the same date reported Device version 23.0.1 and serial prefix XTJ***, with 10 operations and no session. See research/hardware-observations/2026-10-26-manual.json and research/hardware-observations/2026-10-26-ptp.json.",
+      "limitations": "PTP confirms what the console reports, not the exact model number (DeviceInfo says 'Nintendo Switch'), OLED-versus-LCD hardware, no-modchip status, integrity, or exploitability. The HEG-001 model number and modification history remain owner-reported.",
       "last_reviewed": "2026-10-26"
     },
     {
@@ -138,7 +138,7 @@
         "switchbrew-capmtp"
       ],
       "evidence": "Switchbrew states that DeviceInfo Serial Number is set to the output of GetSerialNumber and Device Version is set to SystemVersion DisplayVersion.",
-      "limitations": "The documentation is reverse-engineered and does not guarantee behavior on every firmware revision. Hardware validation on this OLED is still pending.",
+      "limitations": "The documentation is reverse-engineered and does not guarantee behavior on every firmware revision. Hardware validation on this OLED is recorded in E-037.",
       "last_reviewed": "2026-10-26"
     },
     {
@@ -158,16 +158,16 @@
     {
       "id": "E-012",
       "claim": "A Switch OLED in Copy to PC via USB mode enumerates as 0x057e:0x201d and answers PTP GetDeviceInfo.",
-      "status": "PARTIALLY VERIFIED",
-      "confidence": "medium",
-      "scope": "OLED hardware behavior; indirect evidence only.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "OLED hardware behavior; observed on the target console.",
       "sources": [
         "libmtp-device-table",
         "libmtp-bug-1893",
         "switchbrew-capmtp"
       ],
-      "evidence": "The OLED uses the same Switch platform and the libmtp table groups Switch / Switch Lite under 0x057e:0x201d. Switchbrew documents the PTP DeviceInfo mapping. No OLED hardware observation has been recorded in this project yet.",
-      "limitations": "This remains unconfirmed on the target console. The opt-in ptp-info command exists to test it without modifying the console.",
+      "evidence": "On 2026-10-26 the target OLED enumerated as 0x057e:0x201d in Copy to PC via USB mode and answered PTP GetDeviceInfo without opening a session. DeviceInfo reported Manufacturer Nintendo, Model Nintendo Switch, Device version 23.0.1, serial prefix XTJ***, and 10 operations. See research/hardware-observations/2026-10-26-ptp.json.",
+      "limitations": "PTP DeviceInfo is what the console reports; modified firmware could spoof it. The model string is generic and does not distinguish OLED from LCD. This is one console and one observation, not a general OLED compatibility proof.",
       "last_reviewed": "2026-10-26"
     },
     {
@@ -499,6 +499,20 @@
       ],
       "evidence": "The reviewed flaw list's Games section documents game-level infoleaks and anti-cheat issues, not a public game-save or cartridge code-execution chain on 23.0.1. No public chain was found.",
       "limitations": "This is an absence-of-documented-method finding. Save editing and cartridge data manipulation are not code execution. The flaw list is not exhaustive.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-037",
+      "claim": "The target console reports firmware 23.0.1 and serial prefix XTJ through PTP GetDeviceInfo, without opening a session.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Target console identity observation on 2026-10-26.",
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-device-table"
+      ],
+      "evidence": "Ran `.venv/bin/python -m switch_usb_probe ptp-info --source ioreg --confirm` on 2026-10-26 with the console in Copy to PC via USB mode. The device enumerated as 057e:201d. DeviceInfo reported Manufacturer Nintendo, Model Nintendo Switch, Device version 23.0.1, serial prefix XTJ***, and 10 supported operations. Session opened: no. See research/hardware-observations/2026-10-26-ptp.json.",
+      "limitations": "PTP DeviceInfo is what the console reports and can be spoofed by modified firmware. It does not establish the HEG-001 model number, OLED-versus-LCD hardware, no-modchip status, integrity, boot state, or exploitability.",
       "last_reviewed": "2026-10-26"
     }
   ]

@@ -64,7 +64,7 @@ KNOWN_DEVICES: dict[tuple[int, int], KnownDevice] = {
         notes=(
             "Copy to PC via USB mode. Only PTP operations 0x1001-0x100A are documented.",
             "GetDeviceInfo can report model, system display version, and serial prefix.",
-            "OLED enumeration is partially verified until a hardware observation is recorded.",
+            "Observed on the target OLED on 2026-10-26; one console, not a general proof.",
         ),
         safety="Read-only GetDeviceInfo is supported. No writes, object transfer, or payloads.",
     ),

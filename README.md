@@ -17,7 +17,8 @@ This repository does not contain a working exploit, a payload, or a flashing too
 | Is a modchip the documented route? | Yes, but it is a hardware modification and out of scope. | **VERIFIED** |
 | Is there a real software-only userland/sysmodule chain? | Yes: `ns2jb`, but it is Switch 2-packaged, Switch 1-unpackaged, and not a path to Atmosphère. | **PARTIALLY VERIFIED** |
 | Could an undisclosed software-only method exist? | Cannot be established from public sources. | **UNKNOWN** |
-| Is this exact console an OLED on 23.0.1, and is it unmodified? | Owner-confirmed from Settings; no modification history reported. Not independently observed. | **PARTIALLY VERIFIED** |
+| Is this exact console an OLED on 23.0.1, and is it unmodified? | PTP observed 23.0.1 and serial prefix `XTJ`; exact model and no-mod history owner-reported. | **PARTIALLY VERIFIED** |
+| Does the OLED enumerate as `057e:201d` and answer PTP `GetDeviceInfo`? | Yes, observed 2026-10-26; 10 operations, no session opened. | **VERIFIED** |
 
 The important distinction is between **firmware support** and **entry-point support**. Atmosphère and hekate can support the firmware's system modules and boot process, while the console's bootROM still refuses to run an unsigned payload.
 
@@ -44,7 +45,7 @@ The detailed matrix is in [`docs/ENTRY-POINTS.md`](docs/ENTRY-POINTS.md) and [`r
 | BootROM / RCM | Fusée Gelée is patched on Mariko; RCM enumeration does not accept a payload. |
 | Recovery / Maintenance mode | Documented functions are update and initialize/format; no code execution. |
 | Browser / WebKit applets | Historical PegaSwitch targets 1.0.0/Fake News; no public 23.0.1 chain found. |
-| PTP / MTP USB album mode | Identity and media transfer only; no shell, ADB, or general-purpose control. |
+| PTP / MTP USB album mode | Observed as `057e:201d`; `GetDeviceInfo` answered without a session. Identity and media transfer only; no shell, ADB, or general-purpose control. |
 | Local wireless (`ldn`) | CVE-2026-82079 is fixed in 23.0.0; the target is reported on 23.0.1. |
 | Bluetooth | Public stack overflows are fixed before 23.0.1; no public current chain found. |
 | Game saves / cartridges | No public code-execution chain on 23.0.1 found; save editing is not code execution. |
@@ -205,7 +206,7 @@ src/switch_usb_probe/       Read-only USB inspection package
 scripts/validate_research.py Research data validator
 ```
 
-Validation and rendering scripts beyond the validator, and the mocked USB test suite, are planned. The research JSON is currently validated with `python3 scripts/validate_research.py`; the CLI has been exercised with `doctor`, `classify`, and `compat`.
+Validation and rendering scripts beyond the validator, and the mocked USB test suite, are planned. The research JSON is currently validated with `python3 scripts/validate_research.py`; the CLI has been exercised with `doctor`, `list`, `classify`, `compat`, and a read-only `ptp-info` identity probe.
 
 ## Documentation
 

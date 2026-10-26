@@ -8,8 +8,8 @@ Last updated: 2026-10-26
 - Repository: `Tirexisso1010o/TX10LED`, branch `main`, pre-existing commit `8e828a8`.
 - Target: Nintendo Switch OLED, owner-confirmed `HEG-001`, firmware `23.0.1`, serial prefix `XTJ`, no modification history reported.
 - Console state: unchanged by this project.
-- Hardware validation: **pending**. No USB observation has been recorded; the target identity is owner-confirmed only.
-- Target identity: **PARTIALLY VERIFIED**. Owner-confirmed manually on 2026-10-26; not independently observed.
+- Hardware validation: **PTP identity observation recorded** on 2026-10-26. The console enumerated as `057e:201d` and answered `GetDeviceInfo` without a session.
+- Target identity: **PARTIALLY VERIFIED**. Firmware 23.0.1 and serial prefix XTJ are PTP-observed; the HEG-001 model number and no-modification history are owner-reported.
 - Publication: **pushed** to `origin/main` on 2026-10-26; see `git log` for the latest commit.
 - Focus: potential software-only jailbreak research and the read-only USB tool.
 
@@ -27,7 +27,7 @@ Last updated: 2026-10-26
 
 ## Completed work
 
-- Source register (30 sources), evidence ledger (E-001–E-036), and compatibility matrix.
+- Source register (30 sources), evidence ledger (E-001–E-037), and compatibility matrix.
 - Detailed entry-point matrix (`research/entry-points.json`) covering 10 surfaces and 5 public leads.
 - Readable entry-point analysis (`docs/ENTRY-POINTS.md`).
 - README framing the project as a potential-jailbreak investigation plus a read-only USB tool.
@@ -38,6 +38,8 @@ Last updated: 2026-10-26
 - Removed the dead `render_research.py` permission rule from `opencode.json`; deny rules remain last in the ordered list.
 - Read-only USB inspection package and CLI.
 - Manual target observation (`research/hardware-observations/2026-10-26-manual.json`): HEG-001, firmware 23.0.1, serial prefix XTJ, no modification history reported.
+- PTP target observation (`research/hardware-observations/2026-10-26-ptp.json`): `057e:201d`, firmware 23.0.1, serial prefix XTJ, 10 operations, no session.
+- Enumeration fallback fix: `system_profiler` returned no devices on macOS 26.3 while `ioreg` saw the console; `auto` now falls back on an empty result.
 - Repository-local `.venv` with `pyusb` 1.3.1 installed via `pip install -e '.[ptp]'`.
 - `ptp-info --dry-run` verified: it exits with code `2` and opens nothing when no PTP device is connected.
 
@@ -51,36 +53,44 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 30 sources, 36 evidence entries, 10 entry-point surfaces, 5 leads, 18 matrix rows, 5 USB modes.
+Research data OK: 30 sources, 37 evidence entries, 10 entry-point surfaces, 5 leads, 18 matrix rows, 5 USB modes.
 ```
 
-`doctor` reports `pyusb OK`, `libusb OK`, `ptpcamerad not running`, and 0 connected USB devices.
+PTP observation:
+
+```text
+Manufacturer: Nintendo
+Model: Nintendo Switch
+Device version: 23.0.1
+Serial prefix: XTJ***
+Operations supported: 10
+Session opened: no
+```
+
+`doctor` reports `pyusb OK`, `libusb OK`, `ptpcamerad not running`, and 1 device via `ioreg` with a `system_profiler` empty-result warning.
 
 ## Pending approvals
 
-- Open the PTP device for a read-only `GetDeviceInfo` probe after the dry run confirms the selected device.
 - Any console state change, firmware update, RCM entry, or payload attempt requires explicit approval and is currently not authorized.
 
 ## Pending work
 
-- USB test suite and fixtures.
+- USB test suite and fixtures, including a regression test for the empty-`system_profiler` fallback.
 - Generated Markdown renderer and CI workflow.
-- PTP hardware validation once the console is connected and its identity is confirmed.
+- PTP media transfer and file operations are out of scope; the identity probe is complete.
 
 ## Unresolved questions
 
-- Does PTP `DeviceInfo` agree with the owner-reported model and firmware?
-- Does the OLED enumerate as `057e:201d` in Copy to PC via USB mode?
-- Does the OLED answer PTP `GetDeviceInfo` without `OpenSession`, or does it require `--allow-session`?
+- Does `DeviceInfo` ever distinguish OLED from LCD hardware, or is the model string always generic?
 - What Switch 1 model and firmware did the `ns2jb` author test, and is a Switch 1 package planned?
 - Is there an independent OLED/Mariko 23.0.1 reproduction of any userland/sysmodule chain?
 
 ## Next safe action
 
-The target identity is owner-confirmed. Next, connect the console in PTP mode and run the read-only identity probe:
+The PTP identity observation is complete and recorded. The console is unchanged. Continue monitoring public sources for:
 
-1. Confirm the console is in **Copy to PC via USB** mode with the screen open.
-2. Run `.venv/bin/python -m switch_usb_probe ptp-info --dry-run`.
-3. After the dry run confirms the selected device, run `.venv/bin/python -m switch_usb_probe ptp-info --confirm`.
+1. a packaged Switch 1 version of the `ns2jb` chain with a stated model and firmware;
+2. a public chain connecting a userland/sysmodule primitive to kernel or bootROM access on Mariko;
+3. a public 23.0.1-specific browser, local-wireless, or Bluetooth chain.
 
-The `.venv` and `pyusb` install was approved and completed. Do not update firmware, enter RCM, inject a payload, or change console state.
+Do not update firmware, enter RCM, inject a payload, or change console state.
