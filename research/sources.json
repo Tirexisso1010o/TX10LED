@@ -617,6 +617,17 @@
       "snapshot": "Contains the craft harness, tree-visualisation tool, and two small reproducer files, bad.webp (236 bytes) and nso.webp (350 bytes). The README states 'A POC for CVE-2023-4863. NOT an exploit.'",
       "license": "Public proof-of-concept repository; cited as a test corpus.",
       "notes": "Used locally to validate the trigger. The reproducer files are not committed to this repository."
+    },
+    {
+      "id": "nintendo-support-2802-9998",
+      "title": "Nintendo Support: Error Code 2802-9998",
+      "publisher": "Nintendo",
+      "kind": "vendor-documentation",
+      "url": "https://en-americas-support.nintendo.com/app/answers/detail/a_id/27822/~/error-code%3A-2802-9998",
+      "retrieved_at": "2026-10-27",
+      "snapshot": "States that error 2802-9998 may occur when a captured video file has become corrupted, or when trying to view an unsupported video file on Nintendo Switch.",
+      "license": "Nintendo support documentation; quoted as vendor documentation.",
+      "notes": "Indicates that the 2802-xxxx family covers Album media access errors. The observed code 2802-9999 is a sibling."
     }
   ]
 }

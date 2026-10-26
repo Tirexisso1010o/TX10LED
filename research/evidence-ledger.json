@@ -988,6 +988,19 @@
       "evidence": "The console mounted the image and reported the same capacity as the control. The image contained a single root-level TEST.TXT entry whose first cluster is 0x0FFFFFF0. Mounting validates the BPB and root directory; it does not require opening the file, so this result is not evidence that the bounds check is missing.",
       "limitations": "The file was not opened, so the entry may never have been used. This is a negative on the test design, not on the driver.",
       "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-072",
+      "claim": "Setting the Nintendo/Album directory entry's first cluster to 0x0FFFFFF0 causes the console's Album applet to hang and then report error 2802-9999.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Owner observation, one console, 2026-10-27.",
+      "sources": [
+        "nintendo-support-2802-9998"
+      ],
+      "evidence": "The album_dir_oob image placed a Nintendo directory at cluster 3 and an Album directory entry whose first cluster is 0x0FFFFFF0. On insertion and opening the Album applet, the console hung and then displayed error code 2802-9999. The control image mounted normally.",
+      "limitations": "Whether the applet crashed or displayed a handled error is not yet established, and the console's recovery state is unconfirmed. 2802-9999 is a generic member of the album/SD error family. No crash report has been inspected.",
+      "last_reviewed": "2026-10-27"
     }
   ]
 }
