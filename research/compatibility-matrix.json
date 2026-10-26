@@ -24,7 +24,7 @@
     "claim_status": "DISPROVEN",
     "software_only_path_documented": false,
     "scope": "Reviewed public documentation as of 2026-10-26.",
-    "summary": "No publicly documented, reproducible software-only path to Atmosphère was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosphère 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence.",
+    "summary": "No publicly documented, reproducible software-only path to Atmosphère was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosphère 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. GameShare (the splay applet) is recorded as a newly reviewed receiver-side surface: a documented remote-input path with no public vulnerability and an applet-level capability ceiling.",
     "undisclosed_exploit_status": "UNKNOWN",
     "evidence": [
       "E-007",
@@ -33,14 +33,16 @@
       "E-021",
       "E-022",
       "E-032",
-      "E-033"
+      "E-033",
+      "E-043",
+      "E-048"
     ]
   },
   "entry_point_analysis": {
     "file": "research/entry-points.json",
     "last_reviewed": "2026-10-26",
-    "surfaces_reviewed": 10,
-    "software_only_surfaces": 9,
+    "surfaces_reviewed": 11,
+    "software_only_surfaces": 10,
     "public_software_only_chain_on_target": false,
     "documented_route": "Hardware modchip (out of scope)",
     "closest_public_lead": "L-001",
@@ -294,6 +296,65 @@
         "E-018"
       ],
       "notes": "Stock PTP exposes identity and media operations only. It does not expose a shell, ADB, or general-purpose control interface."
+    },
+    {
+      "id": "C-019",
+      "component": "GameShare / splay receiver surface",
+      "version": "splay introduced in 20.0.0; present on Switch 1 23.0.1",
+      "dimension": "Entry point",
+      "status": "UNKNOWN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-038",
+        "E-039",
+        "E-041",
+        "E-042",
+        "E-043"
+      ],
+      "notes": "The target can act as a GameShare receiver, so a remote host can send data that splay parses. No public vulnerability or exploit was found. A compromise would be applet-level userland, not kernel or bootROM."
+    },
+    {
+      "id": "C-020",
+      "component": "GameShare host requirement",
+      "version": "Switch 2 host only; Switch 1 receivers local-wireless only",
+      "dimension": "Prerequisite",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-040"
+      ],
+      "notes": "Nintendo documents that only a Switch 2 can host and that the feature cannot be used between two Switch 1/OLED/Lite systems. This bounds the surface to proximity and to attackers who control a Switch 2 or can spoof a host."
+    },
+    {
+      "id": "C-021",
+      "component": "ns2jb Switch 1 packaging",
+      "version": "Chain tested on Switch 1; package is Switch 2 only",
+      "dimension": "Entry point",
+      "status": "UNVERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-045",
+        "E-046",
+        "E-034"
+      ],
+      "notes": "The author says the chain was tested on Switch 1 but not packaged. Model and firmware are unstated, so this does not establish OLED/Mariko 23.0.1 applicability."
+    },
+    {
+      "id": "C-022",
+      "component": "Gezine universal userland exploit claim",
+      "version": "Claimed Switch 1/2, all firmware; unreleased",
+      "dimension": "Entry point",
+      "status": "UNVERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-048",
+        "E-049"
+      ],
+      "notes": "A userland claim with no public package, technical detail, or reproduction. Even if accurate, it would not by itself provide kernel, bootROM, CFW, or Atmosphère."
     }
   ],
   "usb_modes": [

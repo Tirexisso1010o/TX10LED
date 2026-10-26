@@ -71,7 +71,21 @@ The full ledger, including scope and limitations, is in [`research/evidence-ledg
 | Is it confirmed on OLED/Mariko 23.0.1? | **No.** The author does not state the Switch 1 model or firmware. |
 | Does it change the conclusion for the OLED? | **No.** It is a userland/sysmodule primitive, not a boot chain. |
 
-The author's write-up says the exploit chain was also tested on Switch 1, but it has not been packaged for Switch 1, and the author says it would not provide the capabilities of a modchip. The published repository is Switch 2 only. This is recorded in E-021, E-022, E-032, and E-034. It is a lead worth following, not a method to run on the target.
+The author's write-up says the exploit chain was also tested on Switch 1, but it has not been packaged for Switch 1, and the author says it would not provide the capabilities of a modchip. The published repository is Switch 2 only. This is recorded in E-021, E-022, E-032, E-034, E-045, and E-046. It is a lead worth following, not a method to run on the target.
+
+## GameShare as a receiver-side surface
+
+GameShare is a Switch 2 feature that streams a shared game to nearby systems. On the receiving system the session runs in the **`splay` system applet**, added in system update **20.0.0**. It is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game, so it is recorded separately as `EP-011` and `L-006`.
+
+| Question | Finding |
+|---|---|
+| Can the target receive GameShare? | **Yes**, on 23.0.1 over local wireless. |
+| Can the target host a session? | **No.** Nintendo documents that only a Switch 2 can host. |
+| Is the session authenticated? | **Partially documented.** ECC signature verification is used for some data, including `AdvertiseData`; the coverage is not public. |
+| Is there a public vulnerability or exploit? | **No.** None was found for `splay`, the protocol, or its NACP/JPEG handling. |
+| Would a compromise give kernel or bootROM access? | **No.** `splay` is an applet that holds applet-level privileges, including `StreamPlaySaveData` (`FsAccessFlag` bit 47). |
+
+It is a real surface with a real remote data flow, but it is bounded by the host requirement, local-wireless-only reception on Switch 1, partial authentication, and an applet-level capability ceiling. It is recorded as `UNKNOWN`, not as a method. See E-038 through E-044.
 
 ## 23.0.1-specific checks
 
@@ -86,6 +100,7 @@ The author's write-up says the exploit chain was also tested on Switch 1, but it
 | Mariko boot chain | No unpatched public Mariko software-only boot chain was found. | **PARTIALLY VERIFIED** | E-031 |
 | Userland-to-bootROM chain | No public chain connects a userland/sysmodule primitive to kernel or bootROM access on Mariko. | **DISPROVEN** within reviewed docs | E-033 |
 | Game saves and cartridges | No public save-data or cartridge code-execution chain was found. | **UNKNOWN** | E-036 |
+| GameShare / `splay` | Reachable as a local-wireless receiver on 23.0.1; no public vulnerability or exploit was found. Hosting requires a Switch 2. | **UNKNOWN** | E-038–E-044 |
 
 ## Why the OLED is different
 

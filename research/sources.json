@@ -331,6 +331,116 @@
       "snapshot": "Schema retrieved 2026-10-26 for the installed OpenCode v2.1.4.",
       "license": "Documentation; cited.",
       "notes": "Used to validate the shape of the project-level opencode.json."
+    },
+    {
+      "id": "switchbrew-splay-applet",
+      "title": "Nintendo Switch Brew: Splay Applet",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/Splay_Applet",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Documents the GameShare (splay) applet added with 20.0.0 and launched by qlaunch. States that it uses ldn and video streaming, that SetProtocol is used with value 3, that the host transfers the game NACP and JPEGs to the client during setup, and that ECC signature verification is used including for AdvertiseData from Scan. Lists the applet's IPC client services and notes that with 23.0.0+ the S1 applet gained news:c, stpl:sys, and FS permission bit47.",
+      "license": "Wiki text governed by Nintendo Switch Brew's terms; cited as documentation.",
+      "notes": "Primary technical description of the receive-side applet. It documents data flows, not vulnerabilities."
+    },
+    {
+      "id": "switchbrew-20.0.0",
+      "title": "Nintendo Switch Brew: 20.0.0",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/20.0.0",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Change-log introduces GameShare: compatible software can be shared from a Nintendo Switch 2 to nearby systems, only over local wireless, and the Switch 2 must initiate. States the feature cannot be used between two Switch 1/OLED/Lite systems. Lists new title 0100000000001048 (splay), and notes that ns, migration, and splay use ldn SetProtocol with value 3.",
+      "license": "Wiki text governed by Nintendo Switch Brew's terms; cited as documentation.",
+      "notes": "Establishes when GameShare and the splay applet were introduced, and the host-model restriction."
+    },
+    {
+      "id": "switchbrew-npdm",
+      "title": "Nintendo Switch Brew: NPDM",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/NPDM",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Documents the NPDM format, including FsAccessControl and FsAccessFlag. Bit 47 is named StreamPlaySaveData.",
+      "license": "Wiki text governed by Nintendo Switch Brew's terms; cited as documentation.",
+      "notes": "Used to describe what a splay compromise would reach, not to claim that one exists."
+    },
+    {
+      "id": "nintendo-gameshare-support",
+      "title": "Nintendo Support: GameShare Overview and FAQ",
+      "publisher": "Nintendo",
+      "kind": "vendor-documentation",
+      "url": "https://en-americas-support.nintendo.com/app/answers/detail/a_id/68402/~/gameshare-overview-and-faq",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "States that a Nintendo Switch 2 system and compatible software are required to host a GameShare session. Only Switch 2 can share; it can share online to Switch 2 systems, or via local wireless to both Switch 2 and Switch systems.",
+      "license": "Nintendo support documentation; quoted as vendor documentation.",
+      "notes": "Establishes that the OLED can only be a receiver, and only over local wireless."
+    },
+    {
+      "id": "nintendo-gameshare-feature",
+      "title": "Nintendo: Nintendo Switch 2 GameShare",
+      "publisher": "Nintendo",
+      "kind": "vendor-documentation",
+      "url": "https://www.nintendo.com/us/gaming-systems/switch-2/features/gameshare/",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Feature page describing GameShare as sharing supported games with nearby systems so that players who do not own the game can play.",
+      "license": "Nintendo product documentation; quoted as vendor documentation.",
+      "notes": "Consumer-facing description; used only for scope, not for technical detail."
+    },
+    {
+      "id": "twistedvoxel-smilebasic-delist",
+      "title": "TwistedVoxel: Nintendo Removes SmileBASIC 4 From UK eShop Amid News Of Switch 2 Jailbreak",
+      "publisher": "TwistedVoxel",
+      "kind": "news",
+      "url": "https://twistedvoxel.com/nintendo-removes-smilebasic-4-from-uk-eshop-amid-switch-2-jailbreak/",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Published 2026-10-22. Reports that the UK eShop delisted SmileBASIC 4 after the ns2jb release, that the game remained listed in the US, Canada, and Mexico at the time of writing, and summarises the two-bug chain (SmileBASIC array integer overflow, filesystem path-normalization buffer overflow).",
+      "license": "News reporting; cited as secondary reporting.",
+      "notes": "Delisting status is time-sensitive and region-dependent. Treat store availability as volatile."
+    },
+    {
+      "id": "twistedvoxel-gameshare-alternatives",
+      "title": "TwistedVoxel: Nintendo Switch 2 Jailbreak Exploits Expand Beyond SmileBASIC 4, Developer Claims",
+      "publisher": "TwistedVoxel",
+      "kind": "news",
+      "url": "https://twistedvoxel.com/nintendo-switch-2-jailbreak-exploits/",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Published 2026-10-23. Reports that Gezine said SmileBASIC 4 is not strictly necessary, naming Artemis Engine and an undisclosed physical game cartridge as alternate methods, and that Gezine advised against buying Artemis Engine for this purpose because save-based exploits could stop working if online services are blocked.",
+      "license": "News reporting; cited as secondary reporting.",
+      "notes": "Secondary reporting of social-media claims. No technical details, package, or reproduction is provided."
+    },
+    {
+      "id": "wccftech-gezine-userland",
+      "title": "Wccftech: Nintendo Doubles Down on Switch 2 Security, But Developer Gezine Cracks a Universal Exploit That Works Entirely Offline",
+      "publisher": "Wccftech",
+      "kind": "news",
+      "url": "https://wccftech.com/nintendo-switch-2-security-developer-gezine-cracks-universal-exploit-offline",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Published 2026-07-20. Quotes Gezine saying he created a Switch 1/2 userland exploit that is not a WebKit or save exploit, that it works offline and across all firmware versions, and that it is not a full jailbreak by itself.",
+      "license": "News reporting; cited as secondary reporting.",
+      "notes": "The claim is attributed to the developer's social-media posts. No code, advisory, or technical write-up was found."
+    },
+    {
+      "id": "arstechnica-ns2jb",
+      "title": "Ars Technica: Switch 2 security takes a hit as hackers unlock homebrew access",
+      "publisher": "Ars Technica",
+      "kind": "news",
+      "url": "https://arstechnica.com/gaming/2026/10/switch-2-jailbreak-gives-hackers-new-ways-to-run-homebrew-and-mod-games/",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Published 2026-10-22. Reports that ns2jb gains userland access, that it requires a macOS or Linux PC on the same network running a Node.js package, that the entry bug is a 32-bit integer overflow when removing array items in SmileBASIC, and that the exploit falls well short of kernel-level access.",
+      "license": "News reporting; cited as secondary reporting.",
+      "notes": "Independent coverage corroborating the userland-only capability boundary."
+    },
+    {
+      "id": "techspot-ns2jb",
+      "title": "TechSpot: Nintendo Switch 2 jailbreaking is here, with homebrew, modding, and reverse engineering",
+      "publisher": "TechSpot",
+      "kind": "news",
+      "url": "https://www.techspot.com/news/114303-nintendo-switch-2-jailbreaking-here-homebrew-modding-reverse.html",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Published 2026-10-22. Reports that SmileBASIC 4 was delisted in the US and Europe soon after the Switch 2 jailbreak went public, so only people who already owned it can use that entry point.",
+      "license": "News reporting; cited as secondary reporting.",
+      "notes": "Corroborates the delisting and the resulting ownership constraint."
     }
   ]
 }

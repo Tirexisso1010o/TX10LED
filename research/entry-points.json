@@ -31,7 +31,8 @@
     "notes": [
       "Firmware compatibility is a separate axis: Atmosphère 1.12.1 and hekate v6.5.4 support 23.0.1, but neither provides an entry point.",
       "The only documented route for patched/Mariko consoles is a hardware modchip, which is outside this project's scope.",
-      "The surface matrix records what is publicly documented; it does not claim that any surface is unexploitable."
+      "The surface matrix records what is publicly documented; it does not claim that any surface is unexploitable.",
+      "GameShare is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. It is recorded as EP-011 / L-006; no public vulnerability exists for it."
     ]
   },
   "field_notes": {
@@ -383,6 +384,47 @@
         "nh-guide-modchip"
       ],
       "notes": "Out of scope. No installation instructions, wiring, firmware, or automation are provided."
+    },
+    {
+      "id": "EP-011",
+      "surface": "gameshare_splay",
+      "name": "GameShare / splay applet (receiver-side remote input)",
+      "layer": "userland",
+      "description": "GameShare lets a Nintendo Switch 2 host share compatible software with nearby systems. On the receiving system the session is handled by the splay system applet (added in 20.0.0), which connects over ldn local wireless, receives a video stream, and accepts host-supplied metadata including the game NACP and JPEG images during setup.",
+      "access_required": "A Nintendo Switch 2 host running GameShare-compatible software, and a user on the target who starts the GameShare receive flow. Only local wireless is documented for Switch 1 receivers.",
+      "software_only": true,
+      "physical_access": "proximity (local wireless); no cable and no console opening",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "UNKNOWN",
+      "status_basis": "The splay applet and its data flows are documented, so the surface is real and reachable on a 23.0.1 Switch 1 acting as a GameShare receiver. No public vulnerability, proof of concept, or exploit for splay, the GameShare protocol, or its NACP and JPEG handling was found in the reviewed sources.",
+      "capability_if_successful": "At most applet-level userland code execution in splay, whose NPDM grants StreamPlaySaveData (FsAccessFlag bit47) and a broad IPC service list. Not kernel, bootROM, or CFW.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "A Nintendo Switch 2 host",
+        "A GameShare-compatible title",
+        "A user-initiated receive flow on the target",
+        "A memory-corruption vulnerability in splay or in a service it drives"
+      ],
+      "evidence": [
+        "E-038",
+        "E-039",
+        "E-040",
+        "E-041",
+        "E-042",
+        "E-043",
+        "E-044"
+      ],
+      "sources": [
+        "switchbrew-splay-applet",
+        "switchbrew-20.0.0",
+        "switchbrew-npdm",
+        "switchbrew-23.0.0",
+        "nintendo-gameshare-support",
+        "switchbrew-system-flaws"
+      ],
+      "notes": "This is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. Boundaries: hosting requires a Switch 2, Switch 1 receivers are local-wireless only, the host's AdvertiseData is ECC-verified, and any compromise stops at applet privileges. This is a surface, not an exploit."
     }
   ],
   "leads": [
@@ -484,6 +526,30 @@
         "nh-guide-entering-rcm"
       ],
       "next_step": "None for the target. Do not attempt payload injection."
+    },
+    {
+      "id": "L-006",
+      "name": "GameShare / splay receiver",
+      "surface": "EP-011",
+      "status": "UNKNOWN",
+      "target_applicability": "UNVERIFIED",
+      "leads_to_atmosphere": false,
+      "what_it_is": "A Switch 2 feature that streams a shared game to nearby systems; on the receiving system the session runs in the splay system applet, introduced in 20.0.0.",
+      "what_it_proves": "A documented, user-reachable flow exists in which the target parses host-supplied data (NACP, JPEGs, and a video stream) inside a system applet that holds StreamPlaySaveData access.",
+      "what_it_does_not_prove": "No public vulnerability or exploit exists for this flow. It does not provide kernel or bootROM access. Hosting requires a Switch 2, and Switch 1 receivers are local-wireless only.",
+      "evidence": [
+        "E-038",
+        "E-041",
+        "E-042",
+        "E-043",
+        "E-044"
+      ],
+      "sources": [
+        "switchbrew-splay-applet",
+        "switchbrew-20.0.0",
+        "nintendo-gameshare-support"
+      ],
+      "next_step": "Look for public splay or GameShare protocol research, jpegdec or NACP parsing advisories, and any post-20.0.0 splay fix. Do not spoof a GameShare host or send crafted data to the console."
     }
   ],
   "fixed_public_flaws": [
@@ -551,13 +617,13 @@
     }
   ],
   "surface_summary": {
-    "total_surfaces": 10,
-    "software_only_surfaces": 9,
-    "public_software_only_chain_on_target": 0,
+    "total_surfaces": 11,
+    "software_only_surfaces": 10,
+    "public_software_only_chain_on_target": false,
     "surfaces_with_public_chain_on_target": [
       "EP-010"
     ],
-    "in_scope_surfaces": 9,
+    "in_scope_surfaces": 10,
     "out_of_scope_surfaces": [
       "EP-010"
     ],
@@ -566,7 +632,7 @@
       "PARTIALLY VERIFIED": 1,
       "UNVERIFIED": 0,
       "DISPROVEN": 3,
-      "UNKNOWN": 5
+      "UNKNOWN": 6
     }
   }
 }

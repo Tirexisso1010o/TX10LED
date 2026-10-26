@@ -16,6 +16,7 @@ This repository does not contain a working exploit, a payload, or a flashing too
 | Does Fusée Gelée apply to the OLED? | No. The OLED uses patched Mariko hardware. | **DISPROVEN** |
 | Is a modchip the documented route? | Yes, but it is a hardware modification and out of scope. | **VERIFIED** |
 | Is there a real software-only userland/sysmodule chain? | Yes: `ns2jb`, but it is Switch 2-packaged, Switch 1-unpackaged, and not a path to Atmosphère. | **PARTIALLY VERIFIED** |
+| Is there a remote-input surface on the console? | Yes: GameShare runs in the `splay` applet, but hosting requires a Switch 2 and no public vulnerability exists. | **UNKNOWN** |
 | Could an undisclosed software-only method exist? | Cannot be established from public sources. | **UNKNOWN** |
 | Is this exact console an OLED on 23.0.1, and is it unmodified? | PTP observed 23.0.1 and serial prefix `XTJ`; exact model and no-mod history owner-reported. | **PARTIALLY VERIFIED** |
 | Does the OLED enumerate as `057e:201d` and answer PTP `GetDeviceInfo`? | Yes, observed 2026-10-26; 10 operations, no session opened. | **VERIFIED** |
@@ -30,8 +31,10 @@ flowchart TD
     C -->|"Hardware modchip"| E["Documented, but requires microsoldering"]
     C -->|"Public software-only method"| F["None documented"]
     C -->|"Userland/sysmodule chain"| G["ns2jb: real primitive, not a path to Atmosphère"]
+    C -->|"GameShare / splay"| I["Receiver-side remote input; no public vulnerability"]
     F --> H["No qualifying software-only path as of 2026-10-26"]
     G --> H
+    I --> H
 ```
 
 This is an **absence-of-documented-method** finding, not proof that no undisclosed exploit exists. See [`research/known-limitations.md`](research/known-limitations.md) and the evidence ledger for the exact scope.
@@ -50,6 +53,7 @@ The detailed matrix is in [`docs/ENTRY-POINTS.md`](docs/ENTRY-POINTS.md) and [`r
 | Bluetooth | Public stack overflows are fixed before 23.0.1; no public current chain found. |
 | Game saves / cartridges | No public code-execution chain on 23.0.1 found; save editing is not code execution. |
 | System services / sysmodules | `ns2jb` is a real userland/sysmodule chain, but not a path to Atmosphère. |
+| GameShare / `splay` applet | A Switch 2 host can stream to the console over local wireless; the receiver parses host-supplied data. No public vulnerability, and a compromise would be applet-level. |
 | Kernel / TrustZone | No public 23.0.1 chain found; a kernel primitive alone is not a boot path. |
 | Hardware modchip | Documented route, but not software-only and out of scope. |
 

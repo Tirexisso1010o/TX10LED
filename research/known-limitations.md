@@ -21,11 +21,17 @@ This document records what the research and tooling cannot establish. It is part
 ## Entry-point limitations
 
 - **`ns2jb` is not a target-specific result.** It is packaged for Switch 2 on 23.0.1. The author says the chain was also tested on Switch 1, but the model and firmware are not stated and the Switch 1 version is not packaged. No OLED/Mariko 23.0.1 test is documented. It does not provide kernel, bootROM, CFW, or persistence.
-- **`UNKNOWN` surfaces are not cleared.** Browser/WebKit, local wireless, Bluetooth, game saves/cartridges, and kernel/TrustZone remain `UNKNOWN` where no public 23.0.1 chain was found. A public flaw list can lag private research.
+- **`UNKNOWN` surfaces are not cleared.** Browser/WebKit, local wireless, Bluetooth, game saves/cartridges, GameShare/`splay`, and kernel/TrustZone remain `UNKNOWN` where no public 23.0.1 chain was found. A public flaw list can lag private research.
 - **A fixed flaw is not the whole surface.** CVE-2026-82079 is fixed in 23.0.0, but that does not prove the local-wireless stack has no other vulnerabilities. The same applies to the 23.0.0 `bsdsocket` and `audio` fixes.
 - **Historical entry points are not current ones.** PegaSwitch targets early firmware and the Fake News entry point; Caffeine targets patched Erista 4.1.0. Neither applies to Mariko/OLED on 23.0.1.
 - **Public exploit availability is not established.** CVE-2026-82079's CVE record contains no exploit code, and the linked HackerOne report was not accessible in this review. The ledger labels exploit availability `UNKNOWN`.
 - **A userland primitive is not a boot chain.** Even a successful userland/sysmodule compromise would still need a kernel or bootROM stage to launch Atmosphère persistently.
+- **GameShare is a surface, not a vulnerability.** `splay` is a documented receiver-side parser fed by a remote host, but no public vulnerability, proof of concept, or exploit was found for it, the GameShare protocol, or its NACP/JPEG handling. The claim that it transfers no executable code is an inference from "video streaming is used", not a published protocol guarantee.
+- **GameShare reception is proximity-bound and one-directional.** Nintendo documents that only a Switch 2 can host and that Switch 1 receivers use local wireless only. Attacking the target through this surface would therefore require controlling a Switch 2 or spoofing a host, and no public spoofing method exists.
+- **GameShare's authentication coverage is unknown.** ECC signature verification is documented for some host data, including `AdvertiseData`, but public sources do not state how much of the session it covers. Do not assume the stream is authenticated or unauthenticated.
+- **`ns2jb`'s Switch 1 test is not a Switch 1 package.** The author says the chain was tested on Switch 1 but has not packaged it. Testing does not establish that the `fs` path-normalization bug is present on Switch 1 23.0.1, and the model and firmware are unstated.
+- **SmileBASIC 4 availability is volatile.** The documented `ns2jb` entry point is version-locked to 4.4.9 and was delisted from the eShop in several regions. Store status is region-dependent and changes; a previously purchased copy is not a generally reproducible prerequisite.
+- **Gezine's userland claim is unreleased.** A Switch 1/2 non-WebKit, non-save userland exploit was claimed publicly in July 2026, but no code, advisory, technical write-up, or independent reproduction was found. It cannot be treated as a method, and it would not by itself provide kernel, bootROM, or Atmosphère.
 - **The entry-point matrix records public documentation, not absolute exploitability.** `DISPROVEN` means the known public method is patched or the documented surface does not execute code; it does not prove that no private method exists.
 
 ## USB limitations
@@ -63,4 +69,6 @@ This document records what the research and tooling cannot establish. It is part
 - An independent OLED/Mariko 23.0.1 test of a userland/sysmodule chain.
 - A public chain connecting a userland/sysmodule primitive to kernel or bootROM access on Mariko.
 - A public 23.0.1-specific browser, local-wireless, or Bluetooth chain.
+- A public technical description of the GameShare/splay protocol, including what its ECC signatures cover and how NACP and JPEG data are validated.
+- A public vulnerability or proof of concept in `splay` or a service it drives, combined with a Mariko kernel or bootROM stage.
 - A public, reproducible entry point that changes the software-only conclusion. If one appears, the matrix and evidence ledger must be updated rather than patched with an unsupported claim.

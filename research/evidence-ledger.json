@@ -514,6 +514,175 @@
       "evidence": "Ran `.venv/bin/python -m switch_usb_probe ptp-info --source ioreg --confirm` on 2026-10-26 with the console in Copy to PC via USB mode. The device enumerated as 057e:201d. DeviceInfo reported Manufacturer Nintendo, Model Nintendo Switch, Device version 23.0.1, serial prefix XTJ***, and 10 supported operations. Session opened: no. See research/hardware-observations/2026-10-26-ptp.json.",
       "limitations": "PTP DeviceInfo is what the console reports and can be spoofed by modified firmware. It does not establish the HEG-001 model number, OLED-versus-LCD hardware, no-modchip status, integrity, boot state, or exploitability.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-038",
+      "claim": "GameShare sessions on the receiving system are handled by the splay system applet, which was introduced in system update 20.0.0.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Receiver-side implementation of GameShare.",
+      "sources": [
+        "switchbrew-splay-applet",
+        "switchbrew-20.0.0"
+      ],
+      "evidence": "Switchbrew's Splay Applet page identifies splay as the GameShare applet added with 20.0.0 and launched by qlaunch. The 20.0.0 change-log lists new title 0100000000001048 (splay) and describes GameShare as sharing software from a Switch 2 to nearby systems.",
+      "limitations": "This identifies the component and its introduction version. It does not describe a vulnerability or show that the applet can be subverted.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-039",
+      "claim": "GameShare sends the receiving system a video stream plus setup metadata rather than a downloadable executable package.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Data flow from host to client.",
+      "sources": [
+        "switchbrew-splay-applet",
+        "nintendo-gameshare-support",
+        "nintendo-gameshare-feature"
+      ],
+      "evidence": "Switchbrew states that splay 'uses ldn to connect to the host' and that 'video streaming is used', and that during setup the host transfers the game NACP to the client along with JPEGs. Nintendo's GameShare FAQ states: 'By using streaming technology, it's possible to share the gameplay instantly without having to take time to transfer the software.'",
+      "limitations": "Public documentation describes streaming rather than a software transfer, but does not include a full protocol specification. The stronger claim that no executable code is ever sent is an inference, not a documented guarantee. Treat the exact wire format as UNKNOWN.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-040",
+      "claim": "Only a Nintendo Switch 2 can host a GameShare session, and a Switch 1 or OLED system can only receive, and only over local wireless.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Host and transport prerequisites.",
+      "sources": [
+        "nintendo-gameshare-support",
+        "switchbrew-20.0.0",
+        "nintendo-gameshare-feature"
+      ],
+      "evidence": "Nintendo's GameShare FAQ states: 'Only Nintendo Switch 2 can share compatible games, and can share them online to Nintendo Switch 2 systems, or via local wireless communication to both Nintendo Switch 2 and Nintendo Switch systems', and 'A Nintendo Switch 2 system is required to host a GameShare session.' For internet sessions it states that only Switch 2 systems can join. The 20.0.0 change-log states the feature cannot be used between two Switch 1/OLED/Lite systems and that the Switch 2 must initiate.",
+      "limitations": "This bounds reachability. It does not mean a host cannot be spoofed by other means; it means Nintendo documents no such path and no public spoofing method was found.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-041",
+      "claim": "The splay applet parses host-supplied data, including the game NACP and JPEG images during setup, and ECC signature verification is used for some of that data.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Receiver-side parsing of remote input.",
+      "sources": [
+        "switchbrew-splay-applet"
+      ],
+      "evidence": "Switchbrew states that during setup the host transfers the game NACP to the client, that JPEGs are transferred as well, and that ECC signature verification is used in various functionality including verifying the AdvertiseData returned by Scan, with the public key selected via spl IsDevelopment.",
+      "limitations": "The wiki does not state which fields the signature covers or whether the stream itself is authenticated. JPEG decoding is handled by the separate jpegdec sysmodule, not necessarily inside splay. No parsing bug is documented.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-042",
+      "claim": "The splay applet holds the StreamPlaySaveData filesystem permission (FsAccessFlag bit 47) and, on Switch 1 with 23.0.0 or later, access to news:c and stpl:sys.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Privileges available to the receiving applet.",
+      "sources": [
+        "switchbrew-splay-applet",
+        "switchbrew-npdm",
+        "switchbrew-23.0.0"
+      ],
+      "evidence": "Switchbrew's Splay Applet page states that with 23.0.0+ the Switch 1 applet has access to news:c and stpl:sys and that FS permission bit47 is set. The NPDM page names FsAccessFlag bit 47 StreamPlaySaveData. The 23.0.0 page records the same NPDM change for splay.",
+      "limitations": "A permission describes what the applet may reach if it is compromised; it is not a vulnerability and does not imply kernel or bootROM access.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-043",
+      "claim": "A public vulnerability, proof of concept, or exploit for the GameShare protocol, the splay applet, or its NACP and JPEG handling was not found.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "scope": "Public research status of the GameShare surface.",
+      "sources": [
+        "switchbrew-system-flaws",
+        "switchbrew-splay-applet"
+      ],
+      "evidence": "The reviewed Switchbrew flaw list contains no entry for the splay applet, GameShare, StreamPlay, or jpegdec. No public write-up, advisory, or repository describing a GameShare or splay exploit was found in the reviewed sources.",
+      "limitations": "This is an absence-of-documented-method finding, not evidence that the surface is safe. Public flaw lists lag private research, and the absence of a listed bug says nothing about the actual robustness of the parser.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-044",
+      "claim": "Even a complete compromise of the splay applet would yield applet-level userland code execution, not kernel, bootROM, or Atmosphère access.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Capability ceiling of the GameShare surface.",
+      "sources": [
+        "switchbrew-splay-applet",
+        "switchbrew-npdm"
+      ],
+      "evidence": "The splay applet is an applet process whose documented NPDM grants a specific service list and filesystem permission bits, including StreamPlaySaveData. Nothing in the reviewed documentation gives it kernel capabilities, bootROM access, or the ability to launch unsigned boot code.",
+      "limitations": "This is an inference from the applet's privilege description, not the result of an exploit. A real chain could combine an applet primitive with a separate kernel vulnerability, which is exactly what is missing publicly.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-045",
+      "claim": "The ns2jb chain combines a 32-bit integer overflow in the SmileBASIC interpreter with a path-normalization buffer overflow in the fs sysmodule, and the author says it was tested on Switch 1 but is not packaged for it.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Technical structure and platform status of the ns2jb chain.",
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "ns2jb-repository",
+        "arstechnica-ns2jb"
+      ],
+      "evidence": "The author's write-up describes a 32-bit integer overflow in SmileBASIC's array removal check (position + count wraps), followed by a buffer overflow in fs Path::Normalize reached through the IFileSystem GetEntryType command using a path such as /..\\, then arbitrary read/write and sysmodule code execution. It states the exploit 'has also been tested on the Switch 1, but I haven't gotten around to packaging it yet.' Ars Technica independently describes the SmileBASIC integer overflow.",
+      "limitations": "The Switch 1 test's model and firmware are not stated. Testing is not packaging, and the published repository is Switch 2 only. The fs bug's presence on Switch 1 23.0.1 is not independently documented.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-046",
+      "claim": "The packaged ns2jb demo requires SmileBASIC 4.4.9, system software 23.0.1, a Node.js 22+ host, and more than 20 MiB free in the SmileBASIC save, and it installs no custom firmware or persistence.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Prerequisites and limits of the published package.",
+      "sources": [
+        "ns2jb-repository"
+      ],
+      "evidence": "The repository README states: 'You need SmileBASIC 4.4.9, system software 23.0.1, Node.js 22+ on macOS or Linux, and over 20 MiB free in the SmileBASIC save. The computer and console must be on the same reachable network.' It also states 'This demo does not install custom firmware or persistence' and 'Switch 2 only'.",
+      "limitations": "These are the packaged demo's requirements, not a general statement about the bug classes. The README does not give a Switch 1 procedure.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-047",
+      "claim": "SmileBASIC 4 was delisted from the Nintendo eShop after the ns2jb release, which removes the entry point for anyone who does not already own it.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Availability of the documented ns2jb entry point.",
+      "sources": [
+        "twistedvoxel-smilebasic-delist",
+        "techspot-ns2jb",
+        "ns2jb-repository"
+      ],
+      "evidence": "TwistedVoxel reported on 2026-10-22 that the UK eShop delisted SmileBASIC 4 and that it remained listed in the US, Canada, and Mexico at that time. TechSpot reported that it had disappeared from the US and European eShops. The ns2jb README pins the required version to 4.4.9.",
+      "limitations": "Store availability is region-dependent and changes over time. A previously purchased copy remains owned, and the demo or a physical copy may behave differently; neither is documented for this chain.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-048",
+      "claim": "Gezine claims a Switch 1/2 userland exploit that is neither WebKit-based nor save-based, works offline across firmware versions, and remains unreleased with no public technical details.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "scope": "A claimed but unpublished userland entry point.",
+      "sources": [
+        "wccftech-gezine-userland"
+      ],
+      "evidence": "Wccftech quotes Gezine saying 'I created Switch 1/2 userland exploit that is not webkit or save exploit', that existing save-based userland exploits require online save transfer, and that this one works offline and across all firmware versions. The same article describes it as a userland starting point rather than a full jailbreak.",
+      "limitations": "No code, advisory, technical write-up, or independent reproduction was found. The claim does not identify the vulnerable component or the Switch 1 model and firmware. It cannot be treated as a method.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-049",
+      "claim": "Gezine says SmileBASIC 4 is not strictly required for the Switch 2 chain, naming Artemis Engine and an undisclosed physical game cartridge as alternate triggers.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "scope": "Alternate triggers for an unpublished chain.",
+      "sources": [
+        "twistedvoxel-gameshare-alternatives"
+      ],
+      "evidence": "TwistedVoxel reports that Gezine said SmileBASIC 4 is not strictly necessary, that Artemis Engine could also be used, and that a physical game cartridge method may exist; Gezine did not disclose the cartridge and advised against buying Artemis Engine for this purpose.",
+      "limitations": "Secondary reporting of social-media posts with no technical detail, no package, and no reproduction. It does not establish that any alternate trigger works on Switch 1 23.0.1.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

@@ -45,6 +45,7 @@ The status answers a specific claim: **“This surface provides a publicly docum
 | EP-008 | System services and sysmodules | Initial userland primitive | Real primitive, but not target/CFW | **PARTIALLY VERIFIED** | No |
 | EP-009 | Kernel / TrustZone | Post-userland | No public 23.0.1 chain found | **UNKNOWN** | No |
 | EP-010 | Hardware fault injection / modchip | Microsoldering | Yes — hardware route | **VERIFIED** | Yes, but out of scope |
+| EP-011 | GameShare / `splay` receiver | Switch 2 host + local wireless | No public vulnerability found | **UNKNOWN** | No |
 
 Only EP-010 has a documented public chain to Atmosphère on the target, and it is not software-only. The matrix records it for completeness, not as a recommendation.
 
@@ -159,6 +160,49 @@ The maintained NH Switch Guide documents a hardware modchip as the route for pat
 
 This is a real documented route to Atmosphère on the target, but it is **not software-only** and is **out of scope** for this project. This repository provides no installation instructions, wiring diagrams, firmware, or automation. Use the maintained guide and a reputable installer if you choose that route.
 
+## EP-011 — GameShare / `splay` applet (receiver-side remote input)
+
+GameShare lets a **Nintendo Switch 2** host share compatible software with nearby systems, including a Switch 1 or OLED system. On the receiving system the session is handled by the **`splay` system applet**, which was introduced in system update **20.0.0** and is launched by `qlaunch`.
+
+It is a documented flow in which a nearby device sends data that a system applet on the target parses **without the user launching a game**. That is why it is recorded as its own surface rather than folded into local wireless.
+
+### What is documented
+
+| Property | Finding |
+|---|---|
+| Receiver component | `splay` applet, added in 20.0.0; launched by `qlaunch`. |
+| Transport | `ldn` local wireless, with `SetProtocol` value 3. |
+| Payload | A **video stream**, plus setup metadata: the game's NACP and JPEG images. |
+| Authentication | ECC signature verification is used for some data, including the `AdvertiseData` returned by `Scan`. |
+| Receiver privileges | `StreamPlaySaveData` (`FsAccessFlag` bit 47); on Switch 1 with 23.0.0+, `news:c` and `stpl:sys`. |
+| Who can host | Only a Switch 2. Nintendo states the feature cannot be used between two Switch 1/OLED/Lite systems. |
+| How a Switch 1 can receive | Local wireless only. Online GameShare via GameChat is documented for Switch 2 systems. |
+
+### What it proves — and what it does not
+
+| Question | Answer |
+|---|---|
+| Is the surface reachable on the target? | **Yes.** A 23.0.1 Switch 1 can act as a GameShare receiver. |
+| Is there a public vulnerability or exploit? | **No.** None was found for `splay`, the protocol, or its NACP/JPEG handling. |
+| Would a compromise give kernel access? | **No.** `splay` is an applet; its documented privileges are applet-level. |
+| Would it give bootROM access or Atmosphère? | **No.** A separate kernel or bootROM stage would still be required. |
+| Can the target host a session itself? | **No.** Hosting requires a Switch 2, so the target cannot be the sender. |
+
+The surface is `UNKNOWN`: it is real and user-reachable, but no qualifying public chain exists. The result is recorded as lead `L-006`.
+
+### Why it is interesting, and why it is bounded
+
+It is interesting because a remote peer supplies a system applet with parsing work — NACP metadata, JPEGs, and stream data — and that applet holds a filesystem permission that ordinary software does not. Historically, parsers fed by a remote peer have been productive targets.
+
+It is bounded by four things:
+
+- **Host requirement.** Nintendo documents that only a Switch 2 can host. Attacking the target through this surface would require controlling a Switch 2 or successfully spoofing a host.
+- **Transport.** Switch 1 receivers are local-wireless only, so this is a proximity surface, not an internet-facing one.
+- **Authentication.** At least some host data is ECC-verified. Public documentation does not say how much of the session that covers, which is itself an open question.
+- **Capability ceiling.** Even a full `splay` compromise is applet-level userland. It is not a boot chain.
+
+**This is a surface, not an exploit.** No proof of concept exists publicly, and the project does not have one.
+
 ## Historical leads
 
 | Lead | Era | Why it does not apply |
@@ -188,6 +232,8 @@ As of **2026-10-26**, the reviewed public documentation supports this conclusion
 
 The closest public lead is `ns2jb`. It is a genuine software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. It does not change the conclusion for the OLED.
 
+GameShare (`EP-011`) was reviewed as a receiver-side remote-input surface and recorded as `UNKNOWN`. It is reachable on the target, but no public vulnerability exists, hosting requires a Switch 2, and any compromise would stop at applet privileges. It does not change the conclusion either.
+
 ## What would change this conclusion
 
 The conclusion would need to be revisited if any of the following became available:
@@ -195,6 +241,7 @@ The conclusion would need to be revisited if any of the following became availab
 - A public, independently reproduced Mariko bootROM or pre-boot software vulnerability that works on 23.0.1.
 - A packaged, reproducible Switch 1 version of the `ns2jb` chain, with the model and firmware identified.
 - A public chain that connects a userland/sysmodule primitive to kernel or bootROM access on Mariko, with reproducible steps and hardware evidence.
+- A public vulnerability in `splay` or the GameShare protocol, combined with a Mariko kernel or bootROM stage.
 - A documented software-only entry point from a maintained project that explicitly supports the OLED on 23.0.1.
 - A correction showing that the target is not Mariko/OLED hardware.
 
@@ -208,6 +255,7 @@ A firmware update alone would not create an entry point. A new Atmosphère relea
 - **PTP identity is not integrity.** `GetDeviceInfo` reports what the console says, not whether it is unmodified or exploitable.
 - **A userland primitive is not CFW.** `ns2jb` demonstrates code execution as sysmodules and `fs`, not a boot chain.
 - **A historical exploit is not a current one.** PegaSwitch and Caffeine are recorded to prevent category errors, not as 23.0.1 methods.
+- **A remote-input surface is not a remote exploit.** GameShare gives a host a documented way to send data that the `splay` applet parses. No public vulnerability exists, and the applet is not a boot path.
 
 ## Related records
 

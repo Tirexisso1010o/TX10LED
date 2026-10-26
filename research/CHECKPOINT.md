@@ -10,8 +10,8 @@ Last updated: 2026-10-26
 - Console state: unchanged by this project.
 - Hardware validation: **PTP identity observation recorded** on 2026-10-26. The console enumerated as `057e:201d` and answered `GetDeviceInfo` without a session.
 - Target identity: **PARTIALLY VERIFIED**. Firmware 23.0.1 and serial prefix XTJ are PTP-observed; the HEG-001 model number and no-modification history are owner-reported.
-- Publication: **pushed** to `origin/main` on 2026-10-26; see `git log` for the latest commit.
-- Focus: potential software-only jailbreak research and the read-only USB tool.
+- Publication: pushed to `origin/main` at `d047ad3`. The GameShare research pass is committed separately; see `git log` for the latest commit.
+- Focus: potential software-only jailbreak research, the GameShare receiver surface, and the read-only USB tool.
 
 ## Verified conclusions
 
@@ -20,19 +20,28 @@ Last updated: 2026-10-26
 3. Patched/Mariko consoles can enter RCM but cannot receive a payload.
 4. No publicly documented, reproducible software-only path to Atmosphère was found for an unmodified OLED on 23.0.1. This is an absence-of-documented-method finding, not proof of impossibility.
 5. The documented route is a hardware modchip, which is out of scope.
-6. `ns2jb` is a real software-only userland/sysmodule chain on Switch 2 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1, the model/firmware are not stated, and it does not provide kernel, bootROM, CFW, or persistence. It is the closest public lead, not a path to Atmosphère.
-7. CVE-2026-82079 is a local-wireless stack overflow fixed in 23.0.0; the target is reported on 23.0.1. No public exploit code was found.
-8. PegaSwitch (early browser) and Caffeine (patched Erista 4.1.0) are historical and do not apply to the target.
-9. Switchbrew's 23.0.0 page documents fixes for `bsdsocket`, `audio`, and `ldn`; 23.0.1 lists a stability fix and an `sdb`/SystemVersion update, with an unfilled security-flaw placeholder.
+6. `ns2jb` is a real software-only userland/sysmodule chain on Switch 2 23.0.1. It combines a 32-bit integer overflow in the SmileBASIC interpreter with a path-normalization buffer overflow in the `fs` sysmodule. The author says it was **tested on Switch 1 but not packaged**, and it does not provide kernel, bootROM, CFW, or persistence.
+7. The packaged `ns2jb` demo requires SmileBASIC 4.4.9, system software 23.0.1, a Node.js 22+ host on the same network, and more than 20 MiB free in the SmileBASIC save. It is tethered and installs no CFW or persistence.
+8. SmileBASIC 4 was delisted from the eShop in several regions after the `ns2jb` release, so the documented entry point is only available to people who already own it.
+9. GameShare is handled on the receiving system by the **`splay` system applet**, added in 20.0.0. It uses `ldn` local wireless with `SetProtocol` value 3, receives a video stream, and accepts the game NACP and JPEG images during setup. At least some host data, including `AdvertiseData`, is ECC-verified.
+10. Only a Switch 2 can host GameShare. A Switch 1/OLED can only receive, and only over local wireless. Nintendo states the feature cannot be used between two Switch 1/OLED/Lite systems.
+11. `splay` holds `StreamPlaySaveData` (`FsAccessFlag` bit 47) and, on Switch 1 with 23.0.0+, access to `news:c` and `stpl:sys`. These are applet-level privileges.
+12. **No public vulnerability, proof of concept, or exploit** was found for `splay`, the GameShare protocol, or its NACP/JPEG handling. The surface is `UNKNOWN`.
+13. A full `splay` compromise would yield applet-level userland code execution, not kernel, bootROM, or Atmosphère.
+14. Gezine claims a Switch 1/2 userland exploit that is not WebKit- or save-based and works offline across firmware versions. It is unreleased, has no public technical details, and is `UNVERIFIED`. Gezine also says SmileBASIC 4 is not strictly required, naming Artemis Engine and an undisclosed physical cartridge.
+15. CVE-2026-82079 is a local-wireless stack overflow fixed in 23.0.0; the target is reported on 23.0.1. No public exploit code was found.
+16. PegaSwitch (early browser) and Caffeine (patched Erista 4.1.0) are historical and do not apply to the target.
+17. Switchbrew's 23.0.0 page documents fixes for `bsdsocket`, `audio`, and `ldn`; 23.0.1 lists a stability fix and an `sdb`/SystemVersion update, with an unfilled security-flaw placeholder.
 
 ## Completed work
 
-- Source register (30 sources), evidence ledger (E-001–E-037), and compatibility matrix.
-- Detailed entry-point matrix (`research/entry-points.json`) covering 10 surfaces and 5 public leads.
-- Readable entry-point analysis (`docs/ENTRY-POINTS.md`).
-- README framing the project as a potential-jailbreak investigation plus a read-only USB tool.
-- Compatibility narrative with the `ns2jb` distinction.
-- Known-limitations update covering `UNKNOWN` surfaces, the 23.0.1 placeholder, and the userland-to-boot gap.
+- Source register (40 sources), evidence ledger (E-001–E-049), and compatibility matrix (22 rows).
+- Detailed entry-point matrix (`research/entry-points.json`) covering 11 surfaces and 6 public leads, including `EP-011` GameShare/`splay` and `L-006`.
+- Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a GameShare section, bounds, and capability ceiling.
+- README framing the project as a potential-jailbreak investigation plus a read-only USB tool, with GameShare in the short-version table and the surface table.
+- Compatibility narrative with the `ns2jb` distinction and the GameShare receiver section.
+- Known-limitations update covering GameShare, `ns2jb`'s unpackaged Switch 1 test, SmileBASIC delisting, Gezine's unreleased claim, `UNKNOWN` surfaces, the 23.0.1 placeholder, and the userland-to-boot gap.
+- Decision-log entry recording GameShare as a surface, not a method.
 - Standard-library research validator (`scripts/validate_research.py`).
 - PTP response-code correction (`0x2001`) in `docs/USB_INTEGRATION.md`.
 - Removed the dead `render_research.py` permission rule from `opencode.json`; deny rules remain last in the ordered list.
@@ -53,7 +62,7 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 30 sources, 37 evidence entries, 10 entry-point surfaces, 5 leads, 18 matrix rows, 5 USB modes.
+Research data OK: 40 sources, 49 evidence entries, 11 entry-point surfaces, 6 leads, 22 matrix rows, 5 USB modes.
 ```
 
 PTP observation:
@@ -71,7 +80,7 @@ Session opened: no
 
 ## Pending approvals
 
-- Any console state change, firmware update, RCM entry, or payload attempt requires explicit approval and is currently not authorized.
+- Any console state change, firmware update, RCM entry, payload attempt, GameShare host spoofing, or crafted-data send requires explicit approval and is currently not authorized.
 
 ## Pending work
 
@@ -84,13 +93,17 @@ Session opened: no
 - Does `DeviceInfo` ever distinguish OLED from LCD hardware, or is the model string always generic?
 - What Switch 1 model and firmware did the `ns2jb` author test, and is a Switch 1 package planned?
 - Is there an independent OLED/Mariko 23.0.1 reproduction of any userland/sysmodule chain?
+- What does the GameShare ECC signature actually cover: only `AdvertiseData`, or setup metadata and stream data as well?
+- Is the `splay` NACP and JPEG handling reachable before any user confirmation on the receiver, or only after an explicit join?
+- Did 23.0.1 change `splay` beyond the 23.0.0 NPDM additions, and are there unpublished splay fixes?
 
 ## Next safe action
 
-The PTP identity observation is complete and recorded. The console is unchanged. Continue monitoring public sources for:
+The PTP identity observation is complete and recorded. The console is unchanged. GameShare is documented as a surface with no public vulnerability. Continue monitoring public sources for:
 
 1. a packaged Switch 1 version of the `ns2jb` chain with a stated model and firmware;
 2. a public chain connecting a userland/sysmodule primitive to kernel or bootROM access on Mariko;
-3. a public 23.0.1-specific browser, local-wireless, or Bluetooth chain.
+3. a public 23.0.1-specific browser, local-wireless, or Bluetooth chain;
+4. public GameShare/`splay` protocol research or a `jpegdec`/NACP parsing advisory.
 
-Do not update firmware, enter RCM, inject a payload, or change console state.
+Do not update firmware, enter RCM, inject a payload, spoof a GameShare host, send crafted data to the console, or change console state.
