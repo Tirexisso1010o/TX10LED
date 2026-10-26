@@ -510,9 +510,10 @@
       "in_scope": true,
       "evidence": [
         "E-058",
-        "E-064"
+        "E-064",
+        "E-065"
       ],
-      "notes": "JIT-independent. Reachability depends on WebP support in the applet and on an unpatched decoder. The libwebp heap overflow CVE-2023-4863 is the leading candidate."
+      "notes": "Surface reachable: all six image formats decode, including lossless WebP. Whether the decoder predates the libwebp fix is untested. CVE-2023-4863 is the leading candidate; a public crash reproducer exists but has not been run against the console."
     }
   ],
   "usb_modes": [

@@ -36,3 +36,5 @@ research/hardware-observations/*.local.md
 
 opencode.json
 .gitignore
+# Local-only proof-of-concept assets
+scripts/assets.local/

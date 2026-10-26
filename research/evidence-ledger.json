@@ -894,6 +894,34 @@
       "evidence": "A 400,000-iteration integer loop took 40,39,40,40,39,40,40,39,40,40,39,40 ms across twelve consecutive runs. A shape-varying variant took 49 ms on eleven runs and 48 ms on one. There was no speed-up across runs and only a small monomorphic/polymorphic gap. WebAssembly remained unavailable. For comparison, the same loop shape under Node on the host collapsed from 6-7 ms to 0-1 ms after warm-up.",
       "limitations": "Timing inference, not a direct engine inspection. A JIT could be disabled for this applet or not triggered within twelve runs, and CPU frequency scaling was not controlled. One console and one session.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-065",
+      "claim": "The target captive-portal applet decodes PNG, JPEG, GIF, BMP, WebP, and SVG images, including lossless WebP, so the image decoders are reachable with attacker-supplied files.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Reproduced finding, one console, 2026-10-26.",
+      "sources": [
+        "switchbrew-internet-browser"
+      ],
+      "evidence": "scripts/fingerprint_formats.html loaded six 4x4 assets from the portal server. All six reported onload with correct naturalWidth/naturalHeight (GIF 1x1, others 4x4). The browser's Accept header advertised image/webp, image/png, and image/svg+xml. The WebP asset was produced with cwebp -lossless, so the lossless Huffman path was exercised. canvas and createImageBitmap were also available.",
+      "limitations": "Reachability is not vulnerability. The decoder implementation and its patch level are unknown. One console and one session.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-066",
+      "claim": "The public CVE-2023-4863 reproducer is a valid trigger: against libwebp commit 7ba44f8 with AddressSanitizer it produces a heap-buffer-overflow in BuildHuffmanTable, while a non-ASAN build returns BITSTREAM_ERROR, so a non-ASAN no-crash is inconclusive.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Local reproduction of the trigger, not the console.",
+      "sources": [
+        "isosceles-webp-0day",
+        "poc-cve-2023-4863",
+        "nvd-cve-2023-4863"
+      ],
+      "evidence": "Built libwebp commit 7ba44f80f3b94fc0138db159afea770ef06532a0 with -fsanitize=address. Running examples/dwebp on bad.webp and nso.webp produced 'ERROR: AddressSanitizer: heap-buffer-overflow' with a WRITE of size 4 in BuildHuffmanTable (huffman_utils.c:194), called from ReadHuffmanCode (vp8l_dec.c:354). A non-ASAN libwebp 1.3.1 build returned 'Decoding failed. Status: 3(BITSTREAM_ERROR)' for both files.",
+      "limitations": "Local x86-64 build with a specific allocator, not the console's ARM build. The console may use a different libwebp version, a platform decoder, or a backported fix. Without ASAN, the overflow may be silent.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

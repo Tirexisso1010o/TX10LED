@@ -319,19 +319,23 @@
       "blocked_by": null,
       "evidence": [
         "E-058",
-        "E-064"
+        "E-064",
+        "E-065",
+        "E-066"
       ],
       "sources": [
         "nvd-cve-2023-4863",
         "switchbrew-internet-browser",
-        "arxiv-methodically-defeating-switch"
+        "arxiv-methodically-defeating-switch",
+        "isosceles-webp-0day",
+        "poc-cve-2023-4863"
       ],
       "last_reviewed": "2026-10-26",
       "resolution": "open",
       "hardware": "HEG-001 (Mariko), captive-portal applet",
       "firmware": "23.0.1",
-      "results": "Capability probe built and tested on loopback; not yet run against the console. WebP decoding is unconfirmed.",
-      "uncertainties": "Whether the applet decodes WebP at all, whether Nintendo backported the libwebp fix, and whether the engine uses libwebp or a platform decoder. A crash reproducer would be exploit testing."
+      "results": "Surface reachability confirmed: PNG, JPEG, GIF, BMP, WebP, and SVG all decode, and lossless WebP exercises the Huffman path. The public reproducer was validated locally against libwebp commit 7ba44f8 with ASAN, producing a 4-byte heap overflow in BuildHuffmanTable. On a non-ASAN build the same files return BITSTREAM_ERROR, so a console test that does not crash is inconclusive; only a visible fault would be informative.",
+      "uncertainties": "Whether the console's decoder is libwebp at all, which version it is, and whether Nintendo backported the fix. Without ASAN, a vulnerable decoder may corrupt memory silently. Even a successful trigger would be applet-level userland."
     }
   ]
 }

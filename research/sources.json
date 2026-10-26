@@ -595,6 +595,28 @@
       "snapshot": "Describes a heap buffer overflow in libwebp's Huffman table construction, reachable through a crafted WebP image, fixed in libwebp 1.3.2 and exploited in the wild.",
       "license": "Public vulnerability record; cited as an advisory.",
       "notes": "A non-JIT image decoder bug, relevant to an engine that predates the September 2023 fix."
+    },
+    {
+      "id": "isosceles-webp-0day",
+      "title": "The WebP 0day",
+      "publisher": "Isosceles Blog (Ben Hawkes)",
+      "kind": "write-up",
+      "url": "https://blog.isosceles.com/the-webp-0day/",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Technical analysis of CVE-2023-4863: a heap buffer overflow in libwebp's BuildHuffmanTable reached through a crafted lossless WebP. Describes the trigger construction and reproduces it with AddressSanitizer against libwebp commit 7ba44f80f3b94fc0138db159afea770ef06532a0.",
+      "license": "Public technical write-up; cited as research literature.",
+      "notes": "Establishes the trigger conditions and the ASAN-based validation method."
+    },
+    {
+      "id": "poc-cve-2023-4863",
+      "title": "mistymntncop/CVE-2023-4863",
+      "publisher": "GitHub",
+      "kind": "source-code",
+      "url": "https://github.com/mistymntncop/CVE-2023-4863",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Contains the craft harness, tree-visualisation tool, and two small reproducer files, bad.webp (236 bytes) and nso.webp (350 bytes). The README states 'A POC for CVE-2023-4863. NOT an exploit.'",
+      "license": "Public proof-of-concept repository; cited as a test corpus.",
+      "notes": "Used locally to validate the trigger. The reproducer files are not committed to this repository."
     }
   ]
 }
