@@ -937,6 +937,20 @@
       "evidence": "The portal served bad.webp (236 bytes, color_cache_bits=0) and nso.webp (350 bytes, color_cache_bits=6) to WifiWebAuthApplet. Both fired onload with naturalWidth/naturalHeight 1x1, and the page posted a 'done' marker. Locally, dwebp from libwebp 1.2.4, 1.3.1, and 1.6.0 returned 'Decoding failed. Status: 3(BITSTREAM_ERROR)' for both files. With ASAN on commit 7ba44f8, the same files produced a heap-buffer-overflow in BuildHuffmanTable.",
       "limitations": "A non-ASAN silent overflow cannot be excluded. The applet's decoder implementation and version are unknown. One console and one run per file.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-068",
+      "claim": "Sixty repeated decodes of the stronger CVE-2023-4863 reproducer completed without a visible fault; the applet stayed responsive and posted a completion marker.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Console observation, 2026-10-26.",
+      "sources": [
+        "poc-cve-2023-4863",
+        "isosceles-webp-0day"
+      ],
+      "evidence": "scripts/fingerprint_webp_stress.html decoded /assets/nso.webp sixty times with unique query strings to defeat the cache, posting an iteration marker before each decode. Iterations 0 through 59 all advanced and the page posted stage 'done' with count 60. No timeout, crash, or missing marker occurred.",
+      "limitations": "No AddressSanitizer. A silent out-of-bounds write cannot be excluded. The stress run exercised one allocation pattern; other heap layouts could behave differently. One console.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

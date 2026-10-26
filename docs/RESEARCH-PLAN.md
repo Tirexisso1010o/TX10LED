@@ -34,7 +34,7 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary | 2 | 3 | 2 | **12** | Blocked |
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host | 1 | 3 | 2 | **6** | Blocked |
 | **D6** | Artemis save chain-load (`H-007`) | 1 | No — no Switch reproduction or save delivery | 2 | 2 | 1 | **4** | Blocked |
-| **D7** | Browser non-JS parsers: image decoding (`H-008`) | 1 | **Yes** — the portal serves the assets | 4 | 4 | 3 | **48** | **Next** |
+| **D7** | Browser non-JS parsers: image decoding (`H-008`) | 1 | **Yes** — the portal serves the assets | 4 | 4 | 3 | **48** | **Closed — inconclusive** |
 
 `D1` is now closed: the capmtp surface was tested on hardware and produced only documented errors. `D2` is the next runnable direction. `D3` remains the only direction that can close the decisive stage, and it is blocked because the owner cannot provide firmware artifacts.
 
@@ -135,6 +135,15 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 
 **Second step (needs approval).** Only if WebP decodes, test a public crash reproducer and record whether the applet faults. That is exploit testing.
 
+**Result (2026-10-26).** Closed inconclusive.
+
+- All six image formats decode, including lossless WebP, so the Huffman path is reachable.
+- The console decoded both public reproducers to 1x1 images. Stock libwebp 1.2.4, 1.3.1, and 1.6.0 reject the same files, so the console's decoder is **non-stock** — consistent with an older or custom implementation that lacks the validation added in 2023.
+- Sixty repeated decodes of the stronger file (`nso.webp`, `color_cache_bits=6`) produced no visible fault and the applet stayed responsive.
+- The reproducer was validated locally with ASAN against vulnerable commit `7ba44f8`, so the trigger is real; but without ASAN a silent 4-byte-to-430-byte overflow cannot be observed.
+
+**Why it closes.** A no-fault result is unobservable evidence, and repeating it would not add information. Confirming the overflow would need the decoder binary, ASAN, or heap-grooming work that is indistinguishable from exploit development. Even a confirmed trigger would be applet-level and would not provide SD homebrew.
+
 **Kill criterion.** WebP is not decoded, or the decoder rejects crafted input without faulting.
 
 ## Task queue
@@ -149,6 +158,7 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 | T6 | Determine browser security patch level | Browser binary or controlled exploit testing | **Closed — moot (no JIT)** |
 | T7 | Package1 differ and warmboot checklist | Legal firmware artifacts | Blocked (owner cannot provide) |
 | T8 | Switch 1 `fs` comparison | Stage-1 primitive | Blocked |
+| T9 | WebP reproducer on the console | Owner approval | **Done — no fault, inconclusive** |
 
 ## Program status
 
@@ -160,6 +170,7 @@ Every direction that could be executed with the owner's hardware has now been ei
 - **D4 `fs`**: blocked on a stage-1 primitive.
 - **D5 GameShare**: blocked on a Switch 2 host.
 - **D6 Artemis**: blocked on save delivery and native escape.
+- **D7 browser image parsers**: closed inconclusive (non-stock decoder accepted the reproducer; no observable fault).
 
 No runnable software-only direction remains with the current materials. Further progress requires new public research or a lawful firmware source. That is a statement about available inputs, not proof of impossibility.
 

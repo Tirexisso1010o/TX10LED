@@ -267,3 +267,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Keep the direction open pending patch-level information (rejected: without a JIT the patch level is secondary, and obtaining it needs the binary or exploit testing); attempt a public JIT-based PoC (rejected: would not apply and would be exploit execution); try a non-JIT fuzzing campaign (rejected: out of scope, and it would require crash testing on the owner's console).
 
 **Consequences:** `E-064`, `C-033`, the plan, and the checkpoint record the closure. The program now has no runnable software-only direction with the current materials. The console is unchanged; the DNS entry was temporary and should be reverted. No exploit was attempted.
+
+## 2026-10-26 — Close the WebP decoder lead as inconclusive
+
+**Decision:** Close `H-008` and `D7`. Record that the console's WebP decoder is non-stock — it accepts both CVE-2023-4863 reproducers that stock libwebp 1.2.4, 1.3.1, and 1.6.0 reject — but that sixty repeated decodes produced no visible fault, so vulnerability is unconfirmed.
+
+**Reason:** The reproducer was validated locally with ASAN against vulnerable commit `7ba44f8`, so the trigger is genuine. The console decoded it anyway, which is consistent with an older or custom decoder lacking the 2023 validation, but a silent overflow cannot be observed without ASAN. The pre-registered kill criterion for this direction was a clean run with no fault; that is what happened. Continuing would mean heap-grooming work aimed at forcing a crash, which is indistinguishable from exploit development and would still stop at applet-level userland.
+
+**Alternatives considered:** Repeat the stress longer (rejected: same unobservable outcome); generate a stronger trigger with `craft.c` (rejected: moves into exploit development with no path to homebrew); treat acceptance as proof of vulnerability (rejected: it is not).
+
+**Consequences:** `E-067`, `E-068`, `C-034`, the plan, and the checkpoint record the closure. The console is unchanged and stayed responsive. The local reproducer files are not committed. No software-only direction with an observable signal remains with the current materials.

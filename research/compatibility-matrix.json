@@ -512,9 +512,10 @@
         "E-058",
         "E-064",
         "E-065",
-        "E-067"
+        "E-067",
+        "E-068"
       ],
-      "notes": "Surface reachable: all six image formats decode, including lossless WebP. Both CVE-2023-4863 reproducers were decoded to 1x1 without a fault, while stock libwebp rejects them, so the console decoder is non-stock. Vulnerability is unconfirmed; a silent overflow is possible."
+      "notes": "Closed inconclusive. The decoder is reachable and non-stock: it accepts both CVE-2023-4863 reproducers that stock libwebp rejects. Sixty repeated decodes produced no visible fault. A silent overflow cannot be excluded, but no observable signal exists."
     }
   ],
   "usb_modes": [
