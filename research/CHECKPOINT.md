@@ -9,7 +9,7 @@ Last updated: 2026-10-26
 - Target: Nintendo Switch OLED, user-reported `HEG-001`, firmware `23.0.1`.
 - Console state: unchanged by this project.
 - Hardware validation: **pending**. No USB observation has been recorded.
-- Publication: **not pushed**. Local changes only until the remote, branch, and publication scope are confirmed.
+- Publication: **pushed** to `origin/main` at commit `a043b89` on 2026-10-26.
 - Focus: potential software-only jailbreak research and the read-only USB tool.
 
 ## Verified conclusions
@@ -57,7 +57,6 @@ Research data OK: 30 sources, 36 evidence entries, 10 entry-point surfaces, 5 le
 ## Pending approvals
 
 - Connect the console in PTP mode and confirm its identity before opening it.
-- Confirm the remote, branch, and publication scope before the first push.
 - Any console state change, firmware update, RCM entry, or payload attempt requires explicit approval and is currently not authorized.
 
 ## Pending work
@@ -78,9 +77,9 @@ Research data OK: 30 sources, 36 evidence entries, 10 entry-point surfaces, 5 le
 
 ## Next safe action
 
-Run the research validator and the local CLI checks. Then ask the user for:
+Run the research validator and the local CLI checks. The repository is published to `origin/main`. Then ask the user for:
 
 1. the manual console details (model, firmware confirmation without updating, serial prefix only, and whether it has ever been opened or modchipped);
-2. confirmation of the remote, branch, and publication scope before the first push.
+2. confirmation that the console is connected in PTP mode and ready for a read-only `GetDeviceInfo` probe.
 
 The `.venv` and `pyusb` install was approved and completed. Do not update firmware, enter RCM, inject a payload, or change console state.
