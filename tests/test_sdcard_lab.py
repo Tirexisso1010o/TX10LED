@@ -86,6 +86,26 @@ class AlbumTreeTests(unittest.TestCase):
         low = struct.unpack_from("<H", image, nintendo + 26)[0]
         self.assertEqual((high << 16) | low, 0x0FFFFFF0)
 
+    def test_long_names_match_the_console_pattern(self) -> None:
+        image = lab.build_image(64, "album_date_file_oob")
+        layout = lab.layout_for(64)
+        day = layout.data_start * lab.SECTOR + 5 * lab.SECTOR
+
+        self.assertEqual(image[day + 11], 0x0F)
+        self.assertEqual(image[day] & 0x40, 0x40)  # last LFN chunk stored first
+        short1 = b"202610~1JPG"
+        self.assertEqual(image[day + 160 : day + 171], short1)
+        self.assertEqual(image[day + 160 + 26 : day + 160 + 28], struct.pack("<H", 8))
+
+        short2 = b"202610~2JPG"
+        self.assertEqual(image[day + 352 : day + 363], short2)
+        high = struct.unpack_from("<H", image, day + 352 + 20)[0]
+        low = struct.unpack_from("<H", image, day + 352 + 26)[0]
+        self.assertEqual((high << 16) | low, 0x0FFFFFF0)
+
+        checksum = lab._lfn_checksum(short1)
+        self.assertEqual(image[day + 13], checksum)
+
     def test_date_tree_reaches_the_day_directory(self) -> None:
         image = lab.build_image(64, "album_date_file_oob")
         layout = lab.layout_for(64)
@@ -100,10 +120,7 @@ class AlbumTreeTests(unittest.TestCase):
             low = struct.unpack_from("<H", image, at(cluster) + 26)[0]
             self.assertEqual(low, target)
         day = at(7)
-        self.assertEqual(image[day : day + 11], b"OK      JPG")
-        high = struct.unpack_from("<H", image, day + 32 + 20)[0]
-        low = struct.unpack_from("<H", image, day + 32 + 26)[0]
-        self.assertEqual((high << 16) | low, 0x0FFFFFF0)
+        self.assertEqual(image[day + 11], 0x0F)  # first entry is a long-name record
 
     def test_album_file_points_out_of_range(self) -> None:
         image = lab.build_image(64, "album_file_oob")

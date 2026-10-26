@@ -239,6 +239,61 @@ def _album_tree(image: bytearray, layout: Layout, anomaly: str) -> None:
     image[at(6) : at(6) + len(JPEG)] = JPEG
 
 
+def _short_name(long_name: str, index: int) -> bytes:
+    base, _, ext = long_name.rpartition(".")
+    cleaned = "".join(ch for ch in base if ch.isalnum())[:6].upper()
+    short_base = (cleaned.ljust(6) + "~" + str(index)).ljust(8)[:8]
+    return (short_base + ext[:3].upper().ljust(3)).encode("ascii")
+
+
+def _lfn_checksum(short: bytes) -> int:
+    total = 0
+    for byte in short:
+        total = (((total & 1) << 7) + (total >> 1) + byte) & 0xFF
+    return total
+
+
+def _lfn_entries(long_name: str, short: bytes) -> list[bytes]:
+    checksum = _lfn_checksum(short)
+    units = [ord(ch) for ch in long_name] + [0]
+    while len(units) % 13:
+        units.append(0xFFFF)
+    chunks = [units[i : i + 13] for i in range(0, len(units), 13)]
+    entries: list[bytes] = []
+    for position, chunk in enumerate(chunks):
+        sequence = position + 1
+        if position == len(chunks) - 1:
+            sequence |= 0x40
+        entry = bytearray(32)
+        entry[0] = sequence
+        entry[1:11] = struct.pack("<5H", *chunk[0:5])
+        entry[11] = 0x0F
+        entry[12] = 0
+        entry[13] = checksum
+        entry[14:26] = struct.pack("<6H", *chunk[5:11])
+        entry[26:28] = b"\x00\x00"
+        entry[28:32] = struct.pack("<2H", *chunk[11:13])
+        entries.append(bytes(entry))
+    return list(reversed(entries))
+
+
+def _dir_entry_long(
+    sector: bytearray,
+    offset: int,
+    long_name: str,
+    index: int,
+    attr: int,
+    cluster: int,
+    size: int,
+) -> int:
+    short = _short_name(long_name, index)
+    for entry in _lfn_entries(long_name, short):
+        sector[offset : offset + 32] = entry
+        offset += 32
+    _dir_entry(sector, offset, short, attr, cluster, size)
+    return offset + 32
+
+
 def _album_date_tree(image: bytearray, layout: Layout) -> None:
     data = layout.data_start * SECTOR
 
@@ -258,8 +313,24 @@ def _album_date_tree(image: bytearray, layout: Layout) -> None:
         image[at(cluster) : at(cluster) + SECTOR] = sector
 
     day = bytearray(SECTOR)
-    _dir_entry(day, 0, b"OK      JPG", 0x20, 8, len(JPEG))
-    _dir_entry(day, 32, b"TEST    JPG", 0x20, 0x0FFFFFF0, len(JPEG))
+    offset = _dir_entry_long(
+        day,
+        0,
+        "2026102701000000-" + "A" * 32 + ".jpg",
+        1,
+        0x20,
+        8,
+        len(JPEG),
+    )
+    _dir_entry_long(
+        day,
+        offset,
+        "2026102701000100-" + "B" * 32 + ".jpg",
+        2,
+        0x20,
+        0x0FFFFFF0,
+        len(JPEG),
+    )
     image[at(7) : at(7) + SECTOR] = day
     image[at(8) : at(8) + len(JPEG)] = JPEG
 
