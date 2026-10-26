@@ -441,6 +441,72 @@
       "snapshot": "Published 2026-10-22. Reports that SmileBASIC 4 was delisted in the US and Europe soon after the Switch 2 jailbreak went public, so only people who already owned it can use that entry point.",
       "license": "News reporting; cited as secondary reporting.",
       "notes": "Corroborates the delisting and the resulting ownership constraint."
+    },
+    {
+      "id": "hacks-guide-wiki-models",
+      "title": "Hacks Guide Wiki: Nintendo Switch models",
+      "publisher": "Hacks Guide Wiki",
+      "kind": "guide",
+      "url": "https://wiki.hacks.guide/wiki/Nintendo_Switch",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "States that only original Erista models made before July 2018 are currently hackable, that other patched Erista models may use the software method Caffeine on versions 4.0.0 to 4.1.0, and that Icosa (Mariko V2), Switch Lite (Hoag), and OLED (Aula) systems cannot be hacked via software at this time.",
+      "license": "Community wiki documentation; cited as a maintained guide.",
+      "notes": "Direct vendor-independent statement of the current software-hackability boundary for Mariko and OLED."
+    },
+    {
+      "id": "caffeine-repository",
+      "title": "liuervehc/caffeine: a warmboot exploit for system software 4.1.0 and below",
+      "publisher": "GitHub",
+      "kind": "source-code",
+      "url": "https://github.com/liuervehc/caffeine",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "README: 'an implementation of a warmboot exploit for Nintendo Switch running system software 4.1.0 and below (excluding 1.0.0)'.",
+      "license": "Open-source repository; cited as source code.",
+      "notes": "Establishes the warmboot-exploit category and its firmware range."
+    },
+    {
+      "id": "switchbrew-package1",
+      "title": "Nintendo Switch Brew: Package1",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/Package1",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Describes package1 as the first Switch bootloader plus the encrypted PK11 blob containing the second bootloader and TrustZone code. Section 0 contains the warmboot binary. States that on Mariko package1 is distributed in a custom, signed and encrypted format with an RSA-PSS signature.",
+      "license": "Wiki text governed by Nintendo Switch Brew's terms; cited as documentation.",
+      "notes": "Used to explain why a Mariko warmboot exploit is a distinct requirement from a bootROM bug."
+    },
+    {
+      "id": "gbatemp-switch-exploits",
+      "title": "WikiTemp: List of Switch exploits",
+      "publisher": "GBAtemp",
+      "kind": "wiki",
+      "url": "https://wiki.gbatemp.net/wiki/List_of_Switch_exploits",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Historical list of Switch exploits: Jamais vu (1.0.0), PegaSwitch (1.0.0-3.0.0), Nereba (1.0.0-3.0.0), Déjà Vu / Caffeine (1.0.0-4.1.0, partially up to 7.0.1), and Fusée Gelée (non-iPatched consoles). Last edited 2019-08-07.",
+      "license": "GNU Free Documentation License 1.3 or later.",
+      "notes": "Useful for the historical sequence. It is stale and does not cover 23.0.1."
+    },
+    {
+      "id": "artemis-lua-loader",
+      "title": "Gezine/ArtemisLuaLoader: run arbitrary Lua script from save data",
+      "publisher": "GitHub",
+      "kind": "source-code",
+      "url": "https://github.com/Gezine/ArtemisLuaLoader",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "States that Artemis is a cross-platform visual-novel engine using Lua, that most Artemis games automatically load save9999.dat on boot, and that an edited save can chain-load inject.iet then inject.lua. Lists Windows, Android, iOS, Web, Nintendo Switch, and PlayStation as supported platforms, says testing was on Windows and PS4, and notes the repository is unmaintained and moved to shahrilnet/remote_lua_loader.",
+      "license": "Open-source repository; cited as source code.",
+      "notes": "A save-based script-loading mechanism, not a native-code chain. No Switch reproduction is documented."
+    },
+    {
+      "id": "nintendo-smilebasic-store",
+      "title": "Nintendo: SmileBASIC 4 (download software)",
+      "publisher": "Nintendo",
+      "kind": "vendor-documentation",
+      "url": "https://www.nintendo.com/us/store/products/smilebasic-4-switch/",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Lists SmileBASIC 4 as Nintendo Switch download software.",
+      "license": "Nintendo store listing; quoted as vendor documentation.",
+      "notes": "Confirms the title is distributed as download software, so there is no physical cartridge route to obtain it."
     }
   ]
 }

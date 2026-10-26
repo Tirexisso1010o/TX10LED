@@ -683,6 +683,75 @@
       "evidence": "TwistedVoxel reports that Gezine said SmileBASIC 4 is not strictly necessary, that Artemis Engine could also be used, and that a physical game cartridge method may exist; Gezine did not disclose the cartridge and advised against buying Artemis Engine for this purpose.",
       "limitations": "Secondary reporting of social-media posts with no technical detail, no package, and no reproduction. It does not establish that any alternate trigger works on Switch 1 23.0.1.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-050",
+      "claim": "Caffeine is a warmboot exploit that let patched Erista consoles on 4.0.0-4.1.0 run full CFW without Fusée Gelée, which shows a software-only CFW path on a patched console is possible when the boot stage itself is exploitable.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Historical precedent for a warmboot-based CFW path on patched hardware.",
+      "sources": [
+        "caffeine-repository",
+        "hacks-guide-wiki-models",
+        "gbatemp-switch-exploits"
+      ],
+      "evidence": "The Caffeine repository describes itself as 'an implementation of a warmboot exploit for Nintendo Switch running system software 4.1.0 and below (excluding 1.0.0)'. The Hacks Guide Wiki states that other patched Erista models may use the software method Caffeine if they run on versions 4.0.0 to 4.1.0, while Mariko-based models cannot be hacked via software.",
+      "limitations": "This is Erista only and more than six years old. It does not imply that a warmboot bug exists on Mariko or on 23.0.1; it only shows that the category is viable.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-051",
+      "claim": "Warmboot is package1 section 0, and Mariko package1 is distributed in a signed and encrypted format, so a Mariko warmboot exploit would need a code bug in verified warmboot or TSEC code rather than a re-signed package.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Boot-chain structure relevant to stage 3.",
+      "sources": [
+        "switchbrew-package1"
+      ],
+      "evidence": "Switchbrew states that package1 section 0 contains the warmboot binary and section 2 the Secure Monitor, and that on Mariko the package is distributed in a custom, signed and encrypted format with an RSA-PSS signature at offset 0x10.",
+      "limitations": "The wiki documents the format, not the presence or absence of vulnerabilities. It does not prove that warmboot is hardened, only that replacing it requires defeating verification.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-052",
+      "claim": "The ns2jb fs path-normalization bug is a privilege-escalation stage that requires a prior userland entry point, so it cannot function as an entry point by itself.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "high",
+      "scope": "Stage position of the ns2jb fs bug.",
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "ns2jb-repository"
+      ],
+      "evidence": "The write-up reaches the fs buffer overflow through an IFileSystem handle and the GetEntryType IPC command, after obtaining arbitrary read/write from the SmileBASIC interpreter overflow. The repository requires SmileBASIC 4.4.9 as the entry.",
+      "limitations": "This is a structural reading of the published write-up, not an independent audit. It is consistent with the repository's stated SmileBASIC requirement.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-053",
+      "claim": "Artemis Engine games can chain-load Lua from an edited save file, but the public loader is documented for PS4 and Windows and does not provide native code or a documented Switch reproduction.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Save-based script loading as a candidate trigger.",
+      "sources": [
+        "artemis-lua-loader"
+      ],
+      "evidence": "The ArtemisLuaLoader README states that most Artemis games automatically load save9999.dat on boot and that an edited save can chain-load inject.iet and then inject.lua. It lists Nintendo Switch among supported engine platforms, states testing was on Windows and PS4, and says the repository is unmaintained.",
+      "limitations": "Listing Switch as a supported engine platform is not evidence that the save chain-load works on Switch, and Lua execution inside a game is not native code execution. Copying a crafted save to a stock console is itself a constraint.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-054",
+      "claim": "SmileBASIC 4 is distributed as Nintendo Switch download software, so there is no physical cartridge route to obtain the ns2jb entry point.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Acquisition of the documented ns2jb trigger.",
+      "sources": [
+        "nintendo-smilebasic-store",
+        "twistedvoxel-smilebasic-delist"
+      ],
+      "evidence": "Nintendo's store listing classifies SmileBASIC 4 as Nintendo Switch download software. TwistedVoxel reported the UK eShop delisting on 2026-10-22.",
+      "limitations": "A demo is reported to exist in some regions, and its version and save capability are not documented for this chain. Availability is time-sensitive.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

@@ -355,6 +355,33 @@
         "E-049"
       ],
       "notes": "A userland claim with no public package, technical detail, or reproduction. Even if accurate, it would not by itself provide kernel, bootROM, CFW, or Atmosphère."
+    },
+    {
+      "id": "C-023",
+      "component": "Warmboot / pre-Horizon code execution on Mariko",
+      "version": "Required for Atmosphère; no public Mariko artifact for modern firmware",
+      "dimension": "Boot stage",
+      "status": "UNKNOWN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-050",
+        "E-051"
+      ],
+      "notes": "The decisive missing stage. Caffeine closed it for patched Erista 4.0.0-4.1.0 by attacking warmboot rather than the bootROM. No public Mariko warmboot or pre-Horizon chain exists for 23.0.1."
+    },
+    {
+      "id": "C-024",
+      "component": "Artemis Engine save-based Lua loading",
+      "version": "Documented for PS4 and Windows; no Switch reproduction",
+      "dimension": "Entry point",
+      "status": "UNVERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-053"
+      ],
+      "notes": "A save-based script chain-load that yields game-level Lua execution at most. It is not native code, and placing a crafted save on a stock console is itself a constraint."
     }
   ],
   "usb_modes": [

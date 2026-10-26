@@ -18,6 +18,7 @@ This repository does not contain a working exploit, a payload, or a flashing too
 | Is there a real software-only userland/sysmodule chain? | Yes: `ns2jb`, but it is Switch 2-packaged, Switch 1-unpackaged, and not a path to Atmosphère. | **PARTIALLY VERIFIED** |
 | Is there a remote-input surface on the console? | Yes: GameShare runs in the `splay` applet, but hosting requires a Switch 2 and no public vulnerability exists. | **UNKNOWN** |
 | Could an undisclosed software-only method exist? | Cannot be established from public sources. | **UNKNOWN** |
+| Which link of the chain is missing? | Boot-stage execution (warmboot/package1) on Mariko; stages 1–2 are also absent for Switch 1. | **UNKNOWN** — see [`docs/GAP-ANALYSIS.md`](docs/GAP-ANALYSIS.md) |
 | Is this exact console an OLED on 23.0.1, and is it unmodified? | PTP observed 23.0.1 and serial prefix `XTJ`; exact model and no-mod history owner-reported. | **PARTIALLY VERIFIED** |
 | Does the OLED enumerate as `057e:201d` and answer PTP `GetDeviceInfo`? | Yes, observed 2026-10-26; 10 operations, no session opened. | **VERIFIED** |
 
@@ -191,6 +192,7 @@ pyproject.toml
 docs/
   COMPATIBILITY.md          Compatibility findings and the ns2jb nuance
   ENTRY-POINTS.md           Readable surface-by-surface analysis
+  GAP-ANALYSIS.md           Stage-by-stage view of the missing chain
   USB_INTEGRATION.md        macOS USB architecture, PTP, privacy, failure modes
   RESEARCH_METHODOLOGY.md   Source rules, status labels, reproduction steps
   SAFETY_AND_RECOVERY.md    Scope, risks, recovery, incident response
@@ -214,6 +216,7 @@ Validation and rendering scripts beyond the validator, and the mocked USB test s
 ## Documentation
 
 - [Entry points](docs/ENTRY-POINTS.md)
+- [Gap analysis](docs/GAP-ANALYSIS.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [USB integration](docs/USB_INTEGRATION.md)
 - [Research methodology](docs/RESEARCH_METHODOLOGY.md)

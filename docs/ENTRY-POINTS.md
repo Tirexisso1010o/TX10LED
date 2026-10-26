@@ -17,6 +17,22 @@ Two axes are deliberately separate:
 
 The answer is **yes** to the first and **no documented software-only method** for the second. Atmosphère 1.12.1 and hekate v6.5.4 support 23.0.1, but support for a firmware's system modules is not a way to run code on a patched bootROM.
 
+## The chain, as stages
+
+An entry point is only one link. Atmosphère needs a chain, and the links are not interchangeable:
+
+| Stage | What it must achieve | Public status on Mariko 23.0.1 |
+|---|---|---|
+| **0. Trigger** | Obtain the software the entry lives in | Unavailable to this owner: `ns2jb` needs SmileBASIC 4.4.9 |
+| **1. Initial code execution** | Arbitrary code in an ordinary userland process | Not publicly demonstrated on Switch 1 23.0.1 |
+| **2. Privilege escalation** | A sysmodule with useful permissions, or the kernel | Not publicly demonstrated on Switch 1 23.0.1 |
+| **3. Boot-stage execution** | Code at warmboot/package1, before Horizon verifies its modules | **Nothing public** |
+| **4. Launch and persistence** | Hand off to a payload or CFW | Solved: Atmosphère 1.12.1, hekate v6.5.4 |
+
+Stage 3 is the one that is usually skipped in discussion, and it is the decisive one. Atmosphère replaces verified system modules, so a kernel exploit that arrives after boot cannot make the boot chain load unsigned code. The historical proof that this is possible on patched hardware is **Caffeine**, a warmboot exploit for patched Erista on 4.0.0–4.1.0, which ran full CFW without Fusée Gelée. No Mariko equivalent is public for modern firmware.
+
+The full stage-by-stage analysis is in [`docs/GAP-ANALYSIS.md`](GAP-ANALYSIS.md).
+
 ## How to read this document
 
 Each surface has one of the five evidence statuses used throughout the repository:

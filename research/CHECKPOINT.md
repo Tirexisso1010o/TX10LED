@@ -32,12 +32,18 @@ Last updated: 2026-10-26
 15. CVE-2026-82079 is a local-wireless stack overflow fixed in 23.0.0; the target is reported on 23.0.1. No public exploit code was found.
 16. PegaSwitch (early browser) and Caffeine (patched Erista 4.1.0) are historical and do not apply to the target.
 17. Switchbrew's 23.0.0 page documents fixes for `bsdsocket`, `audio`, and `ldn`; 23.0.1 lists a stability fix and an `sdb`/SystemVersion update, with an unfilled security-flaw placeholder.
+18. Atmosphère is a boot-time CFW, so a software-only path needs **boot-stage execution** (stage 3), not only a userland or kernel primitive. Caffeine proves the category works on patched hardware: a warmboot exploit ran full CFW on patched Erista 4.0.0–4.1.0 without Fusée Gelée.
+19. No public Mariko warmboot or pre-Horizon chain exists for modern firmware. Warmboot is package1 section 0, and Mariko package1 is signed and encrypted, so an equivalent would need a code bug in verified warmboot or TSEC code.
+20. The `ns2jb` `fs` bug is a privilege-escalation stage, not an entry point: it is reached through an `IFileSystem` handle after the SmileBASIC overflow. Without stage 1 there is nothing to escalate from.
+21. SmileBASIC 4 is download-only, so there is no physical cartridge route; the owner does not have it, and the delisting removes the purchase route in several regions.
+22. Artemis Engine games can chain-load Lua from an edited save, but the public loader is documented for PS4 and Windows and yields game-script level, not native code. No Switch reproduction is documented.
 
 ## Completed work
 
-- Source register (40 sources), evidence ledger (E-001–E-049), and compatibility matrix (22 rows).
+- Source register (46 sources), evidence ledger (E-001–E-054), and compatibility matrix (24 rows).
 - Detailed entry-point matrix (`research/entry-points.json`) covering 11 surfaces and 6 public leads, including `EP-011` GameShare/`splay` and `L-006`.
-- Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a GameShare section, bounds, and capability ceiling.
+- Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a stage model, a GameShare section, bounds, and capability ceiling.
+- Stage-by-stage gap analysis (`docs/GAP-ANALYSIS.md`) identifying boot-stage execution as the decisive missing link.
 - README framing the project as a potential-jailbreak investigation plus a read-only USB tool, with GameShare in the short-version table and the surface table.
 - Compatibility narrative with the `ns2jb` distinction and the GameShare receiver section.
 - Known-limitations update covering GameShare, `ns2jb`'s unpackaged Switch 1 test, SmileBASIC delisting, Gezine's unreleased claim, `UNKNOWN` surfaces, the 23.0.1 placeholder, and the userland-to-boot gap.
@@ -62,7 +68,7 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 40 sources, 49 evidence entries, 11 entry-point surfaces, 6 leads, 22 matrix rows, 5 USB modes.
+Research data OK: 46 sources, 54 evidence entries, 11 entry-point surfaces, 6 leads, 24 matrix rows, 5 USB modes.
 ```
 
 PTP observation:
@@ -104,6 +110,7 @@ The PTP identity observation is complete and recorded. The console is unchanged.
 1. a packaged Switch 1 version of the `ns2jb` chain with a stated model and firmware;
 2. a public chain connecting a userland/sysmodule primitive to kernel or bootROM access on Mariko;
 3. a public 23.0.1-specific browser, local-wireless, or Bluetooth chain;
-4. public GameShare/`splay` protocol research or a `jpegdec`/NACP parsing advisory.
+4. public GameShare/`splay` protocol research or a `jpegdec`/NACP parsing advisory;
+5. any public Mariko warmboot, package1, or pre-Horizon code-execution research for modern firmware, which is the decisive missing stage.
 
 Do not update firmware, enter RCM, inject a payload, spoof a GameShare host, send crafted data to the console, or change console state.
