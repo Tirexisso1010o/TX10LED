@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "last_reviewed": "2026-10-26",
+  "purpose": "Falsifiable research hypotheses for a software-only Atmosphère path on Mariko firmware 23.0.1. Each record states what would confirm or kill it, so a negative result is recorded instead of being rediscovered.",
+  "status_legend": [
+    {
+      "status": "VERIFIED",
+      "meaning": "Directly supported by an authoritative or primary source, or reproduced under a stated procedure."
+    },
+    {
+      "status": "PARTIALLY VERIFIED",
+      "meaning": "Indirect evidence, or a result that covers a related but not identical case."
+    },
+    {
+      "status": "UNVERIFIED",
+      "meaning": "Plausible and testable, but not yet tested or not independently checked."
+    },
+    {
+      "status": "DISPROVEN",
+      "meaning": "Contradicted by an authoritative source or by a reproduced negative result."
+    },
+    {
+      "status": "UNKNOWN",
+      "meaning": "Insufficient evidence; currently blocked, untested, or not reachable with available materials."
+    }
+  ],
+  "stage_legend": {
+    "0": "Trigger: obtain the software or surface the entry point lives in.",
+    "1": "Initial code execution in an ordinary userland process.",
+    "2": "Privilege escalation to a sysmodule with useful permissions, or to the kernel.",
+    "3": "Boot-stage execution at warmboot or package1, before Horizon verifies its modules.",
+    "4": "Launch and persistence of a payload or CFW."
+  },
+  "hypotheses": [
+    {
+      "id": "H-001",
+      "title": "capmtp object-read boundary validation",
+      "stage": "1",
+      "surface": "EP-004",
+      "component": "capmtp sysmodule, PTP operation 0x1009 (GetObject)",
+      "hypothesis": "The PTP object-read handler may fail to bound the requested offset and length against the object size, allowing an out-of-bounds read or a crash when a host supplies boundary values.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "USB host access to the console in Copy to PC via USB mode",
+        "A PTP session and at least one object handle",
+        "Approval to send boundary parameters"
+      ],
+      "expected_capability": "At most an out-of-bounds read from the capmtp process, which would be an information disclosure. It would not provide code execution by itself.",
+      "test_procedure": "Enumerate storages and object handles, then issue GetObject with offset and length at 0, size-1, size, size+1, 0x7FFFFFFF, 0x80000000, and 0xFFFFFFFF. Record the response code, returned length, and whether the console stays responsive. Use scripts/ptp_boundary.py.",
+      "expected_signal": "A successful response whose returned length exceeds the object size, or data that is inconsistent with the object's declared size, indicates a validation failure. A transport timeout or a dropped PTP interface indicates a crash or hang and must be recorded as such.",
+      "kill_criteria": "Every boundary case returns a documented PTP error code or a response bounded by the object size, and the console remains responsive across the full run. Record the run as a negative result and stop probing this operation.",
+      "risks": "A malformed boundary request could hang or crash capmtp. Recovery is to disconnect the cable and reboot the console. The session is read-only and no object is modified.",
+      "blocked_by": null,
+      "evidence": [
+        "E-018",
+        "E-055"
+      ],
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-ptp-source"
+      ],
+      "last_reviewed": "2026-10-26",
+      "hardware": "HEG-001 (Mariko), USB host access",
+      "firmware": "23.0.1",
+      "results": "Not run against hardware. The harness is implemented and covered by 14 mocked-pipe tests, including plan construction, framing, refusal of non-read operations, and stop-on-timeout.",
+      "uncertainties": "Whether capmtp bounds offset and length; whether advertised object handles are stable across sessions; whether a timeout would indicate a crash rather than a busy pipe. The fixed-width request shape lowers the expected yield, so a negative result is the most likely outcome."
+    },
+    {
+      "id": "H-002",
+      "title": "capmtp handle-table parameter validation",
+      "stage": "1",
+      "surface": "EP-004",
+      "component": "capmtp sysmodule, PTP operations 0x1007 (GetObjectHandles) and 0x1008 (GetObjectInfo)",
+      "hypothesis": "GetObjectHandles and GetObjectInfo may not validate storage IDs, object format codes, parent handles, or object handles before using them to index internal state, producing an out-of-bounds read or a crash.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "USB host access to the console in Copy to PC via USB mode",
+        "A PTP session",
+        "Approval to send invalid identifiers"
+      ],
+      "expected_capability": "An information disclosure or a denial of service in capmtp. Not code execution by itself.",
+      "test_procedure": "Issue GetObjectHandles with invalid storage IDs, unknown format codes, and invalid parent handles, and GetObjectInfo with handles 0, 1, 0x7FFFFFFF, 0x80000000, and 0xFFFFFFFF. Record response codes and responsiveness. Use scripts/ptp_boundary.py --family handles.",
+      "expected_signal": "A response containing handles or metadata that were never advertised, or an inconsistent success response for an invalid identifier, indicates a validation failure. A timeout indicates a crash or hang.",
+      "kill_criteria": "All invalid identifiers return documented PTP errors and the console remains responsive. Record as a negative result.",
+      "risks": "Same as H-001: possible capmtp hang or crash, recoverable by disconnecting and rebooting.",
+      "blocked_by": null,
+      "evidence": [
+        "E-012",
+        "E-018",
+        "E-055"
+      ],
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-ptp-source"
+      ],
+      "last_reviewed": "2026-10-26",
+      "hardware": "HEG-001 (Mariko), USB host access",
+      "firmware": "23.0.1",
+      "results": "Not run against hardware. The handle-family plan is implemented and unit-tested.",
+      "uncertainties": "Whether invalid identifiers are rejected before indexing internal state; whether the console exposes multiple storages."
+    },
+    {
+      "id": "H-003",
+      "title": "Mariko warmboot memory-safety bug",
+      "stage": "3",
+      "surface": "EP-009",
+      "component": "package1 section 0 (warmboot) and the TSEC payload on Mariko",
+      "hypothesis": "The Mariko warmboot path on 23.0.1 may contain a memory-safety defect reachable during boot, which would allow pre-Horizon code execution and therefore a software-only CFW launch without a modchip.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "Legally obtained package1 images for at least two firmware versions",
+        "A disassembler or decompiler for the warmboot and TSEC payloads",
+        "A way to execute hypotheses in an emulator or on a sacrificial device"
+      ],
+      "expected_capability": "Boot-stage code execution, which is the decisive missing stage for Atmosphère on Mariko.",
+      "test_procedure": "Diff package1 section 0 and the TSEC payload across firmware versions, identify parsing and bounds logic, and rank candidate defects by reachability before Horizon starts. Validate candidates in an emulator before any hardware test.",
+      "expected_signal": "A reachable unchecked length, index, or pointer derived from boot-time data, with a plausible path from the boot state to controlled memory.",
+      "kill_criteria": "No reachable defect survives review across the diffed versions, or every candidate requires a precondition that the boot state cannot supply.",
+      "risks": "Firmware analysis itself is passive. Testing a candidate on hardware could brick the console and is not authorized by this project.",
+      "blocked_by": "No package1 artifacts are available. A stock console cannot dump them, and this project does not accept proprietary firmware or keys.",
+      "evidence": [
+        "E-050",
+        "E-051"
+      ],
+      "sources": [
+        "switchbrew-package1",
+        "caffeine-repository",
+        "hacks-guide-wiki-models"
+      ],
+      "last_reviewed": "2026-10-26",
+      "hardware": "HEG-001 (Mariko)",
+      "firmware": "23.0.1",
+      "results": "Not started. No package1 image is available and this project does not accept proprietary firmware or keys.",
+      "uncertainties": "Whether any reachable defect exists in Mariko warmboot; whether artifacts can be obtained lawfully; whether emulation of Mariko warmboot is accurate enough to validate a candidate."
+    },
+    {
+      "id": "H-004",
+      "title": "ns2jb fs path-normalization bug on Switch 1",
+      "stage": "2",
+      "surface": "EP-008",
+      "component": "fs sysmodule, IFileSystem GetEntryType and Path::Normalize",
+      "hypothesis": "Because the documented filesystem API is largely unchanged between Switch 1 and Switch 2, the path-normalization buffer overflow described in the ns2jb write-up may also exist in the Switch 1 fs sysmodule on 23.0.1.",
+      "status": "UNVERIFIED",
+      "confidence": "medium",
+      "applies_to_target": true,
+      "prerequisites": [
+        "A stage-1 userland primitive on Switch 1 23.0.1",
+        "Either a Switch 1 fs binary to inspect or a way to observe the behavior"
+      ],
+      "expected_capability": "Privilege escalation from a userland process to the fs sysmodule, which is stage 2. It is not an entry point and does not reach boot stage.",
+      "test_procedure": "Compare the documented GetEntryType path handling across generations and inspect a Switch 1 fs binary for the 0x301-byte temporary buffer and the backslash parent-directory path. Confirm only with a stage-1 primitive in a controlled environment.",
+      "expected_signal": "Presence of the same normalize-and-copy sequence with a fixed 0x301-byte allocation and no length check.",
+      "kill_criteria": "The Switch 1 implementation uses a different normalization path, bounds the copy, or is absent.",
+      "risks": "Testing on hardware requires a stage-1 primitive that does not exist publicly. Static inspection is passive.",
+      "blocked_by": "No stage-1 primitive on Switch 1 23.0.1 and no Switch 1 fs binary are available.",
+      "evidence": [
+        "E-045",
+        "E-052"
+      ],
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "switchbrew-filesystem"
+      ],
+      "last_reviewed": "2026-10-26",
+      "hardware": "HEG-001 (Mariko)",
+      "firmware": "23.0.1",
+      "results": "Not tested. Blocked on a stage-1 primitive and a Switch 1 fs binary.",
+      "uncertainties": "Whether Switch 1 fs shares the normalize-and-copy implementation; whether the 0x301-byte buffer is the same size."
+    },
+    {
+      "id": "H-005",
+      "title": "Switch 1 browser WebKit n-day applicability",
+      "stage": "1",
+      "surface": "EP-003",
+      "component": "NetFront-based browser applets (WifiWebAuthApplet, account login) and the system web applet",
+      "hypothesis": "The Switch 1 browser may run a WebKit build exposed to publicly known n-days, and Switch 1 lacks the pointer-authentication mitigations the ns2jb author cites for Switch 2, so a matching public bug could still yield userland code execution.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "A way to reach the browser applet (captive portal or a title that opens it)",
+        "The browser engine version or a fingerprint",
+        "A public n-day matching that version"
+      ],
+      "expected_capability": "Userland code execution in a browser applet, which is stage 1.",
+      "test_procedure": "Serve a controlled page through a captive-portal setup and record the user agent, JavaScript feature detection, and engine quirks to estimate the WebKit vintage. Map the result to public advisories before attempting anything further.",
+      "expected_signal": "A browser build old enough to match a published, exploitable n-day, plus a reachable applet invocation.",
+      "kill_criteria": "The browser build is patched for all matching public advisories, or no applet invocation can be reached without a modified console.",
+      "risks": "Captive-portal testing changes the console's temporary network settings, which are reversible. Exploit development is out of scope and untested.",
+      "blocked_by": "No fingerprint has been collected, and no public chain for 23.0.1 exists.",
+      "evidence": [
+        "E-026",
+        "E-028"
+      ],
+      "sources": [
+        "switchbrew-internet-browser",
+        "pegaswitch-repository",
+        "pepsipu-ns2jb-blog"
+      ],
+      "last_reviewed": "2026-10-26",
+      "hardware": "HEG-001 (Mariko)",
+      "firmware": "23.0.1",
+      "results": "No fingerprint collected. No captive-portal test has been run.",
+      "uncertainties": "Browser engine vintage; whether the applet is reachable without a game; whether public advisories match the build."
+    },
+    {
+      "id": "H-006",
+      "title": "GameShare splay remote parsing bug",
+      "stage": "1",
+      "surface": "EP-011",
+      "component": "splay system applet; NACP, JPEG, and stream handling",
+      "hypothesis": "The splay applet may mishandle host-supplied NACP or JPEG data in a way that yields memory corruption on the receiving console.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "A Nintendo Switch 2 to host GameShare",
+        "A GameShare-compatible title",
+        "A user-initiated receive flow on the target"
+      ],
+      "expected_capability": "Applet-level userland code execution, which is stage 1 with a low privilege ceiling.",
+      "test_procedure": "Obtain the protocol description or instrument a host, then test malformed metadata against a sacrificial receiver. This is not authorized on the target console.",
+      "expected_signal": "A parsing fault that is reproducible and attributable to host-supplied data.",
+      "kill_criteria": "Parsing is delegated to hardened services, or all malformed inputs are rejected before use.",
+      "risks": "Crafting host data and sending it to a console is outside this project's authorization boundary.",
+      "blocked_by": "No Switch 2 host and no public protocol specification.",
+      "evidence": [
+        "E-041",
+        "E-043",
+        "E-044"
+      ],
+      "sources": [
+        "switchbrew-splay-applet",
+        "nintendo-gameshare-support"
+      ],
+      "last_reviewed": "2026-10-26",
+      "hardware": "Switch 2 host plus HEG-001 receiver",
+      "firmware": "23.0.1 on both",
+      "results": "Not tested. No Switch 2 host is available.",
+      "uncertainties": "Protocol framing; which data the ECC signature covers; whether NACP and JPEG parsing happen before user confirmation."
+    },
+    {
+      "id": "H-007",
+      "title": "Artemis save chain-load reaching native code",
+      "stage": "1",
+      "surface": "EP-007",
+      "component": "Artemis Engine games and their save-file script loading",
+      "hypothesis": "An Artemis Engine title on Switch may chain-load Lua from an edited save, and the engine's Lua bindings may expose a path from script execution to native code execution.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "An Artemis Engine title on Switch",
+        "A way to place an edited save on a stock console",
+        "Engine builds and Lua binding documentation"
+      ],
+      "expected_capability": "Game-level script execution, and only with an additional bug, native code execution. Stage 1.",
+      "test_procedure": "Identify Switch titles using Artemis, determine whether save data can be placed on a stock console, and audit the Lua bindings for native escapes.",
+      "expected_signal": "A documented binding that reaches native memory or FFI from game script.",
+      "kill_criteria": "Save injection is impossible on a stock console, or the Lua environment is sandboxed with no native escape.",
+      "risks": "Save manipulation is reversible but requires a delivery path that a stock console may not have.",
+      "blocked_by": "No Switch reproduction and no save-delivery path on a stock console.",
+      "evidence": [
+        "E-053"
+      ],
+      "sources": [
+        "artemis-lua-loader"
+      ],
+      "last_reviewed": "2026-10-26",
+      "hardware": "HEG-001 (Mariko)",
+      "firmware": "23.0.1",
+      "results": "Documented for PS4 and Windows only; no Switch reproduction.",
+      "uncertainties": "Whether an Artemis title exists on Switch with the same save-loading behavior; whether the Lua bindings expose native access; how a crafted save would reach a stock console."
+    }
+  ]
+}

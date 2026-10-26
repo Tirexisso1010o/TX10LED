@@ -207,3 +207,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Keep monitoring and report "nothing new" (rejected: it does not help the owner decide anything); treat a hypothetical kernel exploit as sufficient (rejected: Atmosphère loads at boot and replaces verified modules, so a post-boot kernel primitive is a different artifact); broaden the scope to modchip installation (rejected: out of scope and unsafe).
 
 **Consequences:** `research/sources.json` gains 6 sources (46 total), `research/evidence-ledger.json` gains E-050–E-054 (54 total), and `research/compatibility-matrix.json` gains `C-023` and `C-024` (24 rows). `docs/ENTRY-POINTS.md` gains a stage table, `README.md` links the analysis, and `research/known-limitations.md` and `research/CHECKPOINT.md` are updated. The conclusion is unchanged; the analysis is more precise about what is missing. No console state was modified and no exploit was executed.
+
+## 2026-10-26 — Move from gap analysis to a ranked experiment program
+
+**Decision:** Add `docs/RESEARCH-PLAN.md`, a falsifiable hypothesis register (`research/hypotheses.json`, H-001–H-007), and a gated capmtp boundary harness (`scripts/ptp_boundary.py`) with mocked-pipe tests. Rank the capmtp PTP surface as the first runnable experiment and the Mariko warmboot diff as the highest-value blocked one.
+
+**Reason:** The owner asked for active research rather than documentation. A gap analysis names the missing stage but does not test anything. The PTP surface is the only flow in which the console parses data supplied by a device the owner controls, so it is the only stage-1 hypothesis that can be tested with the materials at hand. It is also narrow, which is why it is scored low on information gain; the point is to falsify it cheaply and record the result instead of leaving it as unexamined suspicion. The warmboot direction remains the only one that can close stage 3, and it is blocked on firmware artifacts rather than on effort.
+
+**Alternatives considered:** Continue monitoring only (rejected: produces no new information); start with browser exploitation (rejected: fingerprinting is the feasible first step, and exploitation is a much larger project); attempt firmware analysis without artifacts (rejected: impossible without package1).
+
+**Consequences:** `research/sources.json` gains the Filesystem services page (47 total), and the validator now checks hypotheses for required fields, stage values, surface references, and evidence/source references. `scripts/ptp_boundary.py` defaults to a dry run, permits only read-only PTP operations, caps reads, and requires `--confirm --active`. `tests/` gains 10 mocked-pipe tests. No device was opened and no console state was modified.

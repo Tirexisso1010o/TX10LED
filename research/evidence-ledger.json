@@ -752,6 +752,20 @@
       "evidence": "Nintendo's store listing classifies SmileBASIC 4 as Nintendo Switch download software. TwistedVoxel reported the UK eShop delisting on 2026-10-22.",
       "limitations": "A demo is reported to exist in some regions, and its version and save capability are not documented for this chain. Availability is time-sensitive.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-055",
+      "claim": "The documented capmtp PTP request surface carries only fixed-width integer parameters; the variable-length data in the protocol flows from the console to the host, not from the host to the console.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Shape of the host-to-console attack surface on capmtp.",
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-ptp-source"
+      ],
+      "evidence": "Switchbrew documents that only PTP operations 0x1001-0x100A are available. In those operations the request parameters are u32 values such as storage IDs, object handles, format codes, parent handles, offsets, and lengths. None is a string or a caller-supplied buffer. DeviceInfo, ObjectInfo, and object payloads are responses constructed by the console.",
+      "limitations": "This is derived from the PTP specification and the wiki's operation list, not from a capmtp binary. Undocumented vendor behavior remains possible, and fixed-width parameters do not preclude index-validation bugs or integer-overflow bugs.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

@@ -507,6 +507,17 @@
       "snapshot": "Lists SmileBASIC 4 as Nintendo Switch download software.",
       "license": "Nintendo store listing; quoted as vendor documentation.",
       "notes": "Confirms the title is distributed as download software, so there is no physical cartridge route to obtain it."
+    },
+    {
+      "id": "switchbrew-filesystem",
+      "title": "Nintendo Switch Brew: Filesystem services",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/Filesystem_services",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Documents fsp-srv, the IFileSystem interface, and commands including GetEntryType, which takes a path buffer and returns a DirectoryEntryType. Describes the filesystem API surface used by games and sysmodules.",
+      "license": "Wiki text governed by Nintendo Switch Brew's terms; cited as documentation.",
+      "notes": "Used to reason about whether the ns2jb fs path-normalization bug class could apply to Switch 1, since the filesystem API is documented as largely unchanged between generations."
     }
   ]
 }

@@ -147,12 +147,17 @@ class Validator:
         evidence_doc = self.load(RESEARCH / "evidence-ledger.json")
         matrix_doc = self.load(RESEARCH / "compatibility-matrix.json")
         entry_doc = self.load(RESEARCH / "entry-points.json")
+        hypotheses_doc = self.load(RESEARCH / "hypotheses.json")
 
         sources = self.unique_ids(sources_doc.get("sources"), "sources")
         evidence = self.unique_ids(evidence_doc.get("entries"), "evidence")
         matrix_rows = self.unique_ids(matrix_doc.get("rows"), "matrix.rows")
         usb_modes = self.unique_ids(matrix_doc.get("usb_modes"), "matrix.usb_modes")
         surfaces = self.unique_ids(entry_doc.get("surfaces"), "entry-points.surfaces")
+        hypotheses = self.unique_ids(
+            hypotheses_doc.get("hypotheses"),
+            "hypotheses",
+        )
         leads = self.unique_ids(entry_doc.get("leads"), "entry-points.leads")
         flaws = self.unique_ids(
             entry_doc.get("fixed_public_flaws"),
@@ -249,6 +254,33 @@ class Validator:
                     surface_ref in surfaces,
                     f"entry-points.leads[{lead_id}].surface is unknown: {surface_ref}",
                 )
+
+        for hypothesis_id, hypothesis in hypotheses.items():
+            label = f"hypotheses[{hypothesis_id}]"
+            self.status(hypothesis, label)
+            for field in (
+                "title",
+                "component",
+                "hypothesis",
+                "test_procedure",
+                "kill_criteria",
+                "last_reviewed",
+            ):
+                self.check(
+                    isinstance(hypothesis.get(field), str)
+                    and bool(hypothesis.get(field)),
+                    f"{label} is missing {field}",
+                )
+            self.check(
+                hypothesis.get("stage") in {"0", "1", "2", "3", "4"},
+                f"{label} has invalid stage: {hypothesis.get('stage')!r}",
+            )
+            self.check(
+                hypothesis.get("surface") in surfaces,
+                f"{label}.surface is unknown: {hypothesis.get('surface')!r}",
+            )
+            self.refs(hypothesis, "evidence", evidence, label)
+            self.refs(hypothesis, "sources", sources, label)
 
         for flaw_id, flaw in flaws.items():
             self.refs(
@@ -373,6 +405,7 @@ class Validator:
             f"{len(evidence)} evidence entries, "
             f"{len(surfaces)} entry-point surfaces, "
             f"{len(leads)} leads, "
+            f"{len(hypotheses)} hypotheses, "
             f"{len(matrix_rows)} matrix rows, "
             f"{len(usb_modes)} USB modes."
         )

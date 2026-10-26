@@ -284,7 +284,7 @@ PYTHONPATH=src python3 -m switch_usb_probe ptp-info --confirm
 
 ## Testing
 
-The mocked test suite is planned, not implemented. It will cover:
+A separate research harness, `scripts/ptp_boundary.py`, sends boundary parameters to the same PTP surface. It is **not** part of the read-only CLI: it defaults to a dry run, permits only read-only PTP operations, caps reads, and requires `--confirm --active`. Its mocked-pipe tests live in `tests/`. The CLI's own mocked test suite is still planned and will cover:
 
 - `system_profiler` JSON parsing, nested hubs, empty buses, and malformed output;
 - `ioreg` plist fallback and timeout handling;
@@ -299,7 +299,7 @@ The mocked test suite is planned, not implemented. It will cover:
 - serial redaction;
 - research data validation.
 
-No real hardware is required for CI. Until the test suite exists, `python3 scripts/validate_research.py` validates the research data and the CLI has been exercised with `doctor`, `classify`, and `compat`.
+No real hardware is required for CI. `python3 -m unittest discover -s tests` runs the boundary-harness tests, and `python3 scripts/validate_research.py` validates the research data, including the hypothesis register. The CLI has been exercised with `doctor`, `classify`, and `compat`.
 
 ## Limitations
 

@@ -94,6 +94,7 @@ It is a lead worth following, not a method to run. See E-021, E-022, E-032, and 
 | [`research/evidence-ledger.json`](research/evidence-ledger.json) | Claims, status, confidence, scope, and limitations. |
 | [`research/entry-points.json`](research/entry-points.json) | Detailed surface-by-surface entry-point matrix. |
 | [`research/compatibility-matrix.json`](research/compatibility-matrix.json) | Higher-level compatibility record. |
+| [`research/hypotheses.json`](research/hypotheses.json) | Falsifiable hypotheses with test procedures and kill criteria. |
 | [`research/known-limitations.md`](research/known-limitations.md) | What the research cannot establish. |
 | [`research/CHECKPOINT.md`](research/CHECKPOINT.md) | Resumable project state. |
 
@@ -193,6 +194,7 @@ docs/
   COMPATIBILITY.md          Compatibility findings and the ns2jb nuance
   ENTRY-POINTS.md           Readable surface-by-surface analysis
   GAP-ANALYSIS.md           Stage-by-stage view of the missing chain
+  RESEARCH-PLAN.md          Ranked experiments and kill criteria
   USB_INTEGRATION.md        macOS USB architecture, PTP, privacy, failure modes
   RESEARCH_METHODOLOGY.md   Source rules, status labels, reproduction steps
   SAFETY_AND_RECOVERY.md    Scope, risks, recovery, incident response
@@ -211,12 +213,13 @@ src/switch_usb_probe/       Read-only USB inspection package
 scripts/validate_research.py Research data validator
 ```
 
-Validation and rendering scripts beyond the validator, and the mocked USB test suite, are planned. The research JSON is currently validated with `python3 scripts/validate_research.py`; the CLI has been exercised with `doctor`, `list`, `classify`, `compat`, and a read-only `ptp-info` identity probe.
+The validator covers the research JSON, including the hypothesis register (`python3 scripts/validate_research.py`). `tests/` covers the capmtp boundary harness with a mocked pipe (`python -m unittest discover -s tests`). A mocked USB test suite for the CLI and a generated Markdown renderer are still planned. The CLI has been exercised with `doctor`, `list`, `classify`, `compat`, and a read-only `ptp-info` identity probe.
 
 ## Documentation
 
 - [Entry points](docs/ENTRY-POINTS.md)
 - [Gap analysis](docs/GAP-ANALYSIS.md)
+- [Research plan](docs/RESEARCH-PLAN.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [USB integration](docs/USB_INTEGRATION.md)
 - [Research methodology](docs/RESEARCH_METHODOLOGY.md)
