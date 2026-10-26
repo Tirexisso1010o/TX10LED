@@ -217,3 +217,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Continue monitoring only (rejected: produces no new information); start with browser exploitation (rejected: fingerprinting is the feasible first step, and exploitation is a much larger project); attempt firmware analysis without artifacts (rejected: impossible without package1).
 
 **Consequences:** `research/sources.json` gains the Filesystem services page (47 total), and the validator now checks hypotheses for required fields, stage values, surface references, and evidence/source references. `scripts/ptp_boundary.py` defaults to a dry run, permits only read-only PTP operations, caps reads, and requires `--confirm --active`. `tests/` gains 10 mocked-pipe tests. No device was opened and no console state was modified.
+
+## 2026-10-26 — First capmtp boundary run: one scoped negative, one stall
+
+**Decision:** Record the first hardware boundary run as a scoped negative for the handle-table hypothesis (`H-002`, matrix `C-025`) and as incomplete for the object-read hypothesis (`H-001`). Record the USB-C role workaround and the PTP transaction-ID requirement as environment findings.
+
+**Reason:** The owner approved active USB probing. The run produced reproducible results: invalid handles and format codes were rejected with `0x2009` and `0x200b`, and a subsequent write timed out. Claiming a vulnerability would be false; discarding the data would waste the run. The transaction-ID finding is a real protocol detail that also fixed a latent bug in the read-only client's session path.
+
+**Alternatives considered:** Treat the whole run as failed because the object family did not finish (rejected: the handle family produced clean data); treat the endpoint stall as a capmtp fault (rejected: it is unexplained and may be a hub artifact).
+
+**Consequences:** `E-056`, `C-025`, and `research/hardware-observations/2026-10-26-ptp-boundary.json` record the result. `H-002` moves to `DISPROVEN` within the tested identifier set; `H-001` stays `UNVERIFIED`. The harness discovery was fixed to use `0xFFFFFFFF` and folder recursion, and both the harness and `PtpClient` send `OpenSession` with transaction ID 0. Tests rose to 20. No exploit was found, no object was modified, and the console was not left in an altered state beyond a stalled endpoint that requires a replug.

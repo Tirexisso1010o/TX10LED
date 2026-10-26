@@ -382,6 +382,19 @@
         "E-053"
       ],
       "notes": "A save-based script chain-load that yields game-level Lua execution at most. It is not native code, and placing a crafted save on a stock console is itself a constraint."
+    },
+    {
+      "id": "C-025",
+      "component": "capmtp handle-table identifier validation",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "DISPROVEN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-056"
+      ],
+      "notes": "Invalid handles and format codes were rejected with documented PTP errors in one reproduced run. Scoped to the tested identifiers; the object-read family was not completed."
     }
   ],
   "usb_modes": [

@@ -766,6 +766,20 @@
       "evidence": "Switchbrew documents that only PTP operations 0x1001-0x100A are available. In those operations the request parameters are u32 values such as storage IDs, object handles, format codes, parent handles, offsets, and lengths. None is a string or a caller-supplied buffer. DeviceInfo, ObjectInfo, and object payloads are responses constructed by the console.",
       "limitations": "This is derived from the PTP specification and the wiki's operation list, not from a capmtp binary. Undocumented vendor behavior remains possible, and fixed-width parameters do not preclude index-validation bugs or integer-overflow bugs.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-056",
+      "claim": "On the target console, capmtp rejected invalid handle-table identifiers with documented PTP errors and stayed responsive across the tested cases.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Reproduced finding, one console and one run, 2026-10-26.",
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-ptp-source"
+      ],
+      "evidence": "With a session open, GetObjectHandles returned 0x2009 InvalidObjectHandle for an invalid storage ID with parent 0, and 0x200b InvalidObjectFormatCode for an invalid format code. GetObjectInfo returned 0x2009 for handles 0, 1, 0x7FFFFFFF, 0x80000000, and 0xFFFFFFFF. The storage/parent pair 0xFFFFFFFF/0xFFFFFFFF returned 0x2001 with 14 associations. See research/hardware-observations/2026-10-26-ptp-boundary.json.",
+      "limitations": "Scoped to the tested identifiers. The 0xFFFFFFFF values have documented 'all' semantics. The object-read boundary family was not completed, and a later endpoint stall is unexplained and not attributed to this result.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

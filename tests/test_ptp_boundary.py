@@ -219,3 +219,60 @@ class DryRunTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FakeClient:
+    """Minimal command router for discovery tests."""
+
+    def __init__(self, routes):
+        self.routes = routes
+
+    def command(self, code, params=(), *, transaction_id=None):
+        key = (code, tuple(params))
+        if key not in self.routes:
+            raise AssertionError(f"unexpected command {key}")
+        return self.routes[key]
+
+
+def u32_array(*values: int) -> bytes:
+    return len(values).to_bytes(4, "little") + b"".join(
+        v.to_bytes(4, "little") for v in values
+    )
+
+
+def object_info(size: int) -> bytes:
+    return bytes(8) + size.to_bytes(4, "little") + bytes(76)
+
+
+class DiscoveryTests(unittest.TestCase):
+    def test_discovers_a_non_empty_child(self) -> None:
+        routes = {
+            (0x1004, ()): (0x2001, (), u32_array(0x60001)),
+            (0x1007, (0x60001, 0, 0xFFFFFFFF)): (0x2001, (), u32_array(0x2AE, 0x2B0)),
+            (0x1007, (0x60001, 0, 0x2AE)): (0x2001, (), u32_array(0x2AF)),
+            (0x1008, (0x2AF,)): (0x2001, (), object_info(1234)),
+        }
+        handle, size = ptp_boundary.discover_target(FakeClient(routes))
+        self.assertEqual(handle, 0x2AF)
+        self.assertEqual(size, 1234)
+
+    def test_skips_empty_objects_and_folder_failures(self) -> None:
+        routes = {
+            (0x1004, ()): (0x2001, (), u32_array(0x60001)),
+            (0x1007, (0x60001, 0, 0xFFFFFFFF)): (0x2001, (), u32_array(0x2AE, 0x2B0)),
+            (0x1007, (0x60001, 0, 0x2AE)): (0x2001, (), u32_array(0x2AF)),
+            (0x1008, (0x2AF,)): (0x2001, (), object_info(0)),
+            (0x1007, (0x60001, 0, 0x2B0)): (0x2001, (), u32_array(0x2B1)),
+            (0x1008, (0x2B1,)): (0x2001, (), object_info(200377)),
+        }
+        handle, size = ptp_boundary.discover_target(FakeClient(routes))
+        self.assertEqual(handle, 0x2B1)
+        self.assertEqual(size, 200377)
+
+    def test_raises_when_the_album_is_empty(self) -> None:
+        routes = {
+            (0x1004, ()): (0x2001, (), u32_array(0x60001)),
+            (0x1007, (0x60001, 0, 0xFFFFFFFF)): (0x2001, (), u32_array()),
+        }
+        with self.assertRaises(ptp_boundary.ProbeError):
+            ptp_boundary.discover_target(FakeClient(routes))

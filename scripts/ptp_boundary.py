@@ -147,13 +147,18 @@ class BoundaryClient:
         return bytes(chunks)
 
     def command(
-        self, code: int, params: Sequence[int] = ()
+        self,
+        code: int,
+        params: Sequence[int] = (),
+        *,
+        transaction_id: int | None = None,
     ) -> tuple[int, tuple[int, ...], bytes]:
         if code not in READ_ONLY_OPS:
             raise PtpProtocolError(
                 f"refusing to send non-read-only PTP operation 0x{code:04x}"
             )
-        transaction_id = self._next_transaction_id()
+        if transaction_id is None:
+            transaction_id = self._next_transaction_id()
         self.pipe.write(  # type: ignore[attr-defined]
             encode_command(code, transaction_id, tuple(params)),
             self.timeout_ms,
@@ -196,7 +201,9 @@ class BoundaryClient:
 
     def open_session(self) -> None:
         try:
-            self.command(PTP_OC_OPEN_SESSION, (1,))
+            # PTP requires OpenSession to carry transaction ID 0.
+            self.command(PTP_OC_OPEN_SESSION, (1,), transaction_id=0)
+            self._transaction_id = 1
         except PtpResponseError as exc:
             if exc.code == PTP_RC_SESSION_ALREADY_OPEN:
                 self.session_opened = False
@@ -370,9 +377,12 @@ def _u32_array(payload: bytes) -> tuple[int, ...]:
 
 
 def discover_target(client: "BoundaryClient") -> tuple[int, int | None]:
-    """Pick the first storage and object handle, and read its size.
+    """Pick a non-empty object and read its declared size.
 
-    Returns ``(handle, size)``. Raises if the console advertises no objects.
+    The console models the album as associations (format 0x3001), so the first
+    level is folders and the screenshots are children.  The console also rejects
+    a parent handle of 0 with InvalidObjectHandle; 0xFFFFFFFF is the working
+    "all" value.  Raises if no non-empty object is found.
     """
 
     _, _, storage_payload = client.command(PTP_OC_GET_STORAGE_IDS)
@@ -381,24 +391,37 @@ def discover_target(client: "BoundaryClient") -> tuple[int, int | None]:
         raise ProbeError("the console advertised no PTP storages")
     storage = storage_ids[0]
 
-    _, _, handles_payload = client.command(
-        PTP_OC_GET_OBJECT_HANDLES, (storage, 0, 0)
+    _, _, roots_payload = client.command(
+        PTP_OC_GET_OBJECT_HANDLES, (storage, 0, 0xFFFFFFFF)
     )
-    handles = _u32_array(handles_payload)
-    if not handles:
+    roots = _u32_array(roots_payload)
+    if not roots:
         raise ProbeError(
             "the storage advertised no objects",
             hint="Add at least one screenshot or video, then retry.",
         )
-    handle = handles[0]
 
-    size: int | None = None
-    try:
-        _, _, info_payload = client.command(PTP_OC_GET_OBJECT_INFO, (handle,))
-        size = object_info_size(info_payload)
-    except ProbeError:
-        size = None
-    return handle, size
+    for root in roots:
+        try:
+            _, _, children_payload = client.command(
+                PTP_OC_GET_OBJECT_HANDLES, (storage, 0, root)
+            )
+        except ProbeError:
+            continue
+        for handle in _u32_array(children_payload):
+            try:
+                _, _, info_payload = client.command(
+                    PTP_OC_GET_OBJECT_INFO, (handle,)
+                )
+            except ProbeError:
+                continue
+            size = object_info_size(info_payload)
+            if size:
+                return handle, size
+    raise ProbeError(
+        "no non-empty object found in the album",
+        hint="Add a screenshot or video, then retry.",
+    )
 
 
 def plan_to_dict(cases: Iterable[Case]) -> list[dict[str, object]]:

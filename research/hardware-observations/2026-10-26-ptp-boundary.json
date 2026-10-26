@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-26-ptp-boundary",
+  "observed_at": "2026-10-26",
+  "observed_at_precision": "date",
+  "observation_type": "ptp-boundary-probe",
+  "operator": "scripts/ptp_boundary.py",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": "23.0.1",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; PTP does not detect modifications"
+  },
+  "connection": {
+    "mode": "copy-to-pc-via-usb",
+    "host_path": "USB 2.0 hub (05e3:0608) plus an A-to-C cable",
+    "role_note": "A direct USB-C connection to the Mac inverted the USB-C power role: the Mac reported a 3 W source (adapter id 0x0000) and never enumerated the console. The hub plus A-to-C path forced the Mac into host role, after which the console enumerated as 057e:201d.",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64"
+  },
+  "usb": {
+    "vid_pid": "057e:201d",
+    "backend": "ioreg",
+    "device_name": "Nintendo Switch"
+  },
+  "protocol": {
+    "session_opened": true,
+    "open_session_transaction_id": 0,
+    "note": "OpenSession with transaction ID 1 returned 0x2004 InvalidTransactionID. Sending it with transaction ID 0 succeeded, which matches the PTP requirement."
+  },
+  "handle_family": {
+    "storage_count": 1,
+    "cases": [
+      {
+        "name": "storage_ids",
+        "operation": "0x1004",
+        "result": "0x2001 OK, 8-byte payload"
+      },
+      {
+        "name": "handles_invalid_storage",
+        "operation": "0x1007",
+        "params": ["0xffffffff", "0x00000000", "0x00000000"],
+        "result": "0x2009 InvalidObjectHandle"
+      },
+      {
+        "name": "handles_invalid_format",
+        "operation": "0x1007",
+        "params": ["0xffffffff", "0xffffffff", "0x00000000"],
+        "result": "0x200b InvalidObjectFormatCode"
+      },
+      {
+        "name": "handles_invalid_parent",
+        "operation": "0x1007",
+        "params": ["0xffffffff", "0x00000000", "0xffffffff"],
+        "result": "0x2001 OK, 60-byte payload (14 handles)"
+      },
+      {
+        "name": "info_zero",
+        "operation": "0x1008",
+        "params": ["0x00000000"],
+        "result": "0x2009 InvalidObjectHandle"
+      },
+      {
+        "name": "info_one",
+        "operation": "0x1008",
+        "params": ["0x00000001"],
+        "result": "0x2009 InvalidObjectHandle"
+      },
+      {
+        "name": "info_int_max",
+        "operation": "0x1008",
+        "params": ["0x7fffffff"],
+        "result": "0x2009 InvalidObjectHandle"
+      },
+      {
+        "name": "info_sign_bit",
+        "operation": "0x1008",
+        "params": ["0x80000000"],
+        "result": "0x2009 InvalidObjectHandle"
+      },
+      {
+        "name": "info_uint_max",
+        "operation": "0x1008",
+        "params": ["0xffffffff"],
+        "result": "0x2009 InvalidObjectHandle"
+      }
+    ],
+    "outcome": "Negative for the tested identifier set. Invalid handles and format codes were rejected with documented PTP errors, and the console stayed responsive for the remainder of the run."
+  },
+  "object_enumeration": {
+    "top_level_associations": 14,
+    "association_format": "0x3001",
+    "sampled_child_counts": [1, 20, 4],
+    "first_image_object": {
+      "format": "0x3801",
+      "size_bytes": 200377
+    },
+    "note": "Album folders are associations and screenshots are their children. A parent handle of 0 returned 0x2009 InvalidObjectHandle; 0xFFFFFFFF returned all 14 associations, so the console does not treat 0 as the root handle."
+  },
+  "stall": {
+    "where": "GetObjectHandles on the fourth association during enumeration",
+    "error": "USB bulk read Errno 5 (Input/Output Error)",
+    "aftermath": "The console remained enumerated as 057e:201d, but a subsequent OpenSession write timed out with Errno 60. The bulk endpoint required a replug.",
+    "retries": 1
+  },
+  "commands": [
+    {
+      "command": ".venv/bin/python scripts/ptp_boundary.py --family handles --confirm --active --timeout 2.0",
+      "exit_code": 0,
+      "result": "Nine cases; all invalid identifiers rejected with documented PTP errors."
+    },
+    {
+      "command": ".venv/bin/python scripts/ptp_boundary.py --family objects --confirm --active --timeout 2.0",
+      "exit_code": 1,
+      "result": "Discovery failed at GetObjectHandles with parent 0 (0x2009). Later fixed to use 0xFFFFFFFF and folder recursion."
+    },
+    {
+      "command": ".venv/bin/python scripts/ptp_boundary.py --family objects --handle 0x2b1 --size 200377 --confirm --active --timeout 3.0",
+      "exit_code": 1,
+      "result": "OpenSession write timed out (Errno 60) because the endpoint was still stalled from the previous run."
+    }
+  ],
+  "interpretation": "The handle-table boundary cases behaved defensively: invalid identifiers produced documented errors and the console stayed responsive. The object-read boundary family was not completed. The run ended with a stalled bulk endpoint after an EIO during folder enumeration, which is an environment observation and not evidence of a vulnerability.",
+  "limitations": [
+    "This is one console, one host, and one run.",
+    "The 0xFFFFFFFF storage and parent values have documented 'all' semantics, so the 14-handle response is not a validation failure.",
+    "The object-read family (offsets and lengths) was not completed, so H-001 remains untested.",
+    "The endpoint stall is unexplained. It may be a hub or host artifact and cannot be attributed to capmtp without a repeat under different conditions.",
+    "A PTP response can be spoofed by modified firmware; this is an observation, not an integrity attestation."
+  ],
+  "redactions": [
+    "Serial number truncated to a three-character prefix; no serial recorded here.",
+    "Album folder names omitted because they would reveal the owner's game library."
+  ]
+}

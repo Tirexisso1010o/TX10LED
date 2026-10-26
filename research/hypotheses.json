@@ -64,8 +64,8 @@
       "last_reviewed": "2026-10-26",
       "hardware": "HEG-001 (Mariko), USB host access",
       "firmware": "23.0.1",
-      "results": "Not run against hardware. The harness is implemented and covered by 14 mocked-pipe tests, including plan construction, framing, refusal of non-read operations, and stop-on-timeout.",
-      "uncertainties": "Whether capmtp bounds offset and length; whether advertised object handles are stable across sessions; whether a timeout would indicate a crash rather than a busy pipe. The fixed-width request shape lowers the expected yield, so a negative result is the most likely outcome."
+      "results": "Not completed. Discovery first failed because the console rejects a parent handle of 0, then the bulk endpoint stalled with EIO during folder enumeration. One retry timed out. The harness discovery logic was fixed to use 0xFFFFFFFF and folder recursion; the object family still needs a fresh run.",
+      "uncertainties": "Whether capmtp bounds offset and length. The endpoint stall must be distinguished from a capmtp fault by repeating on a different host path."
     },
     {
       "id": "H-002",
@@ -74,7 +74,7 @@
       "surface": "EP-004",
       "component": "capmtp sysmodule, PTP operations 0x1007 (GetObjectHandles) and 0x1008 (GetObjectInfo)",
       "hypothesis": "GetObjectHandles and GetObjectInfo may not validate storage IDs, object format codes, parent handles, or object handles before using them to index internal state, producing an out-of-bounds read or a crash.",
-      "status": "UNVERIFIED",
+      "status": "DISPROVEN",
       "confidence": "low",
       "applies_to_target": true,
       "prerequisites": [
@@ -91,7 +91,8 @@
       "evidence": [
         "E-012",
         "E-018",
-        "E-055"
+        "E-055",
+        "E-056"
       ],
       "sources": [
         "switchbrew-capmtp",
@@ -100,8 +101,8 @@
       "last_reviewed": "2026-10-26",
       "hardware": "HEG-001 (Mariko), USB host access",
       "firmware": "23.0.1",
-      "results": "Not run against hardware. The handle-family plan is implemented and unit-tested.",
-      "uncertainties": "Whether invalid identifiers are rejected before indexing internal state; whether the console exposes multiple storages."
+      "results": "Tested on the target on 2026-10-26. Eight invalid-identifier cases returned documented PTP errors (0x2009 or 0x200b) and the console stayed responsive. The 0xFFFFFFFF storage/parent pair returned 14 associations, which is documented 'all' semantics. See hardware observation 2026-10-26-ptp-boundary.",
+      "uncertainties": "Scoped to the tested identifiers. A bulk-endpoint stall occurred later during valid folder enumeration and is unexplained; it is not attributed to this hypothesis."
     },
     {
       "id": "H-003",

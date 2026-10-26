@@ -293,8 +293,15 @@ class PtpClient:
         body = self._read_exact(header.length - 12)
         return header, body
 
-    def _command(self, code: int, params: tuple[int, ...] = ()) -> bytes:
-        transaction_id = self._next_transaction_id()
+    def _command(
+        self,
+        code: int,
+        params: tuple[int, ...] = (),
+        *,
+        transaction_id: int | None = None,
+    ) -> bytes:
+        if transaction_id is None:
+            transaction_id = self._next_transaction_id()
         command = encode_command(code, transaction_id, params)
         self.pipe.write(command, self.timeout_ms)
         payload = bytearray()
@@ -325,7 +332,10 @@ class PtpClient:
 
     def _open_session(self) -> None:
         try:
-            self._command(PTP_OC_OPEN_SESSION, (1,))
+            # PTP requires OpenSession to carry transaction ID 0.  Subsequent
+            # commands restart at 1 so the device sees a monotonic sequence.
+            self._command(PTP_OC_OPEN_SESSION, (1,), transaction_id=0)
+            self._transaction_id = 1
         except PtpResponseError as exc:
             if exc.code == PTP_RC_SESSION_ALREADY_OPEN:
                 # Another client owns the session.  Do not close it on the way
