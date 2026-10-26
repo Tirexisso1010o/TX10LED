@@ -63,7 +63,7 @@ def layout_for(size_mb: int, sectors_per_cluster: int = 1) -> Layout:
     return Layout(total, fat, sectors_per_cluster, clusters, data_start)
 
 
-def _boot_sector(layout: Layout, volume_id: int) -> bytes:
+def _boot_sector(layout: Layout, volume_id: int, hidden: int = 0) -> bytes:
     bs = bytearray(SECTOR)
     bs[0:3] = b"\xeb\x58\x90"
     bs[3:11] = b"MSWIN4.1"
@@ -81,7 +81,7 @@ def _boot_sector(layout: Layout, volume_id: int) -> bytes:
         0,
         63,
         255,
-        0,
+        hidden,
         layout.total_sectors,
     )
     struct.pack_into("<IHHIHH", bs, 36, layout.fat_sectors, 0, 0, ROOT_CLUSTER, 1, 6)
@@ -152,19 +152,20 @@ def _directory(layout: Layout, anomaly: str) -> bytes:
     return bytes(sector)
 
 
-def build_image(
+def _build_fs(
     size_mb: int,
     anomaly: str,
     *,
-    volume_id: int = 0x7A10C0DE,
-) -> bytes:
+    volume_id: int,
+    hidden: int,
+) -> tuple[bytes, Layout]:
     if anomaly not in ANOMALIES:
         raise ValueError(f"unknown anomaly: {anomaly}")
     layout = layout_for(size_mb)
     image = bytearray(layout.total_sectors * SECTOR)
-    image[0:SECTOR] = _boot_sector(layout, volume_id)
+    image[0:SECTOR] = _boot_sector(layout, volume_id, hidden)
     image[SECTOR : 2 * SECTOR] = _fsinfo()
-    image[6 * SECTOR : 7 * SECTOR] = _boot_sector(layout, volume_id)
+    image[6 * SECTOR : 7 * SECTOR] = _boot_sector(layout, volume_id, hidden)
 
     chain: dict[int, int] = {}
     if anomaly == "cluster_oob":
@@ -186,22 +187,54 @@ def build_image(
     image[data_offset : data_offset + SECTOR] = _directory(layout, anomaly)
     file_offset = data_offset + (FILE_CLUSTER - 2) * SECTOR
     image[file_offset : file_offset + FILE_SIZE] = b"HELLO FROM TX10\n"
-    return bytes(image)
+    return bytes(image), layout
+
+
+def build_image(
+    size_mb: int,
+    anomaly: str,
+    *,
+    volume_id: int = 0x7A10C0DE,
+    mbr: bool = False,
+    mbr_start: int = 8192,
+) -> bytes:
+    hidden = mbr_start if mbr else 0
+    fs, layout = _build_fs(
+        size_mb, anomaly, volume_id=volume_id, hidden=hidden
+    )
+    if not mbr:
+        return fs
+    prefix = bytearray(mbr_start * SECTOR)
+    entry = 446
+    prefix[entry] = 0x00
+    prefix[entry + 1 : entry + 4] = b"\xfe\xff\xff"
+    prefix[entry + 4] = 0x0C
+    prefix[entry + 5 : entry + 8] = b"\xfe\xff\xff"
+    struct.pack_into("<I", prefix, entry + 8, mbr_start)
+    struct.pack_into("<I", prefix, entry + 12, len(fs) // SECTOR)
+    prefix[510:512] = b"\x55\xaa"
+    return bytes(prefix) + fs
 
 
 def describe(image: bytes) -> dict[str, object]:
+    offset = 0
+    mbr = image[510:512] == b"\x55\xaa" and image[446 + 4] == 0x0C
+    if mbr:
+        offset = struct.unpack_from("<I", image, 446 + 8)[0] * SECTOR
     info: dict[str, object] = {
-        "bytes_per_sector": struct.unpack_from("<H", image, 11)[0],
-        "sectors_per_cluster": image[13],
-        "reserved_sectors": struct.unpack_from("<H", image, 14)[0],
-        "num_fats": image[16],
-        "total_sectors": struct.unpack_from("<I", image, 32)[0],
-        "fat_sectors": struct.unpack_from("<I", image, 36)[0],
-        "root_cluster": struct.unpack_from("<I", image, 44)[0],
-        "fs_type": image[82:90].decode("ascii", "replace").strip(),
-        "boot_signature": image[510:512].hex(),
+        "mbr": mbr,
+        "partition_offset_bytes": offset,
+        "bytes_per_sector": struct.unpack_from("<H", image, offset + 11)[0],
+        "sectors_per_cluster": image[offset + 13],
+        "reserved_sectors": struct.unpack_from("<H", image, offset + 14)[0],
+        "num_fats": image[offset + 16],
+        "total_sectors": struct.unpack_from("<I", image, offset + 32)[0],
+        "fat_sectors": struct.unpack_from("<I", image, offset + 36)[0],
+        "root_cluster": struct.unpack_from("<I", image, offset + 44)[0],
+        "fs_type": image[offset + 82 : offset + 90].decode("ascii", "replace").strip(),
+        "boot_signature": image[offset + 510 : offset + 512].hex(),
     }
-    fat_offset = RESERVED * SECTOR + FILE_CLUSTER * 4
+    fat_offset = offset + RESERVED * SECTOR + FILE_CLUSTER * 4
     fat = struct.unpack_from("<I", image, fat_offset)[0]
     info["file_chain_entry"] = f"0x{fat:08x}"
     return info
@@ -212,6 +245,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, help="Output image path.")
     parser.add_argument("--size-mb", type=int, default=64)
     parser.add_argument("--anomaly", choices=sorted(ANOMALIES), default="none")
+    parser.add_argument("--mbr", action="store_true", help="Wrap in an MBR partition table.")
+    parser.add_argument("--mbr-start", type=int, default=8192)
     parser.add_argument("--list", action="store_true", help="List anomalies.")
     parser.add_argument("--describe", type=Path, help="Describe an image.")
     args = parser.parse_args(argv)
@@ -228,7 +263,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not args.out:
         parser.error("--out is required unless --list or --describe is used")
 
-    image = build_image(args.size_mb, args.anomaly)
+    image = build_image(
+        args.size_mb, args.anomaly, mbr=args.mbr, mbr_start=args.mbr_start
+    )
     args.out.write_bytes(image)
     print(f"wrote {args.out} ({len(image)} bytes, anomaly={args.anomaly})")
     return 0

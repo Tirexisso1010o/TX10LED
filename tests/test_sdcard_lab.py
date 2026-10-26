@@ -48,6 +48,29 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(image[510:512], b"\x55\xaa")
 
 
+class MbrTests(unittest.TestCase):
+    def test_mbr_layout_matches_the_card(self) -> None:
+        fs = lab.build_image(64, "none")
+        image = lab.build_image(64, "none", mbr=True)
+        self.assertEqual(len(image), 8192 * lab.SECTOR + len(fs))
+        self.assertEqual(image[510:512], b"\x55\xaa")
+        self.assertEqual(image[446 + 4], 0x0C)
+        self.assertEqual(struct.unpack_from("<I", image, 446 + 8)[0], 8192)
+        self.assertEqual(
+            struct.unpack_from("<I", image, 446 + 12)[0], len(fs) // lab.SECTOR
+        )
+        offset = 8192 * lab.SECTOR
+        self.assertEqual(image[offset + 510 : offset + 512], b"\x55\xaa")
+        self.assertEqual(image[offset + 82 : offset + 90], b"FAT32   ")
+        self.assertEqual(struct.unpack_from("<I", image, offset + 28)[0], 8192)
+
+    def test_describe_finds_the_partition(self) -> None:
+        info = lab.describe(lab.build_image(64, "none", mbr=True))
+        self.assertTrue(info["mbr"])
+        self.assertEqual(info["partition_offset_bytes"], 4194304)
+        self.assertEqual(info["fs_type"], "FAT32")
+
+
 class AnomalyTests(unittest.TestCase):
     def test_cluster_oob_points_beyond_the_volume(self) -> None:
         image = lab.build_image(64, "cluster_oob")
