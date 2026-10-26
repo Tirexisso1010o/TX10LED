@@ -71,6 +71,31 @@ class MbrTests(unittest.TestCase):
         self.assertEqual(info["fs_type"], "FAT32")
 
 
+class AlbumTreeTests(unittest.TestCase):
+    def _offsets(self):
+        layout = lab.layout_for(64)
+        data = layout.data_start * lab.SECTOR
+        return data, data + lab.SECTOR, data + 2 * lab.SECTOR
+
+    def test_album_directory_points_out_of_range(self) -> None:
+        image = lab.build_image(64, "album_dir_oob")
+        root, nintendo, _ = self._offsets()
+        self.assertEqual(image[root : root + 11], b"NINTENDO   ")
+        self.assertEqual(image[nintendo : nintendo + 11], b"ALBUM      ")
+        high = struct.unpack_from("<H", image, nintendo + 20)[0]
+        low = struct.unpack_from("<H", image, nintendo + 26)[0]
+        self.assertEqual((high << 16) | low, 0x0FFFFFF0)
+
+    def test_album_file_points_out_of_range(self) -> None:
+        image = lab.build_image(64, "album_file_oob")
+        _, _, album = self._offsets()
+        self.assertEqual(image[album : album + 11], b"OK      JPG")
+        self.assertEqual(image[album + 32 : album + 43], b"TEST    JPG")
+        high = struct.unpack_from("<H", image, album + 32 + 20)[0]
+        low = struct.unpack_from("<H", image, album + 32 + 26)[0]
+        self.assertEqual((high << 16) | low, 0x0FFFFFF0)
+
+
 class AnomalyTests(unittest.TestCase):
     def test_cluster_oob_points_beyond_the_volume(self) -> None:
         image = lab.build_image(64, "cluster_oob")

@@ -362,14 +362,15 @@
       "risks": "A malformed card can hang or crash the console; remove the card and reboot. The card is erased. Internal storage is not touched.",
       "blocked_by": null,
       "evidence": [
-        "E-070"
+        "E-070",
+        "E-071"
       ],
       "sources": [],
       "last_reviewed": "2026-10-27",
       "resolution": "open",
       "hardware": "HEG-001 (Mariko) plus a sacrificial microSD and reader",
       "firmware": "23.0.1",
-      "results": "Control image mounts. Anomalies not yet tested.",
+      "results": "Control image mounts. A root-level out-of-range file entry also mounts, but the file is not on a path the console reads during mount, so that result is inconclusive. The next images place the out-of-range entry under Nintendo/Album, which the Album applet scans.",
       "uncertainties": "Whether the console validates each field before use, and whether any failure would be in the driver, the fs service, or a recoverable error path."
     }
   ]

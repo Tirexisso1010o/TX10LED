@@ -12,6 +12,7 @@ separate, destructive step that the owner must run explicitly.
 from __future__ import annotations
 
 import argparse
+import base64
 import struct
 import sys
 from dataclasses import dataclass
@@ -26,6 +27,10 @@ FILE_CLUSTER = 3
 FILE_SIZE = 16
 EOC = 0x0FFFFFFF
 
+JPEG = base64.b64decode(
+    "/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAABKADAAQAAAABAAAABAAAAAD/7QA4UGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAAA4QklNBCUAAAAAABDUHYzZjwCyBOmACZjs+EJ+/8AAEQgABAAEAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMAAgICAgICAwICAwUDAwMFBgUFBQUGCAYGBgYGCAoICAgICAgKCgoKCgoKCgwMDAwMDA4ODg4ODw8PDw8PDw8PD//bAEMBAgICBAQEBwQEBxALCQsQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEP/dAAQAAf/aAAwDAQACEQMRAD8A+L6KKK/lM/38P//Z"
+)
+
 ANOMALIES = {
     "none": "Valid control image with one 16-byte file.",
     "cluster_oob": "FAT chain for the file points far beyond the cluster count.",
@@ -35,6 +40,8 @@ ANOMALIES = {
     "bpb_spc_zero": "BPB declares zero sectors per cluster.",
     "lfn_bad": "Long-file-name entry has an invalid checksum and length.",
     "two_fats_mismatch": "The two FAT copies disagree about the file chain.",
+    "album_file_oob": "Nintendo/Album image entry points at an out-of-range cluster.",
+    "album_dir_oob": "Nintendo/Album directory entry points at an out-of-range cluster.",
 }
 
 
@@ -111,6 +118,8 @@ def _fat(layout: Layout, chain: dict[int, int]) -> bytes:
     table[1] = 0x0FFFFFFF
     table[ROOT_CLUSTER] = EOC
     table[FILE_CLUSTER] = EOC
+    for cluster in (4, 5, 6):
+        table[cluster] = EOC
     for cluster, value in chain.items():
         table[cluster] = value
     for index, value in enumerate(table):
@@ -184,10 +193,47 @@ def _build_fs(
         image[13] = 0
 
     data_offset = layout.data_start * SECTOR
-    image[data_offset : data_offset + SECTOR] = _directory(layout, anomaly)
-    file_offset = data_offset + (FILE_CLUSTER - 2) * SECTOR
-    image[file_offset : file_offset + FILE_SIZE] = b"HELLO FROM TX10\n"
+    if anomaly in {"album_file_oob", "album_dir_oob"}:
+        _album_tree(image, layout, anomaly)
+    else:
+        image[data_offset : data_offset + SECTOR] = _directory(layout, anomaly)
+        file_offset = data_offset + (FILE_CLUSTER - 2) * SECTOR
+        image[file_offset : file_offset + FILE_SIZE] = b"HELLO FROM TX10\n"
     return bytes(image), layout
+
+
+def _dir_entry(sector: bytearray, offset: int, name: bytes, attr: int, cluster: int, size: int) -> None:
+    entry = bytearray(32)
+    entry[0:11] = name
+    entry[11] = attr
+    struct.pack_into("<H", entry, 20, (cluster >> 16) & 0xFFFF)
+    struct.pack_into("<H", entry, 26, cluster & 0xFFFF)
+    struct.pack_into("<I", entry, 28, size)
+    sector[offset : offset + 32] = entry
+
+
+def _album_tree(image: bytearray, layout: Layout, anomaly: str) -> None:
+    data = layout.data_start * SECTOR
+
+    def at(cluster: int) -> int:
+        return data + (cluster - 2) * SECTOR
+
+    root = bytearray(SECTOR)
+    _dir_entry(root, 0, b"NINTENDO   ", 0x10, 3, 0)
+    image[at(2) : at(2) + SECTOR] = root
+
+    nintendo = bytearray(SECTOR)
+    album_cluster = 0x0FFFFFF0 if anomaly == "album_dir_oob" else 4
+    _dir_entry(nintendo, 0, b"ALBUM      ", 0x10, album_cluster, 0)
+    image[at(3) : at(3) + SECTOR] = nintendo
+
+    album = bytearray(SECTOR)
+    _dir_entry(album, 0, b"OK      JPG", 0x20, 5, len(JPEG))
+    file_cluster = 0x0FFFFFF0 if anomaly == "album_file_oob" else 6
+    _dir_entry(album, 32, b"TEST    JPG", 0x20, file_cluster, len(JPEG))
+    image[at(4) : at(4) + SECTOR] = album
+    image[at(5) : at(5) + len(JPEG)] = JPEG
+    image[at(6) : at(6) + len(JPEG)] = JPEG
 
 
 def build_image(

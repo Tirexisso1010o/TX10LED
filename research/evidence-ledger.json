@@ -977,6 +977,17 @@
       "evidence": "scripts/sdcard_lab.py built a FAT32 image with one 16-byte file and an MBR partition entry at LBA 8192. It was written to a sacrificial 31.9 GB microSD and inserted into the console. The console mounted it and reported approximately 40 MB free, which is less than the image's 63 MB because the console reserves space or writes its own structure.",
       "limitations": "Mounting proves the parser accepts the container, not that any anomaly is handled safely. One console and one card.",
       "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-071",
+      "claim": "The dir_cluster_oob image mounted and showed 40 MB free, but the crafted entry sits in the root directory and is not on a path the console walks during mount, so the out-of-range cluster was not necessarily dereferenced.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Mount observation and methodology, 2026-10-27.",
+      "sources": [],
+      "evidence": "The console mounted the image and reported the same capacity as the control. The image contained a single root-level TEST.TXT entry whose first cluster is 0x0FFFFFF0. Mounting validates the BPB and root directory; it does not require opening the file, so this result is not evidence that the bounds check is missing.",
+      "limitations": "The file was not opened, so the entry may never have been used. This is a negative on the test design, not on the driver.",
+      "last_reviewed": "2026-10-27"
     }
   ]
 }
