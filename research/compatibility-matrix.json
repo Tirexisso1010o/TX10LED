@@ -516,6 +516,19 @@
         "E-068"
       ],
       "notes": "Closed inconclusive. The decoder is reachable and non-stock: it accepts both CVE-2023-4863 reproducers that stock libwebp rejects. Sixty repeated decodes produced no visible fault. A silent overflow cannot be excluded, but no observable signal exists."
+    },
+    {
+      "id": "C-035",
+      "component": "SD-card FAT32 mount surface",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "UNKNOWN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-070"
+      ],
+      "notes": "A crafted MBR FAT32 image mounts, so filesystem metadata is reachable. Anomaly handling is untested. A fault would be below userland."
     }
   ],
   "usb_modes": [

@@ -339,6 +339,38 @@
       "firmware": "23.0.1",
       "results": "Closed inconclusive on 2026-10-26. The surface is reachable and all six image formats decode, including lossless WebP. The console decoded both CVE-2023-4863 reproducers to 1x1 images, while stock libwebp 1.2.4, 1.3.1, and 1.6.0 reject them, so the decoder is non-stock. Sixty repeated decodes of the stronger file produced no visible fault. A silent overflow cannot be excluded without ASAN, but no observable signal exists and further repeats would not add information. A sweep of stock libwebp 1.0.3 through 1.6.0 found that every release rejects both reproducers; the console accepts them, so its decoder is not stock libwebp and the CVE is likely inapplicable.",
       "uncertainties": "Whether the decoder wrote out of bounds silently. Confirming it would need ASAN, the decoder binary, or heap-grooming work that is indistinguishable from exploit development. No path to homebrew follows from this surface alone. The decoder may be NetFront's own implementation rather than libwebp, in which case CVE-2023-4863 does not apply at all."
+    },
+    {
+      "id": "H-009",
+      "title": "SD-card FAT32 metadata parser",
+      "stage": "2",
+      "surface": "EP-007",
+      "component": "Console FAT32 driver and filesystem service, reached by mounting a crafted microSD image",
+      "hypothesis": "The console's FAT32 parser may mishandle crafted filesystem metadata such as out-of-range cluster references, oversized directory entries, or cyclic chains, producing a memory-safety failure in the filesystem driver or fs service.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "A sacrificial microSD card and reader",
+        "The console's SD slot",
+        "A crafted image that the console will mount"
+      ],
+      "expected_capability": "A fault in the FAT32 driver or fs service, which would be below userland. Stage 2 at best; it would not by itself provide boot-stage execution.",
+      "test_procedure": "Write one anomaly image at a time to the sacrificial card, insert it into the console, and record whether the console mounts, rejects, hangs, or reboots. Start with dir_cluster_oob, then cluster_oob, dir_size_huge, fat_loop, bpb_spc_zero, lfn_bad, and two_fats_mismatch.",
+      "expected_signal": "A hang, reboot, or filesystem-service fault when a specific anomaly is mounted, reproducible with that image and not with the control.",
+      "kill_criteria": "Every anomaly is either rejected cleanly or mounted without a fault, and the control behaves the same as the anomalies.",
+      "risks": "A malformed card can hang or crash the console; remove the card and reboot. The card is erased. Internal storage is not touched.",
+      "blocked_by": null,
+      "evidence": [
+        "E-070"
+      ],
+      "sources": [],
+      "last_reviewed": "2026-10-27",
+      "resolution": "open",
+      "hardware": "HEG-001 (Mariko) plus a sacrificial microSD and reader",
+      "firmware": "23.0.1",
+      "results": "Control image mounts. Anomalies not yet tested.",
+      "uncertainties": "Whether the console validates each field before use, and whether any failure would be in the driver, the fs service, or a recoverable error path."
     }
   ]
 }

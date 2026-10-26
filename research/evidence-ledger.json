@@ -966,6 +966,17 @@
       "evidence": "Built libwebp 1.0.3, 1.1.0, 1.2.2, 1.2.3, 1.2.4, 1.3.1, and 1.6.0 and ran examples/dwebp on bad.webp and nso.webp. Every release returned BITSTREAM_ERROR for both files. The target applet decoded both to 1x1 images (E-067).",
       "limitations": "The reproducers target a specific libwebp commit and may not generalize to every vulnerable build. The applet's decoder could still be a modified libwebp with different validation. This does not prove the applet is safe, only that the stock-libwebp trigger does not reproduce.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-070",
+      "claim": "A crafted 64 MB FAT32 image with an MBR partition at 4 MiB mounts on the target console, which reports about 40 MB free.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Reproduced finding, one console, 2026-10-27.",
+      "sources": [],
+      "evidence": "scripts/sdcard_lab.py built a FAT32 image with one 16-byte file and an MBR partition entry at LBA 8192. It was written to a sacrificial 31.9 GB microSD and inserted into the console. The console mounted it and reported approximately 40 MB free, which is less than the image's 63 MB because the console reserves space or writes its own structure.",
+      "limitations": "Mounting proves the parser accepts the container, not that any anomaly is handled safely. One console and one card.",
+      "last_reviewed": "2026-10-27"
     }
   ]
 }
