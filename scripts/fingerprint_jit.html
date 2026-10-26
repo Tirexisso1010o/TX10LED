@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Network check</title></head>
+<body>
+<h1>Network check</h1>
+<p id="status">measuring…</p>
+<script>
+(function () {
+  var N = 400000;
+  var RUNS = 12;
+
+  function intWork(n) {
+    var x = 0;
+    for (var i = 0; i < n; i++) {
+      x = (x + i) | 0;
+    }
+    return x;
+  }
+
+  function polyWork(o, n) {
+    var x = 0;
+    for (var i = 0; i < n; i++) {
+      x = (x + o.v) | 0;
+    }
+    return x;
+  }
+
+  function measure(fn, a, b) {
+    var start = Date.now();
+    var value = fn(a, b);
+    return { ms: Date.now() - start, value: value };
+  }
+
+  var intRuns = [];
+  var polyRuns = [];
+  var i;
+  for (i = 0; i < RUNS; i++) {
+    intRuns.push(measure(intWork, N).ms);
+  }
+  for (i = 0; i < RUNS; i++) {
+    var shape = (i % 2 === 0) ? { v: 1 } : { v: 2, w: 3 };
+    polyRuns.push(measure(polyWork, shape, N).ms);
+  }
+
+  var payload = {
+    ua: navigator.userAgent,
+    n: N,
+    runs: intRuns,
+    polyRuns: polyRuns,
+    dateNow: Date.now(),
+    perfNow: (typeof performance !== "undefined" && typeof performance.now === "function"),
+    wasm: (typeof WebAssembly !== "undefined")
+  };
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/fp", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.onload = function () { document.getElementById("status").textContent = "done"; };
+  xhr.onerror = function () { document.getElementById("status").textContent = "done (no reply)"; };
+  xhr.send(JSON.stringify(payload));
+})();
+</script>
+</body>
+</html>
