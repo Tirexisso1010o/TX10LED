@@ -227,3 +227,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Treat the whole run as failed because the object family did not finish (rejected: the handle family produced clean data); treat the endpoint stall as a capmtp fault (rejected: it is unexplained and may be a hub artifact).
 
 **Consequences:** `E-056`, `C-025`, and `research/hardware-observations/2026-10-26-ptp-boundary.json` record the result. `H-002` moves to `DISPROVEN` within the tested identifier set; `H-001` stays `UNVERIFIED`. The harness discovery was fixed to use `0xFFFFFFFF` and folder recursion, and both the harness and `PtpClient` send `OpenSession` with transaction ID 0. Tests rose to 20. No exploit was found, no object was modified, and the console was not left in an altered state beyond a stalled endpoint that requires a replug.
+
+## 2026-10-26 — Close the capmtp direction on a reproduced negative
+
+**Decision:** Close direction D1 after the object family returned `0x2006 ParameterNotSupported` for every `GetObject` request. Mark `H-001` as `UNKNOWN` with resolution `closed-negative`, keep `H-002` as `DISPROVEN` within the tested identifier set, and record `C-026`.
+
+**Reason:** The pre-registered kill criterion for `H-001` was "every boundary case returns a documented PTP error or a size-bounded response, and the console stays responsive". That is exactly what happened. Recording the direction as open would invite a repeat that cannot produce new information. Keeping `H-001` as `UNKNOWN` rather than `DISPROVEN` is deliberate: the offset and length validation logic was never reached, so the vulnerability claim itself was not tested, only its reachability.
+
+**Alternatives considered:** Mark `H-001` `DISPROVEN` (rejected: overstates what was tested); keep probing other PTP operations such as `GetThumb` (rejected for now: low expected yield and no pre-registered hypothesis); treat the transient stall as a capmtp fault (rejected: it did not reproduce and cleared after a replug).
+
+**Consequences:** `E-057`, `C-026`, the boundary observation, `docs/RESEARCH-PLAN.md`, and `research/CHECKPOINT.md` record the closure. The next runnable direction is the browser fingerprint (`D2`, `H-005`); the decisive direction (`D3`, `H-003`) remains blocked because the owner cannot provide firmware artifacts. No exploit was found. Tests remain at 20 and the validator passes.

@@ -40,14 +40,14 @@ Last updated: 2026-10-26
 
 ## Completed work
 
-- Source register (47 sources), evidence ledger (E-001–E-056), hypothesis register (H-001–H-007), and compatibility matrix (25 rows).
+- Source register (47 sources), evidence ledger (E-001–E-057), hypothesis register (H-001–H-007), and compatibility matrix (26 rows).
 - Detailed entry-point matrix (`research/entry-points.json`) covering 11 surfaces and 6 public leads, including `EP-011` GameShare/`splay` and `L-006`.
 - Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a stage model, a GameShare section, bounds, and capability ceiling.
 - Stage-by-stage gap analysis (`docs/GAP-ANALYSIS.md`) identifying boot-stage execution as the decisive missing link.
 - Ranked research plan (`docs/RESEARCH-PLAN.md`) with scored directions and kill criteria.
 - Falsifiable hypothesis register (`research/hypotheses.json`, H-001–H-007) validated by the research validator.
 - capmtp boundary harness (`scripts/ptp_boundary.py`) with a dry-run default, read-only operation allowlist, and 20 mocked-pipe tests in `tests/`.
-- First hardware boundary run (`research/hardware-observations/2026-10-26-ptp-boundary.json`): invalid handle-table identifiers were rejected with documented PTP errors, closing H-002 as a scoped negative. The object-read family did not complete because the bulk endpoint stalled.
+- First hardware boundary run (`research/hardware-observations/2026-10-26-ptp-boundary.json`): invalid handle-table identifiers were rejected with documented PTP errors (H-002 closed as a scoped negative), and GetObject returned 0x2006 for every parameter set (H-001 closed negative). A transient endpoint stall cleared after a replug and did not reproduce.
 - PTP `OpenSession` must carry transaction ID 0; sending 1 returns `0x2004 InvalidTransactionID`. Fixed in both the harness and the library, with tests.
 - README framing the project as a potential-jailbreak investigation plus a read-only USB tool, with GameShare in the short-version table and the surface table.
 - Compatibility narrative with the `ns2jb` distinction and the GameShare receiver section.
@@ -73,7 +73,7 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 47 sources, 56 evidence entries, 11 entry-point surfaces, 6 leads, 7 hypotheses, 25 matrix rows, 5 USB modes.
+Research data OK: 47 sources, 57 evidence entries, 11 entry-point surfaces, 6 leads, 7 hypotheses, 26 matrix rows, 5 USB modes.
 ```
 
 PTP observation:
@@ -95,7 +95,7 @@ Session opened: no
 
 ## Pending work
 
-- Replug the console after the endpoint stall, then run the object family (`--family objects --confirm --active`) to close or open H-001.
+- Run the browser/WebKit fingerprint (D2, H-005): serve a controlled page through a captive portal and record the engine vintage. Needs owner approval and a temporary console network entry.
 - USB test suite and fixtures for the CLI, including a regression test for the empty-`system_profiler` fallback.
 - Generated Markdown renderer and CI workflow.
 - PTP media transfer and file operations are out of scope; the identity probe is complete.

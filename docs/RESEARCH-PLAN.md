@@ -28,14 +28,14 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 
 | ID | Direction | Stage | Feasible now? | F | I | R | Score | Status |
 |---|---|---|---|---|---|---|---|---|
-| **D1** | capmtp PTP boundary validation (`H-001`, `H-002`) | 1 | **Yes** — console + USB host | 5 | 2 | 3 | **30** | Active |
-| **D2** | Browser/WebKit fingerprint (`H-005`) | 1 | **Yes**, with a captive-portal setup | 3 | 3 | 3 | **27** | Ready |
+| **D1** | capmtp PTP boundary validation (`H-001`, `H-002`) | 1 | **Yes** — console + USB host | 5 | 2 | 3 | **30** | **Closed — negative** |
+| **D2** | Browser/WebKit fingerprint (`H-005`) | 1 | **Yes**, with a captive-portal setup | 3 | 3 | 3 | **27** | **Next** |
 | **D3** | Mariko warmboot / package1 diff (`H-003`) | 3 | No — needs artifacts | 1 | 5 | 5 | **25** | Blocked |
 | **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary | 2 | 3 | 2 | **12** | Blocked |
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host | 1 | 3 | 2 | **6** | Blocked |
 | **D6** | Artemis save chain-load (`H-007`) | 1 | No — no Switch reproduction or save delivery | 2 | 2 | 1 | **4** | Blocked |
 
-`D1` and `D2` are the only directions with a runnable next step. `D3` is the only direction that can close the decisive stage, and it is blocked on firmware artifacts.
+`D1` is now closed: the capmtp surface was tested on hardware and produced only documented errors. `D2` is the next runnable direction. `D3` remains the only direction that can close the decisive stage, and it is blocked because the owner cannot provide firmware artifacts.
 
 ## D1 — capmtp PTP boundary validation
 
@@ -43,7 +43,15 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 
 **What is known.** `capmtp` implements PTP over USB and exposes only operations `0x1001`–`0x100A`. The request parameters are fixed-width u32 handles, format codes, offsets, and lengths; no request carries a string or a caller-supplied buffer (`E-055`). This is a *narrow* parser surface, which is why the information gain is scored low: a negative result is the most likely outcome.
 
-**Why run it anyway.** It is the only reachable flow in which the console parses data supplied by a device the owner controls. It is cheap to falsify, and a negative result closes the direction with evidence instead of suspicion. It also produces a reusable harness for any future USB surface.
+**Result (2026-10-26).** Run against the target, and **closed negative**:
+
+- Handle-table identifiers were validated. Invalid storage, invalid format, and handles `0`, `1`, `0x7FFFFFFF`, `0x80000000`, `0xFFFFFFFF` all returned documented errors (`0x2009`, `0x200b`). The `0xFFFFFFFF` storage/parent pair returned 14 associations, which is documented "all" semantics. `H-002` is `DISPROVEN` within the tested set.
+- `GetObject` (0x1009) returned **`0x2006 ParameterNotSupported`** for all ten parameter sets, including a valid handle at offset 0. Object data could not be read, so offset and length validation was never exercised. `H-001` is `UNKNOWN` with resolution `closed-negative`, because the operation is not a reachable primitive.
+- A transient bulk-endpoint stall occurred during the first enumeration and cleared after a replug. It did not reproduce and is not attributed to capmtp.
+
+Two protocol findings came out of the run: `OpenSession` must carry transaction ID 0 (`0x2004` otherwise), and the console rejects a parent handle of 0, using `0xFFFFFFFF` for "all". Both are fixed in the harness and covered by tests.
+
+**Why it was worth running.** It was the only reachable flow in which the console parses data supplied by a device the owner controls. It is now falsified, not merely suspected, and the harness is reusable for any future USB surface.
 
 **Next task.** With the console connected in **Copy to PC via USB** mode and at least one screenshot present:
 
@@ -107,12 +115,12 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| T1 | Implement `capmtp` boundary harness with tests | — | **Done** (`scripts/ptp_boundary.py`, 10 tests) |
-| T2 | Run T1 handle family on the target | Owner approval + console connected | Pending |
-| T3 | Run T1 object family on the target | T2 + one screenshot on the console | Pending |
-| T4 | Record T2/T3 as positive or negative results | T2, T3 | Pending |
-| T5 | Browser fingerprint via captive portal | Owner approval + network setup | Pending |
-| T6 | Package1 differ and warmboot checklist | Legal firmware artifacts | Blocked |
+| T1 | Implement `capmtp` boundary harness with tests | — | **Done** (`scripts/ptp_boundary.py`, 20 tests) |
+| T2 | Run handle family on the target | Owner approval + console connected | **Done — negative** |
+| T3 | Run object family on the target | T2 + one screenshot | **Done — closed negative** |
+| T4 | Record the results | T2, T3 | **Done** (`E-056`, `E-057`, `C-025`, `C-026`) |
+| T5 | Browser fingerprint via captive portal | Owner approval + network setup | **Next** |
+| T6 | Package1 differ and warmboot checklist | Legal firmware artifacts | Blocked (owner cannot provide) |
 | T7 | Switch 1 `fs` comparison | Stage-1 primitive | Blocked |
 
 ## How results are recorded

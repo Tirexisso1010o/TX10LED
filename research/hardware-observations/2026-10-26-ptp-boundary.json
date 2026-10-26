@@ -100,10 +100,75 @@
     },
     "note": "Album folders are associations and screenshots are their children. A parent handle of 0 returned 0x2009 InvalidObjectHandle; 0xFFFFFFFF returned all 14 associations, so the console does not treat 0 as the root handle."
   },
+  "object_family": {
+    "cases": [
+      {
+        "name": "info_baseline",
+        "operation": "0x1008",
+        "result": "0x2001 OK, 166-byte ObjectInfo dataset"
+      },
+      {
+        "name": "read_zero_length",
+        "operation": "0x1009",
+        "params": ["discovered handle", "0x00000000", "0x00000000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_head",
+        "operation": "0x1009",
+        "params": ["discovered handle", "0x00000000", "0x00001000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_last_byte",
+        "operation": "0x1009",
+        "params": ["discovered handle", "size - 1", "0x00001000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_at_size",
+        "operation": "0x1009",
+        "params": ["discovered handle", "size", "0x00001000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_past_size",
+        "operation": "0x1009",
+        "params": ["discovered handle", "size + 1", "0x00001000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_offset_int_max",
+        "operation": "0x1009",
+        "params": ["discovered handle", "0x7fffffff", "0x00001000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_offset_sign_bit",
+        "operation": "0x1009",
+        "params": ["discovered handle", "0x80000000", "0x00001000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_offset_uint_max",
+        "operation": "0x1009",
+        "params": ["discovered handle", "0xffffffff", "0x00001000"],
+        "result": "0x2006 ParameterNotSupported"
+      },
+      {
+        "name": "read_length_large",
+        "operation": "0x1009",
+        "params": ["discovered handle", "0x00000000", "0x00100000"],
+        "result": "0x2006 ParameterNotSupported"
+      }
+    ],
+    "outcome": "Negative. GetObject returned 0x2006 for every parameter set, including a valid handle with offset 0. Object data could not be read, so offset and length validation was never exercised. This meets the pre-registered kill criterion for H-001."
+  },
   "stall": {
-    "where": "GetObjectHandles on the fourth association during enumeration",
+    "where": "GetObjectHandles on the fourth association during the first enumeration attempt",
     "error": "USB bulk read Errno 5 (Input/Output Error)",
-    "aftermath": "The console remained enumerated as 057e:201d, but a subsequent OpenSession write timed out with Errno 60. The bulk endpoint required a replug.",
+    "aftermath": "The console remained enumerated as 057e:201d, but a subsequent OpenSession write timed out with Errno 60. After a replug the endpoint responded normally and the object family completed.",
+    "classification": "Transient host or hub endpoint stall, not reproducible on the second attempt. Not attributed to capmtp.",
     "retries": 1
   },
   "commands": [
@@ -115,20 +180,26 @@
     {
       "command": ".venv/bin/python scripts/ptp_boundary.py --family objects --confirm --active --timeout 2.0",
       "exit_code": 1,
-      "result": "Discovery failed at GetObjectHandles with parent 0 (0x2009). Later fixed to use 0xFFFFFFFF and folder recursion."
+      "result": "First discovery attempt failed at GetObjectHandles with parent 0 (0x2009), then the endpoint stalled. Discovery was fixed to use 0xFFFFFFFF and folder recursion."
     },
     {
-      "command": ".venv/bin/python scripts/ptp_boundary.py --family objects --handle 0x2b1 --size 200377 --confirm --active --timeout 3.0",
-      "exit_code": 1,
-      "result": "OpenSession write timed out (Errno 60) because the endpoint was still stalled from the previous run."
+      "command": ".venv/bin/python -m switch_usb_probe ptp-info --source ioreg --confirm",
+      "exit_code": 0,
+      "result": "DeviceInfo answered after the replug, confirming the endpoint had recovered."
+    },
+    {
+      "command": ".venv/bin/python scripts/ptp_boundary.py --family objects --confirm --active --timeout 3.0",
+      "exit_code": 0,
+      "result": "Ten cases; GetObject returned 0x2006 for every parameter set."
     }
   ],
-  "interpretation": "The handle-table boundary cases behaved defensively: invalid identifiers produced documented errors and the console stayed responsive. The object-read boundary family was not completed. The run ended with a stalled bulk endpoint after an EIO during folder enumeration, which is an environment observation and not evidence of a vulnerability.",
+  "interpretation": "capmtp behaved defensively at both tested boundaries. Invalid handle-table identifiers produced documented errors, and GetObject was rejected outright rather than serving object data. The object-read path is therefore not a reachable primitive on this firmware through the documented operation, and no offset or length validation logic was exercised.",
   "limitations": [
-    "This is one console, one host, and one run.",
+    "This is one console, one host, and one session.",
     "The 0xFFFFFFFF storage and parent values have documented 'all' semantics, so the 14-handle response is not a validation failure.",
-    "The object-read family (offsets and lengths) was not completed, so H-001 remains untested.",
-    "The endpoint stall is unexplained. It may be a hub or host artifact and cannot be attributed to capmtp without a repeat under different conditions.",
+    "GetObject may be gated by an undocumented precondition. The 0x2006 response is consistent with an unsupported operation, but it does not prove that no other operation reads object data.",
+    "GetThumb (0x100A) was not tested.",
+    "The endpoint stall was transient and is not attributed to capmtp.",
     "A PTP response can be spoofed by modified firmware; this is an observation, not an integrity attestation."
   ],
   "redactions": [

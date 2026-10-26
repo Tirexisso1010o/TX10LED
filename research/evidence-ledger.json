@@ -780,6 +780,20 @@
       "evidence": "With a session open, GetObjectHandles returned 0x2009 InvalidObjectHandle for an invalid storage ID with parent 0, and 0x200b InvalidObjectFormatCode for an invalid format code. GetObjectInfo returned 0x2009 for handles 0, 1, 0x7FFFFFFF, 0x80000000, and 0xFFFFFFFF. The storage/parent pair 0xFFFFFFFF/0xFFFFFFFF returned 0x2001 with 14 associations. See research/hardware-observations/2026-10-26-ptp-boundary.json.",
       "limitations": "Scoped to the tested identifiers. The 0xFFFFFFFF values have documented 'all' semantics. The object-read boundary family was not completed, and a later endpoint stall is unexplained and not attributed to this result.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-057",
+      "claim": "On the target console, PTP GetObject (0x1009) returned 0x2006 ParameterNotSupported for every tested parameter set, so object data could not be read and offset/length validation was not exercised.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Reproduced finding, one console and one session, 2026-10-26.",
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-ptp-source"
+      ],
+      "evidence": "After discovering a non-empty object, GetObject was issued with offset and length at 0/0, 0/0x1000, size-1/0x1000, size/0x1000, size+1/0x1000, 0x7FFFFFFF/0x1000, 0x80000000/0x1000, 0xFFFFFFFF/0x1000, and 0/0x00100000. Every request returned 0x2006. GetObjectInfo for the same handle returned 0x2001 with a 166-byte dataset. See research/hardware-observations/2026-10-26-ptp-boundary.json.",
+      "limitations": "One run. GetObject may be gated by an undocumented precondition, and GetThumb (0x100A) was not tested. The result does not prove that no other operation reads object data.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

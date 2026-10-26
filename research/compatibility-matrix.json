@@ -395,6 +395,19 @@
         "E-056"
       ],
       "notes": "Invalid handles and format codes were rejected with documented PTP errors in one reproduced run. Scoped to the tested identifiers; the object-read family was not completed."
+    },
+    {
+      "id": "C-026",
+      "component": "capmtp GetObject (0x1009) as an object-read primitive",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "DISPROVEN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-057"
+      ],
+      "notes": "Every GetObject request returned 0x2006 ParameterNotSupported, including a valid handle at offset 0. The operation is not a reachable read primitive on this firmware. GetThumb was not tested."
     }
   ],
   "usb_modes": [

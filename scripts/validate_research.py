@@ -276,6 +276,11 @@ class Validator:
                 f"{label} has invalid stage: {hypothesis.get('stage')!r}",
             )
             self.check(
+                hypothesis.get("resolution")
+                in {"open", "closed-negative", "closed-disproven", "blocked"},
+                f"{label} has invalid resolution: {hypothesis.get('resolution')!r}",
+            )
+            self.check(
                 hypothesis.get("surface") in surfaces,
                 f"{label}.surface is unknown: {hypothesis.get('surface')!r}",
             )

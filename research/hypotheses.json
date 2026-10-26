@@ -55,7 +55,8 @@
       "blocked_by": null,
       "evidence": [
         "E-018",
-        "E-055"
+        "E-055",
+        "E-057"
       ],
       "sources": [
         "switchbrew-capmtp",
@@ -64,8 +65,9 @@
       "last_reviewed": "2026-10-26",
       "hardware": "HEG-001 (Mariko), USB host access",
       "firmware": "23.0.1",
-      "results": "Not completed. Discovery first failed because the console rejects a parent handle of 0, then the bulk endpoint stalled with EIO during folder enumeration. One retry timed out. The harness discovery logic was fixed to use 0xFFFFFFFF and folder recursion; the object family still needs a fresh run.",
-      "uncertainties": "Whether capmtp bounds offset and length. The endpoint stall must be distinguished from a capmtp fault by repeating on a different host path."
+      "results": "Closed negative on 2026-10-26. After discovery was fixed, GetObject returned 0x2006 ParameterNotSupported for all ten tested parameter sets, including a valid handle with offset 0. Object data could not be read, so the offset and length logic was never exercised. See hardware observation 2026-10-26-ptp-boundary.",
+      "uncertainties": "GetObject may require an undocumented precondition, and GetThumb was not tested. The underlying validation logic remains unexamined; the direction is closed because the operation is not a reachable primitive.",
+      "resolution": "closed-negative"
     },
     {
       "id": "H-002",
@@ -102,7 +104,8 @@
       "hardware": "HEG-001 (Mariko), USB host access",
       "firmware": "23.0.1",
       "results": "Tested on the target on 2026-10-26. Eight invalid-identifier cases returned documented PTP errors (0x2009 or 0x200b) and the console stayed responsive. The 0xFFFFFFFF storage/parent pair returned 14 associations, which is documented 'all' semantics. See hardware observation 2026-10-26-ptp-boundary.",
-      "uncertainties": "Scoped to the tested identifiers. A bulk-endpoint stall occurred later during valid folder enumeration and is unexplained; it is not attributed to this hypothesis."
+      "uncertainties": "Scoped to the tested identifiers. The transient endpoint stall is not attributed to this hypothesis and did not reproduce after a replug.",
+      "resolution": "closed-disproven"
     },
     {
       "id": "H-003",
@@ -138,7 +141,8 @@
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
       "results": "Not started. No package1 image is available and this project does not accept proprietary firmware or keys.",
-      "uncertainties": "Whether any reachable defect exists in Mariko warmboot; whether artifacts can be obtained lawfully; whether emulation of Mariko warmboot is accurate enough to validate a candidate."
+      "uncertainties": "Whether any reachable defect exists in Mariko warmboot; whether artifacts can be obtained lawfully; whether emulation of Mariko warmboot is accurate enough to validate a candidate.",
+      "resolution": "blocked"
     },
     {
       "id": "H-004",
@@ -172,7 +176,8 @@
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
       "results": "Not tested. Blocked on a stage-1 primitive and a Switch 1 fs binary.",
-      "uncertainties": "Whether Switch 1 fs shares the normalize-and-copy implementation; whether the 0x301-byte buffer is the same size."
+      "uncertainties": "Whether Switch 1 fs shares the normalize-and-copy implementation; whether the 0x301-byte buffer is the same size.",
+      "resolution": "blocked"
     },
     {
       "id": "H-005",
@@ -208,7 +213,8 @@
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
       "results": "No fingerprint collected. No captive-portal test has been run.",
-      "uncertainties": "Browser engine vintage; whether the applet is reachable without a game; whether public advisories match the build."
+      "uncertainties": "Browser engine vintage; whether the applet is reachable without a game; whether public advisories match the build.",
+      "resolution": "open"
     },
     {
       "id": "H-006",
@@ -244,7 +250,8 @@
       "hardware": "Switch 2 host plus HEG-001 receiver",
       "firmware": "23.0.1 on both",
       "results": "Not tested. No Switch 2 host is available.",
-      "uncertainties": "Protocol framing; which data the ECC signature covers; whether NACP and JPEG parsing happen before user confirmation."
+      "uncertainties": "Protocol framing; which data the ECC signature covers; whether NACP and JPEG parsing happen before user confirmation.",
+      "resolution": "blocked"
     },
     {
       "id": "H-007",
@@ -277,7 +284,8 @@
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
       "results": "Documented for PS4 and Windows only; no Switch reproduction.",
-      "uncertainties": "Whether an Artemis title exists on Switch with the same save-loading behavior; whether the Lua bindings expose native access; how a crafted save would reach a stock console."
+      "uncertainties": "Whether an Artemis title exists on Switch with the same save-loading behavior; whether the Lua bindings expose native access; how a crafted save would reach a stock console.",
+      "resolution": "blocked"
     }
   ]
 }
