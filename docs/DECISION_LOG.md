@@ -256,4 +256,4 @@ Decisions are dated and recorded with the reason and the alternatives considered
 
 **Alternatives considered:** Try a public WebKit PoC to test the patch level (rejected: exploit execution, crash risk, no consent); keep the direction open as if runnable (rejected: it would invite pointless retries); omit the fingerprint because it did not yield an exploit (rejected: it is a reproducible result that closes a question).
 
-**Consequences:** `E-058` through `E-062`, `C-027` through `C-031`, the browser observation file, the plan, and the checkpoint record the result. `H-005` is `UNKNOWN` with resolution `blocked`. The console's DNS entry was temporary and reverted. No exploit was attempted and no console state was changed permanently.
+**Consequences:** `E-058` through `E-062`, `C-027` through `C-031`, the browser observation file, the plan, and the checkpoint record the result. `H-005` is `UNKNOWN` with resolution `blocked`. The console's DNS entry was temporary; the owner was advised to revert it. No exploit was attempted and no console state was changed permanently.
