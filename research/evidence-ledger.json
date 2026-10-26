@@ -822,6 +822,50 @@
       "evidence": "The page reported async functions, optional chaining, and BigInt as available, WebAssembly as unavailable, WebGL as null, hardwareConcurrency 4, and a 1280x720 screen at device pixel ratio 1. The arXiv paper states the Switch browser has no JIT.",
       "limitations": "Feature detection bounds the engine generation but does not identify the build. WebAssembly may be disabled independently of JIT. WebGL absence may be a policy choice.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-060",
+      "claim": "The target's WifiWebAuthApplet JavaScript engine is feature-bracketed to Safari 15.4-15.6 (WebKit 615.x, 2022): it supports features introduced in 15.4 and lacks features introduced in 16.0 and 16.4.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Feature-level engine generation, one console.",
+      "sources": [
+        "caniuse-array-at",
+        "caniuse-tosorted",
+        "caniuse-lookbehind",
+        "switchbrew-internet-browser"
+      ],
+      "evidence": "The page reported Array.prototype.at, findLast, findLastIndex, structuredClone, Error cause, and RegExp match indices as present, all introduced in Safari 15.4. It reported Array.prototype.toSorted and toReversed as absent (Safari 16.0), and RegExp lookbehind as a SyntaxError (Safari 16.4). It also reported no Intl object, no WebAssembly, no Atomics, and no SharedArrayBuffer.",
+      "limitations": "Feature detection bounds the engine generation, not the security patch level. Nintendo can backport fixes without adding features, and the NetFront build number does change between firmware versions. One applet and one run.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-061",
+      "claim": "Web-applets, including WifiWebAuthApplet, hold a broad userland IPC service list and SystemSaveData filesystem permission, so an applet compromise would be a meaningful userland foothold rather than an empty sandbox.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented NPDM privileges.",
+      "sources": [
+        "switchbrew-internet-browser",
+        "switchbrew-npdm"
+      ],
+      "evidence": "Switchbrew lists access for all web-applets to services including acc:u1, appletAE, bsd:a, erpt:c, fatal:u, fsp-srv, hid, hid:sys, ldr:ro, mm:u, nifm:s, ns:web, nvdrv:a, pl:u, set:sys, sfdnsres, ssl, and vi:s, plus the SystemSaveData filesystem permission. The same page lists the optional svcMapPhysicalMemoryUnsafe code path added in 11.0.0.",
+      "limitations": "Service access is not a vulnerability, and applet privileges are still userland. Kernel or boot-stage execution would require a separate exploit.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-062",
+      "claim": "CVE-2026-2441 is a Chromium/Blink CSS use-after-free and does not apply to the Switch's WebKit-based NetFront NX engine.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Applicability of a specific 2026 browser CVE.",
+      "sources": [
+        "nvd-cve-2026-2441",
+        "switchbrew-internet-browser"
+      ],
+      "evidence": "The NVD record names Google Chrome and the CSS component of Blink. Switchbrew identifies the Switch browser as NetFront NX, which is WebKit-based. A public PS4 test of the same CVE against NetFront NX also reported that the engine was not vulnerable, which is consistent with the different engine.",
+      "limitations": "This rules out one CVE, not the WebKit engine. It says nothing about WebKit-specific issues in the 15.4-15.6 bracket.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

@@ -40,14 +40,15 @@ Last updated: 2026-10-26
 
 ## Completed work
 
-- Source register (47 sources), evidence ledger (E-001–E-057), hypothesis register (H-001–H-007), and compatibility matrix (26 rows).
+- Source register (52 sources), evidence ledger (E-001–E-062), hypothesis register (H-001–H-007), and compatibility matrix (31 rows).
 - Detailed entry-point matrix (`research/entry-points.json`) covering 11 surfaces and 6 public leads, including `EP-011` GameShare/`splay` and `L-006`.
 - Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a stage model, a GameShare section, bounds, and capability ceiling.
 - Stage-by-stage gap analysis (`docs/GAP-ANALYSIS.md`) identifying boot-stage execution as the decisive missing link.
 - Ranked research plan (`docs/RESEARCH-PLAN.md`) with scored directions and kill criteria.
 - Falsifiable hypothesis register (`research/hypotheses.json`, H-001–H-007) validated by the research validator.
 - capmtp boundary harness (`scripts/ptp_boundary.py`) with a dry-run default, read-only operation allowlist, and 20 mocked-pipe tests in `tests/`.
-- Captive-portal fingerprint harness (`scripts/captive_portal.py`) with nine loopback tests, ready for an elevated run.
+- Captive-portal fingerprint harness (`scripts/captive_portal.py`) with ten loopback tests, used successfully against the console.
+- Browser fingerprint observation (`research/hardware-observations/2026-10-26-browser-fingerprint.json`): WifiWebAuthApplet reached via DNS redirect, engine feature-bracketed to Safari 15.4-15.6 (WebKit 615.x, 2022), no URL whitelist, no Intl, no WebAssembly, broad applet IPC privileges.
 - First hardware boundary run (`research/hardware-observations/2026-10-26-ptp-boundary.json`): invalid handle-table identifiers were rejected with documented PTP errors (H-002 closed as a scoped negative), and GetObject returned 0x2006 for every parameter set (H-001 closed negative). A transient endpoint stall cleared after a replug and did not reproduce.
 - PTP `OpenSession` must carry transaction ID 0; sending 1 returns `0x2004 InvalidTransactionID`. Fixed in both the harness and the library, with tests.
 - README framing the project as a potential-jailbreak investigation plus a read-only USB tool, with GameShare in the short-version table and the surface table.
@@ -74,7 +75,7 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 47 sources, 57 evidence entries, 11 entry-point surfaces, 6 leads, 7 hypotheses, 26 matrix rows, 5 USB modes.
+Research data OK: 52 sources, 62 evidence entries, 11 entry-point surfaces, 6 leads, 7 hypotheses, 31 matrix rows, 5 USB modes.
 ```
 
 PTP observation:
@@ -96,7 +97,7 @@ Session opened: no
 
 ## Pending work
 
-- Run the browser/WebKit fingerprint (D2, H-005): the owner starts `sudo .venv/bin/python scripts/captive_portal.py --answer-ip 192.168.178.167`, sets the console's primary DNS to that address, reconnects, and triggers the portal. Revert the DNS entry afterwards.
+- Determine the browser security patch level, which needs the browser binary or controlled exploit testing; both are unavailable. D2 is characterized and blocked.
 - USB test suite and fixtures for the CLI, including a regression test for the empty-`system_profiler` fallback.
 - Generated Markdown renderer and CI workflow.
 - PTP media transfer and file operations are out of scope; the identity probe is complete.

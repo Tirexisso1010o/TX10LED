@@ -247,3 +247,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Guess the engine version from public documentation (rejected: the Switch 1 browser build is not pinned in public sources); skip straight to exploit development (rejected: without a version there is nothing to target).
 
 **Consequences:** The harness is tested on loopback (29 tests total) and verified with `dig` and `curl`. Real use requires binding DNS to 53 and HTTP to 80, which needs elevated privileges, so the run must be started by the owner. The console needs a temporary manual DNS entry pointing at the Mac, which is reversible. No exploit is included and the page only reads browser properties.
+
+## 2026-10-26 — Characterize the browser surface and stop at the patch-level wall
+
+**Decision:** Record the WifiWebAuthApplet as a confirmed stage-1 surface, bracket its engine to Safari 15.4–15.6 (WebKit 615.x, 2022), and mark the direction characterized but blocked. Do not attempt browser exploitation.
+
+**Reason:** The owner approved the captive-portal test, and it produced a clean fingerprint: the applet is reachable without credentials, has no URL whitelist, permits ignoring invalid TLS certificates, and executes page JavaScript. Feature detection narrows the engine to a 2022 WebKit generation, and the applet's NPDM grants a meaningful IPC set. That is enough to call it a real lead. It is not enough to call it a vulnerability: feature detection says nothing about backported security fixes, the NetFront shell changes between firmware versions, and the documented absence of a JIT invalidates many public WebKit techniques. Testing patch-level guesses with public PoCs would be exploit execution on the owner's console, which is outside the authorization boundary. `CVE-2026-2441` was checked and ruled out because it is a Blink bug.
+
+**Alternatives considered:** Try a public WebKit PoC to test the patch level (rejected: exploit execution, crash risk, no consent); keep the direction open as if runnable (rejected: it would invite pointless retries); omit the fingerprint because it did not yield an exploit (rejected: it is a reproducible result that closes a question).
+
+**Consequences:** `E-058` through `E-062`, `C-027` through `C-031`, the browser observation file, the plan, and the checkpoint record the result. `H-005` is `UNKNOWN` with resolution `blocked`. The console's DNS entry was temporary and reverted. No exploit was attempted and no console state was changed permanently.

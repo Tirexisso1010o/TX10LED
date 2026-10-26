@@ -434,6 +434,45 @@
         "E-058"
       ],
       "notes": "AppleWebKit/613.0 is a frozen token shared across multiple NetFront builds in public user-agent databases. Engine generation must be inferred from feature detection."
+    },
+    {
+      "id": "C-029",
+      "component": "WifiWebAuthApplet JavaScript engine generation",
+      "version": "23.0.1",
+      "dimension": "Fingerprinting",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-060"
+      ],
+      "notes": "Feature-bracketed to Safari 15.4-15.6 (WebKit 615.x, 2022). Security patch level is not established by feature detection."
+    },
+    {
+      "id": "C-030",
+      "component": "Web-applet privilege ceiling",
+      "version": "23.0.1",
+      "dimension": "Capability",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-061"
+      ],
+      "notes": "Documented NPDM grants fsp-srv, nvdrv:a, hid:sys, ssl, bsd:a, and SystemSaveData permission. Userland applet only; no kernel or boot-stage access."
+    },
+    {
+      "id": "C-031",
+      "component": "CVE-2026-2441 applicability to NetFront NX",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "DISPROVEN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-062"
+      ],
+      "notes": "The CVE is a Blink/Chromium CSS use-after-free. The Switch browser is WebKit-based NetFront NX, so the issue does not apply."
     }
   ],
   "usb_modes": [

@@ -529,6 +529,50 @@
       "snapshot": "Describes the Switch browser attack surface, the WifiWebAuthApplet captive-portal path, and states that the Switch does not have a JIT in its browser, which changes the standard WebKit exploitation approach.",
       "license": "arXiv preprint; cited as research literature.",
       "notes": "Used for the no-JIT constraint and the browser applet security context."
+    },
+    {
+      "id": "caniuse-array-at",
+      "title": "Can I use: Array.prototype.at",
+      "publisher": "Can I use",
+      "kind": "database",
+      "url": "https://caniuse.com/mdn-javascript_builtins_array_at",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Lists Safari 15.4 as the first version supporting Array.prototype.at.",
+      "license": "Can I use data; cited as a compatibility database.",
+      "notes": "Used with other feature tables to bracket the engine generation."
+    },
+    {
+      "id": "caniuse-tosorted",
+      "title": "Can I use: Array.prototype.toSorted",
+      "publisher": "Can I use",
+      "kind": "database",
+      "url": "https://caniuse.com/mdn-javascript_builtins_array_tosorted",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Lists Safari 16.0 as the first version supporting Array.prototype.toSorted, with 3.1-15.6 unsupported.",
+      "license": "Can I use data; cited as a compatibility database.",
+      "notes": "The observed engine lacks this feature, which places it before Safari 16.0 at the feature level."
+    },
+    {
+      "id": "caniuse-lookbehind",
+      "title": "Can I use: RegExp lookbehind",
+      "publisher": "Can I use",
+      "kind": "database",
+      "url": "https://caniuse.com/js-regexp-lookbehind",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Lists Safari 16.4 as the first version supporting regular-expression lookbehind assertions.",
+      "license": "Can I use data; cited as a compatibility database.",
+      "notes": "The observed engine rejects lookbehind with a SyntaxError, which places it before Safari 16.4."
+    },
+    {
+      "id": "nvd-cve-2026-2441",
+      "title": "NVD: CVE-2026-2441",
+      "publisher": "NIST NVD",
+      "kind": "advisory",
+      "url": "https://nvd.nist.gov/vuln/detail/cve-2026-2441",
+      "retrieved_at": "2026-10-26",
+      "snapshot": "Describes CVE-2026-2441 as a use-after-free in CSS in Google Chrome before 145.0.7632.75, allowing remote code execution inside the sandbox via a crafted HTML page.",
+      "license": "Public vulnerability record; cited as an advisory.",
+      "notes": "Blink/Chromium-specific, therefore not applicable to a WebKit-based NetFront NX engine."
     }
   ]
 }

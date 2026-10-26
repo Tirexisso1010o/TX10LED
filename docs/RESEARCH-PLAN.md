@@ -29,7 +29,7 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | ID | Direction | Stage | Feasible now? | F | I | R | Score | Status |
 |---|---|---|---|---|---|---|---|---|
 | **D1** | capmtp PTP boundary validation (`H-001`, `H-002`) | 1 | **Yes** — console + USB host | 5 | 2 | 3 | **30** | **Closed — negative** |
-| **D2** | Browser/WebKit fingerprint (`H-005`) | 1 | **Yes**, with a captive-portal setup | 3 | 3 | 3 | **27** | **Next** |
+| **D2** | Browser/WebKit fingerprint (`H-005`) | 1 | **Yes**, with a captive-portal setup | 3 | 3 | 3 | **27** | **Characterized — blocked** |
 | **D3** | Mariko warmboot / package1 diff (`H-003`) | 3 | No — needs artifacts | 1 | 5 | 5 | **25** | Blocked |
 | **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary | 2 | 3 | 2 | **12** | Blocked |
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host | 1 | 3 | 2 | **6** | Blocked |
@@ -78,7 +78,16 @@ The harness discovers the first storage and object handle, then sends boundary o
 
 **Next task.** Serve a controlled page through a captive portal and record the user agent, JS feature detection, and engine quirks. Map the result to public WebKit advisories. This step is fingerprinting only; it does not attempt exploitation.
 
-**Kill criterion.** The engine build is patched for every matching public advisory, or the applet cannot be reached without modifying the console.
+**Result (2026-10-26).** The applet was reached and fingerprinted. It is a genuine stage-1 surface, and it is now characterized:
+
+- The captive-portal DNS redirect works; the console queried `ctest.cdn.nintendo.net`, followed a 302, and executed the page's JavaScript.
+- `WifiWebAuthApplet` has **no URL whitelist** and permits ignoring invalid TLS certificates.
+- The User-Agent is a frozen token and identifies nothing. Feature detection brackets the engine to **Safari 15.4–15.6 (WebKit 615.x, 2022)**: `at`, `findLast`, `structuredClone`, `Error.cause`, and RegExp match indices are present; `toSorted`, `toReversed`, lookbehind, and `ArrayBuffer.transfer` are absent.
+- `Intl` is entirely absent, and `WebAssembly`, `Atomics`, `SharedArrayBuffer`, `serviceWorker`, and `crypto.subtle` are unavailable.
+- Web-applet NPDM grants `fsp-srv`, `nvdrv:a`, `hid:sys`, `ssl`, `bsd:a`, and `SystemSaveData`, so a compromise would be a real userland foothold, not an empty sandbox.
+- `CVE-2026-2441` was ruled out: it is a Blink/Chromium CSS bug, not WebKit.
+
+**Why it is still blocked.** Feature detection does not reveal the security patch level. Nintendo updates the NetFront shell between firmware versions (20.1.1 used `NF/6.0.3.27.11`; 23.0.1 uses `NF/6.0.3.31.11`) and can backport fixes without adding features. Determining the patch level needs the browser binary or controlled exploit testing. The arXiv analysis also reports no JIT in the Switch browser, which invalidates many public WebKit techniques. Even a full compromise is stage 1 only.
 
 **Risk.** Captive-portal testing changes temporary network settings, which are reversible. It requires the owner to add a network on the console.
 
@@ -119,9 +128,10 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 | T2 | Run handle family on the target | Owner approval + console connected | **Done — negative** |
 | T3 | Run object family on the target | T2 + one screenshot | **Done — closed negative** |
 | T4 | Record the results | T2, T3 | **Done** (`E-056`, `E-057`, `C-025`, `C-026`) |
-| T5 | Browser fingerprint via captive portal | Owner approval + network setup | **Next** |
-| T6 | Package1 differ and warmboot checklist | Legal firmware artifacts | Blocked (owner cannot provide) |
-| T7 | Switch 1 `fs` comparison | Stage-1 primitive | Blocked |
+| T5 | Browser fingerprint via captive portal | Owner approval + network setup | **Done** — engine bracketed to WebKit 615.x |
+| T6 | Determine browser security patch level | Browser binary or controlled exploit testing | Blocked |
+| T7 | Package1 differ and warmboot checklist | Legal firmware artifacts | Blocked (owner cannot provide) |
+| T8 | Switch 1 `fs` comparison | Stage-1 primitive | Blocked |
 
 ## How results are recorded
 
