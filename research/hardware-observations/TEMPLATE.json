@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "observation_id": "YYYY-MM-DD-mode",
+  "observed_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "operator": "redacted-or-role",
+  "console": {
+    "model": "HEG-001",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "serial_prefix": "XXX",
+    "ever_opened_or_modchipped": null
+  },
+  "connection": {
+    "mode": "copy-to-pc-via-usb",
+    "cable": "data-capable USB-C",
+    "port": "bottom",
+    "host_os": "macOS",
+    "host_arch": "arm64"
+  },
+  "usb": {
+    "vid_pid": null,
+    "backend": null,
+    "device_name": null,
+    "location_id": null
+  },
+  "commands": [
+    {
+      "command": "switch-usb-probe list --json",
+      "exit_code": null,
+      "result": null
+    }
+  ],
+  "ptp": {
+    "opened": false,
+    "session_opened": false,
+    "manufacturer": null,
+    "model": null,
+    "device_version": null,
+    "serial_prefix": null,
+    "operations_count": null
+  },
+  "interpretation": null,
+  "limitations": [
+    "PTP DeviceInfo is a read-only identity observation, not proof of exploitability or integrity."
+  ],
+  "redactions": [
+    "Serial number truncated to a three-character prefix."
+  ]
+}

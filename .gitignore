@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local logs and private observations
+*.log
+*.local.json
+*.local.md
+
+# Keep the observation template and README, but do not publish raw local data
+research/hardware-observations/*.local.json
+research/hardware-observations/*.local.md
+
+# Editor and OS clutter
+.vscode/
+.idea/
+*.swp
+*~

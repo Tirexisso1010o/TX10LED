@@ -1,0 +1,381 @@
+{
+  "schema_version": 1,
+  "last_reviewed": "2026-10-26",
+  "target": {
+    "model": "HEG-001",
+    "family": "Nintendo Switch OLED",
+    "soc": "NVIDIA Tegra X1+ (Mariko), ODNX10-A1 motherboard",
+    "firmware_reported": "23.0.1",
+    "firmware_verified": false,
+    "user_reported": true,
+    "notes": "Model and firmware are user-reported until manually confirmed and, optionally, observed through PTP. Do not update the firmware to verify it."
+  },
+  "conclusion": {
+    "claim": "A publicly documented, reproducible software-only path to Atmosphère exists for an unmodified Switch OLED on firmware 23.0.1.",
+    "claim_status": "DISPROVEN",
+    "software_only_path_documented": false,
+    "scope": "Reviewed public documentation as of 2026-10-26.",
+    "summary": "No publicly documented, reproducible software-only path to Atmosphère was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosphère 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence.",
+    "undisclosed_exploit_status": "UNKNOWN",
+    "evidence": [
+      "E-007",
+      "E-016",
+      "E-017",
+      "E-021",
+      "E-022",
+      "E-032",
+      "E-033"
+    ]
+  },
+  "entry_point_analysis": {
+    "file": "research/entry-points.json",
+    "last_reviewed": "2026-10-26",
+    "surfaces_reviewed": 10,
+    "software_only_surfaces": 9,
+    "public_software_only_chain_on_target": false,
+    "documented_route": "Hardware modchip (out of scope)",
+    "closest_public_lead": "L-001",
+    "closest_public_lead_name": "ns2jb",
+    "notes": "Detailed surface-by-surface analysis, access requirements, and fixed public flaws are in research/entry-points.json. This matrix keeps only the higher-level compatibility record."
+  },
+  "rows": [
+    {
+      "id": "C-001",
+      "component": "Atmosphère",
+      "version": "1.12.1",
+      "dimension": "firmware",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-001"
+      ],
+      "notes": "Firmware compatibility only. It does not provide an OLED entry point."
+    },
+    {
+      "id": "C-002",
+      "component": "hekate",
+      "version": "v6.5.4",
+      "dimension": "firmware",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-002"
+      ],
+      "notes": "Firmware compatibility only. The bootloader still needs a way to run on the console."
+    },
+    {
+      "id": "C-003",
+      "component": "Nintendo Switch OLED",
+      "version": "HEG-001",
+      "dimension": "hardware",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-003"
+      ],
+      "notes": "The OLED uses Mariko/Tegra X1+ hardware, not the Erista hardware targeted by Fusée Gelée."
+    },
+    {
+      "id": "C-004",
+      "component": "Fusée Gelée (CVE-2018-6242)",
+      "version": "RCM bootROM exploit",
+      "dimension": "entry_point",
+      "status": "DISPROVEN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-004",
+        "E-005"
+      ],
+      "notes": "Applies to vulnerable Erista bootROMs. Patched/Mariko consoles can enter RCM but cannot receive the payload."
+    },
+    {
+      "id": "C-005",
+      "component": "Hardware modchip (Picofly/hwfly class)",
+      "version": "not applicable",
+      "dimension": "entry_point",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": false,
+      "evidence": [
+        "E-008"
+      ],
+      "notes": "Documented route for patched/Mariko consoles. Requires microsoldering and is explicitly out of scope for this software-only project."
+    },
+    {
+      "id": "C-006",
+      "component": "Documented public software-only chain",
+      "version": "none identified",
+      "dimension": "entry_point",
+      "status": "DISPROVEN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-007"
+      ],
+      "notes": "No qualifying public method was found in the reviewed sources as of 2026-10-26."
+    },
+    {
+      "id": "C-007",
+      "component": "Undisclosed software-only chain",
+      "version": "unknown",
+      "dimension": "entry_point",
+      "status": "UNKNOWN",
+      "applies_to_target": null,
+      "in_scope": true,
+      "evidence": [
+        "E-016"
+      ],
+      "notes": "Cannot be established from public documentation. The ledger does not claim impossibility."
+    },
+    {
+      "id": "C-008",
+      "component": "PTP DeviceInfo identity query",
+      "version": "PTP operation 0x1001",
+      "dimension": "usb",
+      "status": "PARTIALLY VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-010",
+        "E-012"
+      ],
+      "notes": "Protocol behavior is documented; OLED hardware observation is pending. This is read-only and does not establish exploitability."
+    },
+    {
+      "id": "C-009",
+      "component": "RCM/APX enumeration",
+      "version": "0x0955:0x7321",
+      "dimension": "usb",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-005",
+        "E-014"
+      ],
+      "notes": "The mode is reachable on patched consoles, but payload injection is not possible on Mariko/OLED."
+    },
+    {
+      "id": "C-010",
+      "component": "Payload injection on the target",
+      "version": "any RCM payload",
+      "dimension": "usb",
+      "status": "DISPROVEN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-005"
+      ],
+      "notes": "Do not attempt. Enumeration or RCM presence is not evidence that injection works."
+    },
+    {
+      "id": "C-011",
+      "component": "Target model and firmware",
+      "version": "HEG-001 / 23.0.1",
+      "dimension": "target_identity",
+      "status": "UNVERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-009"
+      ],
+      "notes": "User-reported. Manual confirmation is required before any state-changing operation; no state-changing operation is currently authorized."
+    },
+    {
+      "id": "C-012",
+      "component": "Normal Switch USB mode",
+      "version": "0x057e:0x2000",
+      "dimension": "usb",
+      "status": "PARTIALLY VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-019"
+      ],
+      "notes": "Recognized for identification only. The tool does not claim control or firmware-query capability in this mode."
+    },
+    {
+      "id": "C-013",
+      "component": "ns2jb userland/sysmodule chain",
+      "version": "Switch 2 package; Switch 1 test unpackaged",
+      "dimension": "entry_point",
+      "status": "PARTIALLY VERIFIED",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-021",
+        "E-022",
+        "E-032",
+        "E-034"
+      ],
+      "notes": "A real software-only userland/sysmodule chain on Switch 2 23.0.1. It does not provide kernel, bootROM, CFW, or persistence, and no OLED/23.0.1 test is documented. The Switch 1 test is a lead, not a packaged method."
+    },
+    {
+      "id": "C-014",
+      "component": "CVE-2026-82079 (local wireless)",
+      "version": "fixed in 23.0.0",
+      "dimension": "entry_point",
+      "status": "DISPROVEN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-023",
+        "E-035"
+      ],
+      "notes": "Affects system versions before 23.0.0. The target is reported on 23.0.1. No public exploit code was found; this row records the fixed flaw, not an available entry point."
+    },
+    {
+      "id": "C-015",
+      "component": "23.0.1 security changes",
+      "version": "23.0.1",
+      "dimension": "firmware",
+      "status": "VERIFIED",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-024",
+        "E-025"
+      ],
+      "notes": "Switchbrew's 23.0.1 page lists a stability fix and an sdb/SystemVersion update; its security-flaw field is an unfilled wiki placeholder. 23.0.0 documents fixes for bsdsocket, audio, and ldn."
+    },
+    {
+      "id": "C-016",
+      "component": "Browser/WebKit entry point",
+      "version": "23.0.1",
+      "dimension": "entry_point",
+      "status": "UNKNOWN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-026",
+        "E-028",
+        "E-031"
+      ],
+      "notes": "PegaSwitch is a historical 1.0.0/Fake News toolkit. No public 23.0.1 browser chain was found. Browser applets remain a live attack surface."
+    },
+    {
+      "id": "C-017",
+      "component": "Recovery/Maintenance mode entry point",
+      "version": "23.0.1",
+      "dimension": "entry_point",
+      "status": "DISPROVEN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-030"
+      ],
+      "notes": "Documented recovery functions are system update and initialize/format; no unsigned-code execution or payload loading is documented."
+    },
+    {
+      "id": "C-018",
+      "component": "PTP/MTP USB entry point",
+      "version": "PTP 0x1001-0x100A",
+      "dimension": "entry_point",
+      "status": "DISPROVEN",
+      "applies_to_target": false,
+      "in_scope": true,
+      "evidence": [
+        "E-015",
+        "E-018"
+      ],
+      "notes": "Stock PTP exposes identity and media operations only. It does not expose a shell, ADB, or general-purpose control interface."
+    }
+  ],
+  "usb_modes": [
+    {
+      "id": "U-001",
+      "mode": "switch_ptp",
+      "vid_pid": "057e:201d",
+      "label": "Nintendo Switch / Switch Lite PTP album mode",
+      "status": "PARTIALLY VERIFIED",
+      "target_model": true,
+      "evidence": [
+        "E-011",
+        "E-012"
+      ],
+      "can_establish": [
+        "USB presence and product identity",
+        "Model, device version, and serial prefix via PTP GetDeviceInfo"
+      ],
+      "cannot_establish": [
+        "Exploitability or entry-point availability",
+        "Boot state, CFW access, or NAND contents"
+      ]
+    },
+    {
+      "id": "U-002",
+      "mode": "switch2_ptp",
+      "vid_pid": "057e:2061",
+      "label": "Nintendo Switch 2 PTP album mode",
+      "status": "VERIFIED",
+      "target_model": false,
+      "evidence": [
+        "E-013"
+      ],
+      "can_establish": [
+        "USB presence and product identity"
+      ],
+      "cannot_establish": [
+        "Anything about the OLED target"
+      ]
+    },
+    {
+      "id": "U-003",
+      "mode": "switch_normal",
+      "vid_pid": "057e:2000",
+      "label": "Nintendo Switch normal USB mode",
+      "status": "PARTIALLY VERIFIED",
+      "target_model": true,
+      "evidence": [
+        "E-019"
+      ],
+      "can_establish": [
+        "USB presence and product identity"
+      ],
+      "cannot_establish": [
+        "Firmware version",
+        "Exploitability",
+        "Shell or remote-control access"
+      ]
+    },
+    {
+      "id": "U-004",
+      "mode": "switch_rcm",
+      "vid_pid": "0955:7321",
+      "label": "NVIDIA Tegra APX / Switch RCM",
+      "status": "VERIFIED",
+      "target_model": true,
+      "evidence": [
+        "E-014"
+      ],
+      "can_establish": [
+        "The console has entered RCM/APX mode"
+      ],
+      "cannot_establish": [
+        "That a payload can be accepted on patched/Mariko hardware",
+        "Firmware version or CFW access"
+      ]
+    },
+    {
+      "id": "U-005",
+      "mode": "switch_pro_controller",
+      "vid_pid": "057e:2009",
+      "label": "Nintendo Switch Pro Controller",
+      "status": "PARTIALLY VERIFIED",
+      "target_model": false,
+      "evidence": [
+        "E-020"
+      ],
+      "can_establish": [
+        "A controller is connected"
+      ],
+      "cannot_establish": [
+        "Anything about the console"
+      ]
+    }
+  ]
+}

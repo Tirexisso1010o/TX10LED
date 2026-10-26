@@ -1,0 +1,505 @@
+{
+  "schema_version": 1,
+  "last_reviewed": "2026-10-26",
+  "entries": [
+    {
+      "id": "E-001",
+      "claim": "Atmosphère 1.12.1 supports firmware 23.0.1.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Firmware compatibility only; not entry-point compatibility.",
+      "sources": [
+        "atmosphere-release-1.12.1",
+        "atmosphere-changelog",
+        "nh-guide-updating",
+        "atmosphere-issue-2883"
+      ],
+      "evidence": "The 1.12.1 release notes add support for 23.0.0 and describe the 23.0.0 changes. The maintained NH Switch Guide compatibility checker lists Atmosphère 1.12.1 as supporting firmware 23.0.1. A community reply in Atmosphère issue #2883 also states that the latest release supports 23.0.1.",
+      "limitations": "The release notes explicitly name 23.0.0; 23.0.1 support is established by the maintained guide and issue discussion. Firmware support does not imply that an entry point exists on Mariko.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-002",
+      "claim": "hekate v6.5.4 supports Horizon OS 23.0.1.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Bootloader and firmware compatibility only.",
+      "sources": [
+        "hekate-release-v6.5.4"
+      ],
+      "evidence": "The v6.5.4 release body states: Latest HOS supported: 23.0.1. The release was published 2026-09-28 from commit 45cd81ed08e30a26ba380958c7e20b55c342834b.",
+      "limitations": "This establishes firmware support, not that the bootloader can be launched on an unmodified OLED.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-003",
+      "claim": "The Nintendo Switch OLED (model HEG-001) uses a Mariko/Tegra X1+ SoC on an ODNX10-A1 motherboard.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Hardware identification.",
+      "sources": [
+        "switchbrew-hardware",
+        "nintendo-support-oled-serial"
+      ],
+      "evidence": "Switchbrew's hardware page lists the OLED motherboard as ODNX10-A1 and identifies the OLED SoC family as Tegra X1+ / Mariko. Nintendo's support page lists the OLED model number as HEG-001.",
+      "limitations": "The user's specific console has not been opened or independently identified; model and firmware remain user-reported until manual confirmation.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-004",
+      "claim": "CVE-2018-6242 (Fusée Gelée) is a Tegra BootROM Recovery Mode buffer overflow affecting Tegra mobile processors released before 2016.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Vulnerability description.",
+      "sources": [
+        "nvd-cve-2018-6242"
+      ],
+      "evidence": "The NVD record states that some NVIDIA Tegra mobile processors released prior to 2016 contain a buffer overflow in BootROM Recovery Mode (RCM), exploitable with physical USB access and the ability to force RCM.",
+      "limitations": "The NVD record describes the vulnerability class and affected generation; it does not by itself prove which later hardware revisions are patched. The Mariko conclusion is supported separately by E-005 and E-006.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-005",
+      "claim": "Patched and Mariko consoles can enter RCM, but cannot receive a payload over RCM.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Entry-point behavior on patched/Mariko hardware.",
+      "sources": [
+        "nh-guide-entering-rcm"
+      ],
+      "evidence": "The NH Switch Guide's Entering RCM page states: Patched units can enter RCM, but it is not possible to send a payload on those systems.",
+      "limitations": "The guide is maintained community documentation, not a Nintendo statement. The behavior is consistent with the patched bootROM described by the same guide.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-006",
+      "claim": "The maintained NH Switch Guide routes patched and Mariko consoles to a modchip rather than a software-only entry point.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented public guidance.",
+      "sources": [
+        "nh-guide-getting-started",
+        "nh-guide-modchip",
+        "nh-guide-updating"
+      ],
+      "evidence": "The guide states that patched consoles are immune to the fusee-gelee exploit in RCM, that attempting to inject a payload on a patched console will be unsuccessful, and that modchips allow any patched console to run CFW. Its firmware table maps patched/Mariko consoles on 5.0.0 or later to the modchip route.",
+      "limitations": "This is evidence about documented guidance, not a mathematical proof that no software-only method can ever exist.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-007",
+      "claim": "A publicly documented, reproducible software-only entry point to Atmosphère exists for an unmodified Switch OLED on firmware 23.0.1.",
+      "status": "DISPROVEN",
+      "confidence": "high",
+      "scope": "Reviewed public documentation as of 2026-10-26.",
+      "sources": [
+        "nh-guide-getting-started",
+        "nh-guide-modchip",
+        "nh-guide-entering-rcm",
+        "atmosphere-release-1.12.1",
+        "hekate-release-v6.5.4",
+        "pepsipu-ns2jb-blog"
+      ],
+      "evidence": "No reviewed source describes a software-only Mariko/OLED entry point to Atmosphère. The authoritative maintained guide explicitly routes patched/Mariko consoles to a modchip and states that RCM payload injection does not work on them. Atmosphère and hekate document firmware support, not an OLED entry point. The ns2jb write-up reports a software-only userland/sysmodule chain tested on Switch 1, but it is unpackaged, does not provide CFW or kernel access, and is not shown on OLED/23.0.1 (E-022, E-032).",
+      "limitations": "This is an absence-of-documented-method finding, not proof that no undisclosed exploit exists. It does not deny that a userland/sysmodule chain exists; it denies that a public chain to Atmosphère on the target exists. The search was limited to public documentation and releases reviewed on 2026-10-26; it was not an exhaustive audit of private research.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-008",
+      "claim": "The documented route to Atmosphère on an unmodified OLED is a hardware modchip, which is outside this project's software-only scope.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented alternative route; not a software-only method.",
+      "sources": [
+        "nh-guide-modchip"
+      ],
+      "evidence": "The NH Switch Guide describes modchips as a CPU voltage-glitching hardware modification that bypasses bootROM verification and allows a payload to be launched on patched consoles. Installation requires microsoldering.",
+      "limitations": "This project does not provide installation instructions, tooling, or automation for modchips. Hardware modification carries warranty, safety, and bricking risks.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-009",
+      "claim": "The target console is a Nintendo Switch OLED (HEG-001) running firmware 23.0.1.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "scope": "User-reported target identity.",
+      "sources": [],
+      "evidence": "The console model and firmware were reported by the user at the start of the project. No manual or USB observation has been recorded yet.",
+      "limitations": "Requires manual confirmation of the model number, firmware display, and serial prefix, followed by an opt-in USB observation. Do not update the firmware to check.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-010",
+      "claim": "Switch Capmtp DeviceInfo reports the console serial number and system display version through the standard PTP DeviceInfo fields.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented PTP behavior on Switch system firmware 11.0.0 and later.",
+      "sources": [
+        "switchbrew-capmtp"
+      ],
+      "evidence": "Switchbrew states that DeviceInfo Serial Number is set to the output of GetSerialNumber and Device Version is set to SystemVersion DisplayVersion.",
+      "limitations": "The documentation is reverse-engineered and does not guarantee behavior on every firmware revision. Hardware validation on this OLED is still pending.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-011",
+      "claim": "USB product ID 0x057e:0x201d is associated with Nintendo Switch / Switch Lite PTP mode.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "USB identification on Switch and Switch Lite.",
+      "sources": [
+        "libmtp-device-table",
+        "libmtp-bug-1893"
+      ],
+      "evidence": "libmtp's device table lists Nintendo 0x057e:0x201d as Switch / Switch Lite. The related libmtp issue documents Switch PTP/MTP support added in system firmware 11.0.0.",
+      "limitations": "The libmtp table does not list the OLED separately; OLED applicability is tracked as E-012.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-012",
+      "claim": "A Switch OLED in Copy to PC via USB mode enumerates as 0x057e:0x201d and answers PTP GetDeviceInfo.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "OLED hardware behavior; indirect evidence only.",
+      "sources": [
+        "libmtp-device-table",
+        "libmtp-bug-1893",
+        "switchbrew-capmtp"
+      ],
+      "evidence": "The OLED uses the same Switch platform and the libmtp table groups Switch / Switch Lite under 0x057e:0x201d. Switchbrew documents the PTP DeviceInfo mapping. No OLED hardware observation has been recorded in this project yet.",
+      "limitations": "This remains unconfirmed on the target console. The opt-in ptp-info command exists to test it without modifying the console.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-013",
+      "claim": "USB product ID 0x057e:0x2061 is associated with Nintendo Switch 2 PTP mode.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "USB identification; not the target model.",
+      "sources": [
+        "libmtp-device-table",
+        "libmtp-bug-1953"
+      ],
+      "evidence": "libmtp's device table lists Nintendo 0x057e:0x2061 as Switch 2. The libmtp issue shows a Switch 2 PTP DeviceInfo response with model, device version, serial number, and the nintendo.com: 1.0 vendor extension.",
+      "limitations": "The Switch 2 is a different console and must not be confused with the OLED target.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-014",
+      "claim": "USB product ID 0x0955:0x7321 is the NVIDIA Tegra APX / Switch RCM identity.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "USB identification of RCM/APX mode.",
+      "sources": [
+        "tegrarcmsmash-readme"
+      ],
+      "evidence": "TegraRcmSmash documents default USB IDs 0x0955:0x7321 for a Switch in RCM mode. The tool is listed for identification only; this project does not send payloads.",
+      "limitations": "Enumeration in RCM does not prove that a payload can be accepted. On patched/Mariko hardware it cannot be.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-015",
+      "claim": "Stock Switch USB PTP mode exposes only PTP operations 0x1001-0x100A and does not expose a shell, ADB, or general-purpose remote-control interface.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented stock USB surface.",
+      "sources": [
+        "switchbrew-capmtp"
+      ],
+      "evidence": "Switchbrew states that only PTP operations 0x1001-0x100A are available. No reviewed source documents a stock shell, ADB, or general-purpose remote-control interface over USB.",
+      "limitations": "This describes the documented stock interface. It does not rule out vendor-specific or undisclosed behavior.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-016",
+      "claim": "An undisclosed software-only exploit exists for Mariko/OLED on firmware 23.0.1.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "scope": "Non-public vulnerability research.",
+      "sources": [],
+      "evidence": "No public evidence was found in the reviewed sources. This claim cannot be tested from public documentation or from the console's stock USB interface.",
+      "limitations": "Private research may exist. This ledger does not claim that a software-only method is impossible, only that no qualifying public method was verified.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-017",
+      "claim": "Firmware compatibility with Atmosphère and hekate does not establish that an entry point exists on Mariko/OLED hardware.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Analytical distinction between firmware support and exploit compatibility.",
+      "sources": [
+        "atmosphere-release-1.12.1",
+        "nh-guide-getting-started",
+        "nh-guide-entering-rcm"
+      ],
+      "evidence": "Atmosphère and hekate document support for the firmware's system modules and boot process. The NH Switch Guide separately documents that patched/Mariko consoles cannot receive an RCM payload and require a modchip. These are independent axes.",
+      "limitations": "This is a conclusion drawn from the cited sources; it does not add new hardware evidence.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-018",
+      "claim": "PTP GetDeviceInfo is a read-only identity query and does not prove boot state, exploitability, or CFW access.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Protocol capability and limits.",
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-ptp-source"
+      ],
+      "evidence": "PTP operation 0x1001 returns a DeviceInfo dataset. The dataset contains identity and capability fields such as manufacturer, model, device version, serial number, and supported operations. It does not execute code or report boot state.",
+      "limitations": "A device response can be spoofed by modified firmware; this project treats PTP output as an observation, not proof of console integrity.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-019",
+      "claim": "USB product ID 0x057e:0x2000 is associated with Nintendo Switch normal USB mode.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "USB identification; vendor database only.",
+      "sources": [
+        "devicehunt-nintendo"
+      ],
+      "evidence": "DeviceHunt lists Nintendo 0x057e:0x2000 as Switch.",
+      "limitations": "This is a third-party device database, not protocol documentation. The tool reports it as a recognizable Nintendo device but does not claim any control capability.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-020",
+      "claim": "USB product ID 0x057e:0x2009 is associated with the Nintendo Switch Pro Controller.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "USB identification; not a console.",
+      "sources": [
+        "devicehunt-nintendo"
+      ],
+      "evidence": "DeviceHunt lists Nintendo 0x057e:0x2009 as Switch Pro Controller.",
+      "limitations": "This is a third-party device database. The tool classifies it as a controller, not a console.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-021",
+      "claim": "ns2jb is a software-only, tethered userland/sysmodule jailbreak for the Nintendo Switch 2 on system software 23.0.1.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Switch 2 only; userland/sysmodule code execution.",
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "ns2jb-repository"
+      ],
+      "evidence": "The author's write-up states that ns2jb is a software-only, tethered jailbreak for the Switch 2 on 23.0.1, running arbitrary native code as ordinary sysmodules and as the built-in fs sysmodule. The repository README states 'Switch 2 only' and that the demo does not install custom firmware or persistence.",
+      "limitations": "This is not the OLED target. It does not provide kernel access, bootROM access, or custom firmware. It requires SmileBASIC 4.4.9 and a host on the same network.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-022",
+      "claim": "The ns2jb exploit chain was also tested on a Switch 1, but it has not been packaged for Switch 1 and does not provide modchip-level capability.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Author-reported Switch 1 test; not a release.",
+      "sources": [
+        "pepsipu-ns2jb-blog"
+      ],
+      "evidence": "The write-up states: 'The exploit has also been tested on the Switch 1, but I haven’t gotten around to packaging it yet. It wouldn’t provide the capabilities of a modchip, but it wouldn’t require any external hardware.'",
+      "limitations": "The write-up does not identify the Switch 1 model, firmware version, or whether it was an OLED/Mariko unit. 'Tested' is not a reproducible package. The published repository is Switch 2 only. This does not establish a path to Atmosphère, kernel, or bootROM.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-023",
+      "claim": "CVE-2026-82079 is a stack-based buffer overflow in Nintendo Switch local wireless networking that affects system versions before 23.0.0 and is fixed in 23.0.0.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Vulnerability description and fixed version.",
+      "sources": [
+        "cve-2026-82079",
+        "switchbrew-23.0.0",
+        "nintendo-security-advisory-2026-09-10"
+      ],
+      "evidence": "The CVE record lists CWE-121, an adjacent-network attack vector, CVSS 4.0 base score 7.0, affected versions before 23.0.0, and a solution of system update 23.0.0. Switchbrew 23.0.0 states that an ldn vulnerability was fixed (CVE-2026-82079).",
+      "limitations": "The CVE record describes the vulnerability class and patch; it does not provide exploit code. The target is reported to be on 23.0.1, so this fixed flaw is not available to it.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-024",
+      "claim": "Switchbrew's 23.0.0 changelog documents fixes for bsdsocket AddrInfo deserialization, multiple audio validation issues, and the ldn CVE.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented 23.0.0 security fixes.",
+      "sources": [
+        "switchbrew-23.0.0",
+        "switchbrew-system-flaws"
+      ],
+      "evidence": "The 23.0.0 page states that a vulnerability was fixed in the nnSdk AddrInfo deserialization code used by bsdsocket; that audio RequestUpdate now performs additional validation and includes vulnerability fixes; and that an ldn vulnerability was fixed (CVE-2026-82079). The flaw list marks the corresponding entries fixed in 23.0.0.",
+      "limitations": "This is a public changelog and flaw list, not a complete audit of 23.0.1. It does not prove that no other flaw exists.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-025",
+      "claim": "Switchbrew's 23.0.1 page documents a stability fix and an sdb/SystemVersion update, and does not list a security fix.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented 23.0.1 changes.",
+      "sources": [
+        "switchbrew-23.0.1"
+      ],
+      "evidence": "The page states that 23.0.1 fixed an issue from 23.0.0 where software occasionally took a long time to start, pause, or close. It lists sdb as the only updated sysmodule and SystemVersion as updated. Its security-flaw field is the unfilled wiki placeholder 'Security flaws fixed: <fill this in manually>'.",
+      "limitations": "The placeholder means the wiki page is incomplete. The absence of a listed security fix is not proof that 23.0.1 contains none; the official change-log describes a stability update.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-026",
+      "claim": "PegaSwitch is an archived early-Switch browser exploit toolkit whose documented launch paths target firmware 1.0.0 and the Fake News entry point, not 23.0.1.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Historical browser entry point.",
+      "sources": [
+        "pegaswitch-repository",
+        "switchbrew-internet-browser"
+      ],
+      "evidence": "The archived PegaSwitch README instructs users to start with --webapplet if on 1.0.0 or using the Fake News entry point, and to use a JPN copy of Puyo Puyo Tetris on 1.0.0. The repository was archived on 2021-09-21. Switchbrew documents the WebKit-based browser applets but no 23.0.1 exploit chain.",
+      "limitations": "The README does not state a hard upper firmware bound. The finding is that its documented paths are for early firmware and it is archived, not that it never worked on any later version. No 23.0.1 support is documented.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-027",
+      "claim": "Caffeine is an old software exploit for patched Erista consoles on firmware 4.1.0 and does not apply to Mariko/OLED on 23.0.1.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Historical Erista software entry point.",
+      "sources": [
+        "nh-guide-getting-started"
+      ],
+      "evidence": "The NH Switch Guide's compatibility table lists Caffeine for patched systems on 4.1.0 only and states that any firmware version past 4.1.0 is not vulnerable to software exploits.",
+      "limitations": "The guide is community documentation. It describes the documented route, not a formal proof. Some secondary sources describe the range as 4.0.0-4.1.0; either way, 23.0.1 is far outside it.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-028",
+      "claim": "A public browser/WebKit exploit chain exists for Switch 1 firmware 23.0.1.",
+      "status": "UNKNOWN",
+      "confidence": "medium",
+      "scope": "Browser/WebKit entry point on the target firmware.",
+      "sources": [
+        "switchbrew-system-flaws",
+        "switchbrew-internet-browser",
+        "pepsipu-ns2jb-blog"
+      ],
+      "evidence": "No 23.0.1 browser chain is listed in the reviewed flaw list or browser documentation. The ns2jb write-up describes a WebKit attempt on Switch 2 that did not succeed, and a separate SmileBASIC route. No public Switch 1 23.0.1 browser chain was found.",
+      "limitations": "This is an absence-of-documented-method finding. Public flaw lists can lag or omit private research. Browser applets remain an attack surface, and the Switch 1 browser environment differs from Switch 2.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-029",
+      "claim": "The public Bluetooth and local-wireless flaws listed by Switchbrew are fixed before or in 23.0.0, and no public 23.0.1 chain was found.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Bluetooth and local-wireless surfaces on 23.0.1.",
+      "sources": [
+        "switchbrew-system-flaws",
+        "switchbrew-23.0.0",
+        "cve-2026-82079"
+      ],
+      "evidence": "The flaw list marks the listed Bluetooth stack overflows fixed in 15.0.0, 16.0.0, 21.0.0, and 22.0.0, and the ldn flaws fixed in 21.0.0 and 23.0.0. The 23.0.0 page confirms the ldn CVE fix. No public 23.0.1 chain is listed.",
+      "limitations": "Absence-of-documentation finding. The flaw list is not exhaustive and may not include private research. It does not prove the surfaces are unexploitable.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-030",
+      "claim": "Recovery/Maintenance mode provides update and format/initialize functions, not an unsigned-code execution path.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Documented recovery-mode behavior.",
+      "sources": [
+        "switchbrew-boot-modes"
+      ],
+      "evidence": "Switchbrew's Boot Modes page describes Recovery Mode as a menu that allows updating the console through the internet and formatting/initializing it with or without keeping user info, screenshots, and saves. It documents no code execution or payload loading.",
+      "limitations": "This describes documented stock behavior. It does not rule out a hypothetical vulnerability in the recovery applet, but no public one was found.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-031",
+      "claim": "The reviewed public flaw list contains no unpatched Mariko software-only boot chain as of 2026-10-26.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Public boot-chain flaws affecting Mariko.",
+      "sources": [
+        "switchbrew-system-flaws",
+        "switchbrew-23.0.0",
+        "switchbrew-23.0.1"
+      ],
+      "evidence": "The flaw list marks the bootROM flaws fixed on Mariko, and lists fixes through 23.0.0 for the reviewed kernel, sysmodule, browser, ldn, and Bluetooth entries. The 23.0.1 page lists only a stability fix. No entry describes an unpatched Mariko boot chain.",
+      "limitations": "This is an absence-of-documented-method finding, not proof of impossibility. The list is public and may lag private research. It does not cover every binary or configuration.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-032",
+      "claim": "The ns2jb userland/sysmodule chain does not provide custom firmware, kernel access, or persistence, and therefore is not a path to Atmosphère by itself.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Capability boundary of the ns2jb chain.",
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "ns2jb-repository"
+      ],
+      "evidence": "The write-up states that ns2jb runs native code as ordinary sysmodules and fs, and its conclusion describes the work as a step toward CFW rather than CFW itself. It also says the Switch 1 version 'wouldn’t provide the capabilities of a modchip.' The README states that the demo does not install custom firmware or persistence.",
+      "limitations": "It could be a stepping stone if combined with additional vulnerabilities; the author says it may help the community make progress toward CFW. It is not a complete chain, and no public kernel or bootROM stage is included.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-033",
+      "claim": "A publicly documented, reproducible software-only userland-to-bootROM chain exists for the OLED on firmware 23.0.1.",
+      "status": "DISPROVEN",
+      "confidence": "high",
+      "scope": "Reviewed public documentation as of 2026-10-26.",
+      "sources": [
+        "switchbrew-system-flaws",
+        "nh-guide-getting-started",
+        "pepsipu-ns2jb-blog",
+        "atmosphere-release-1.12.1"
+      ],
+      "evidence": "No reviewed source connects a userland/sysmodule primitive to kernel or bootROM access on Mariko/OLED. The ns2jb chain stops at sysmodule/fs code execution and explicitly does not provide CFW or kernel access. The maintained NH Switch Guide routes Mariko consoles to a modchip. Atmosphère documents firmware support, not an OLED entry point.",
+      "limitations": "This is an absence-of-documented-method finding, not proof that no undisclosed chain exists. The ns2jb Switch 1 test is a lead, but it is unpackaged and its model/firmware are not stated.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-034",
+      "claim": "The ns2jb chain is confirmed to work on an OLED/Mariko console running 23.0.1.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "scope": "Target-specific applicability of the ns2jb chain.",
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "ns2jb-repository"
+      ],
+      "evidence": "The author says the exploit was also tested on Switch 1, but does not identify the model or firmware. The published repository is Switch 2 only. No OLED/Mariko 23.0.1 test is documented.",
+      "limitations": "Do not assume that a Switch 1 test applies to the OLED or to 23.0.1. Independent reproduction or an author statement identifying the model and firmware is required.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-035",
+      "claim": "A public exploit for CVE-2026-82079 is available.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "scope": "Public exploit availability.",
+      "sources": [
+        "cve-2026-82079",
+        "switchbrew-system-flaws"
+      ],
+      "evidence": "The CVE record includes no exploit code and CISA ADP lists exploitation as none at the record update. Switchbrew links a HackerOne report for details, but no public packaged exploit was found in the reviewed sources.",
+      "limitations": "The HackerOne report may contain technical details and was not accessible in this review. The CVE record and CISA status are point-in-time observations, not proof that no exploit exists privately.",
+      "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-036",
+      "claim": "A public code-execution entry point through game save data or game cartridges exists on firmware 23.0.1.",
+      "status": "UNKNOWN",
+      "confidence": "low",
+      "scope": "Game save and game cartridge surfaces.",
+      "sources": [
+        "switchbrew-system-flaws"
+      ],
+      "evidence": "The reviewed flaw list's Games section documents game-level infoleaks and anti-cheat issues, not a public game-save or cartridge code-execution chain on 23.0.1. No public chain was found.",
+      "limitations": "This is an absence-of-documented-method finding. Save editing and cartridge data manipulation are not code execution. The flaw list is not exhaustive.",
+      "last_reviewed": "2026-10-26"
+    }
+  ]
+}

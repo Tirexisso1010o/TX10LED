@@ -1,0 +1,1024 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "docs/SAFETY_AND_RECOVERY.md",
+    "research/CHECKPOINT.md"
+  ],
+  "permissions": [
+    {
+      "action": "*",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "*.env",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "*.env.*",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "*.env.example",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "*.key",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "*.pem",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "id_*",
+      "effect": "ask"
+    },
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": ".git/*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": ".venv/*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.key",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.pem",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.p12",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*.mobileprovision",
+      "effect": "deny"
+    },
+    {
+      "action": "glob",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "grep",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "question",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "execute",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://github.com/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://raw.githubusercontent.com/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://api.github.com/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://switchbrew.org/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://switch.hacks.guide/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://nh-server.github.io/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://opencode.ai/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://services.nvd.nist.gov/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://nvd.nist.gov/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://sourceforge.net/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://en-americas-support.nintendo.com/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "https://devicehunt.com/*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "websearch",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "subagent",
+      "resource": "explore",
+      "effect": "allow"
+    },
+    {
+      "action": "subagent",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "skill",
+      "resource": "opencode",
+      "effect": "allow"
+    },
+    {
+      "action": "skill",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "opencode_list_mcp_resources",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "opencode_read_mcp_resource",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pwd*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "ls*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "find .*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "find src*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "find tests*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "find docs*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "find research*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "wc*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "head*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tail*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sed -n*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "grep*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "rg*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git status*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git diff*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git log*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git show*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git remote -v*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git ls-files*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git ls-remote*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git rev-parse*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git check-ignore*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git grep*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git config --get*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git add*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git add -A*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git add .*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git commit*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git commit --amend*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 --version*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m unittest*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "PYTHONPATH=src python3 -m unittest*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m compileall*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 scripts/validate_research.py*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m json.tool*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m pip --version*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m pip list*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m pip show*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m unittest*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m switch_usb_probe doctor*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m switch_usb_probe list*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m switch_usb_probe classify*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m switch_usb_probe compat*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m switch_usb_probe watch*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "PYTHONPATH=src python3 -m switch_usb_probe doctor*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "PYTHONPATH=src python3 -m switch_usb_probe list*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "PYTHONPATH=src python3 -m switch_usb_probe classify*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "PYTHONPATH=src python3 -m switch_usb_probe compat*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "PYTHONPATH=src python3 -m switch_usb_probe watch*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sw_vers*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "uname*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "arch*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "whoami*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "date*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "command -v*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "which*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "brew list*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "system_profiler SPUSBDataType*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "ioreg -p IOUSB*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pgrep*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "plutil -p*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "plutil -lint*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "shasum*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "md5*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "df*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "du*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "stat*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "opencode --version*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "opencode debug config*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git push*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git remote add*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git remote set-url*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git tag*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git checkout*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git switch*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git merge*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git rebase*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git stash*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git restore*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git reset*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git config*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m pip*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m venv*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m pip*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pip*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pip3*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "brew install*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "brew uninstall*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "brew upgrade*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "curl*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "wget*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "nc*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "ssh*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "scp*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "rsync*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "tar*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "unzip*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "zip*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "make*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "npm*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "node*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "npx*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "open*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "osascript*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "defaults write*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "xcode-select*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "chmod*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "chown*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "ln*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "mv*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "cp*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "rm*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -c*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -c*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "python3 -m switch_usb_probe ptp-info*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": ".venv/bin/python -m switch_usb_probe ptp-info*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "system_profiler *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "ioreg *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "ps*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "lsof*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "codesign*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "xxd*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "base64*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "od*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "strings*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "ssh-keygen*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "su*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "doas*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "dd*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "diskutil*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "mkfs*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "fdisk*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "gpt*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "newfs*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "csrutil*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "spctl*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "systemsetup*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "nvram*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "softwareupdate*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "launchctl*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "brew services*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "killall*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "pkill*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "kill -9*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "rm -rf *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "rm -r *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git reset --hard*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git clean*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git filter-branch*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --force*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push -f*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --delete*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --mirror*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git remote remove*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git config --global*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git config --system*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "security *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "printenv*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "env*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "history*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "npm install -g*",
+      "effect": "deny"
+    }
+  ]
+}

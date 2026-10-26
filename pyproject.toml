@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "switch-usb-probe"
+version = "0.1.0"
+description = "Potential software-only Atmosphère jailbreak research and a read-only macOS USB inspection tool for Nintendo Switch"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "TX10LED contributors" },
+]
+keywords = [
+  "nintendo-switch",
+  "usb",
+  "ptp",
+  "macos",
+  "research",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: System :: Hardware",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.optional-dependencies]
+ptp = [
+  "pyusb>=1.2,<2",
+]
+
+[project.scripts]
+switch-usb-probe = "switch_usb_probe.cli:main"
+
+[project.urls]
+Repository = "https://github.com/Tirexisso1010o/TX10LED"
+Issues = "https://github.com/Tirexisso1010o/TX10LED/issues"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+switch_usb_probe = ["py.typed"]

@@ -1,0 +1,564 @@
+{
+  "schema_version": 1,
+  "last_reviewed": "2026-10-26",
+  "target": {
+    "model": "HEG-001",
+    "family": "Nintendo Switch OLED",
+    "soc": "NVIDIA Tegra X1+ (Mariko)",
+    "firmware_reported": "23.0.1",
+    "firmware_verified": false,
+    "note": "User-reported. See research/compatibility-matrix.json for the canonical target record. Do not update the firmware to verify it."
+  },
+  "summary": {
+    "question": "Is there a publicly documented, reproducible, software-only entry point to Atmosphère on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",
+    "answer": "No publicly documented, reproducible software-only entry point was found in the reviewed public sources as of 2026-10-26.",
+    "status": "DISPROVEN",
+    "scope": "Public documentation reviewed on 2026-10-26. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
+    "software_only_public_chain_on_target": false,
+    "documented_route": "Hardware modchip (out of scope for this software-only project)",
+    "closest_public_lead": "L-001",
+    "closest_public_lead_name": "ns2jb",
+    "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1, does not provide kernel or bootROM access, and is not documented on OLED/Mariko 23.0.1.",
+    "undisclosed_method_status": "UNKNOWN",
+    "notes": [
+      "Firmware compatibility is a separate axis: Atmosphère 1.12.1 and hekate v6.5.4 support 23.0.1, but neither provides an entry point.",
+      "The only documented route for patched/Mariko consoles is a hardware modchip, which is outside this project's scope.",
+      "The surface matrix records what is publicly documented; it does not claim that any surface is unexploitable."
+    ]
+  },
+  "field_notes": {
+    "status": "Status of the claim that this surface provides a publicly documented, reproducible software-only path to Atmosphère on the target.",
+    "public_chain_on_target": "Whether a public chain is documented for this exact target: OLED/Mariko hardware on firmware 23.0.1. A surface can have a real public primitive (PARTIALLY VERIFIED) without a target-specific chain.",
+    "leads_to_atmosphere": "Whether the surface, as publicly documented, provides a complete path to launching Atmosphère on the target.",
+    "software_only": "No modchip, soldering, or console hardware modification. An external USB cable, jig, host, or game card is not a hardware modification.",
+    "physical_access": "none, optional, or required. This describes physical access to the console, not whether the method is software-only."
+  },
+  "status_legend": [
+    {
+      "status": "VERIFIED",
+      "meaning": "Directly supported by an authoritative or primary source, with no reviewed contradiction."
+    },
+    {
+      "status": "PARTIALLY VERIFIED",
+      "meaning": "Indirect evidence, or evidence that covers a related but not identical case."
+    },
+    {
+      "status": "UNVERIFIED",
+      "meaning": "Plausible or user-reported, but not independently checked."
+    },
+    {
+      "status": "DISPROVEN",
+      "meaning": "Contradicted by an authoritative source or direct evidence."
+    },
+    {
+      "status": "UNKNOWN",
+      "meaning": "Insufficient evidence; neither supported nor contradicted."
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "EP-001",
+      "surface": "bootrom_rcm",
+      "name": "BootROM / RCM USB recovery",
+      "layer": "bootrom",
+      "description": "The Tegra bootROM's USB recovery mode (RCM/APX). On vulnerable Erista consoles, Fusée Gelée (CVE-2018-6242) lets a USB host send an unsigned payload before Horizon OS starts.",
+      "access_required": "Physical: force RCM with a jig or button combination, connect USB, and run a host-side payload sender.",
+      "software_only": true,
+      "physical_access": "required",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "DISPROVEN",
+      "status_basis": "The OLED uses Mariko/Tegra X1+ hardware, whose bootROM is patched against Fusée Gelée. Patched consoles can enter RCM and enumerate as 0955:7321, but cannot receive the payload.",
+      "capability_if_successful": "Unsigned code execution before Horizon OS; the classic route to a custom bootloader and Atmosphère.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "A vulnerable bootROM",
+        "RCM access",
+        "A USB host"
+      ],
+      "evidence": [
+        "E-004",
+        "E-005",
+        "E-014",
+        "E-031"
+      ],
+      "sources": [
+        "nvd-cve-2018-6242",
+        "nh-guide-entering-rcm",
+        "switchbrew-boot-modes",
+        "switchbrew-system-flaws"
+      ],
+      "notes": "Do not attempt payload injection on the target. RCM enumeration is not evidence that injection works."
+    },
+    {
+      "id": "EP-002",
+      "surface": "recovery_mode",
+      "name": "Recovery / Maintenance mode",
+      "layer": "recovery",
+      "description": "The stock recovery menu entered with Volume Up + Volume Down + Power. It supports system update and initialize/format operations.",
+      "access_required": "Physical buttons; no host software.",
+      "software_only": true,
+      "physical_access": "required",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "DISPROVEN",
+      "status_basis": "The documented functions are system update and initialize/format. No unsigned-code execution or payload loading is documented.",
+      "capability_if_successful": "None beyond stock recovery functions; it is not a CFW launch path.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "Recovery-mode access"
+      ],
+      "evidence": [
+        "E-030"
+      ],
+      "sources": [
+        "switchbrew-boot-modes"
+      ],
+      "notes": "This describes documented stock behavior. It does not prove the recovery applet has no vulnerabilities, but no public chain was found."
+    },
+    {
+      "id": "EP-003",
+      "surface": "browser_webkit",
+      "name": "Browser / WebKit applets",
+      "layer": "userland",
+      "description": "NetFront NX/WebKit-based applets, including the captive-portal WifiWebAuthApplet and the account-login browser. Historical Switch browser exploits used these applets.",
+      "access_required": "A user-accessible network/applet flow; historical exploits used DNS redirection or a captive portal.",
+      "software_only": true,
+      "physical_access": "none",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "UNKNOWN",
+      "status_basis": "PegaSwitch is an archived early-Switch toolkit whose documented launch paths target firmware 1.0.0 and the Fake News entry point. No public 23.0.1 browser chain was found in the reviewed sources. Browser applets remain a live attack surface.",
+      "capability_if_successful": "Userland code execution in the browser-applet context; a kernel or bootROM stage would still be required for Atmosphère.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "A browser/applet code-execution bug",
+        "A kernel/bootROM stage for CFW"
+      ],
+      "evidence": [
+        "E-026",
+        "E-028",
+        "E-031"
+      ],
+      "sources": [
+        "pegaswitch-repository",
+        "switchbrew-internet-browser",
+        "switchbrew-system-flaws"
+      ],
+      "notes": "UNKNOWN means no qualifying public chain was found, not that the browser is safe or that no private chain exists."
+    },
+    {
+      "id": "EP-004",
+      "surface": "ptp_mtp_usb",
+      "name": "PTP / MTP USB album mode",
+      "layer": "usb",
+      "description": "The stock 'Copy to PC via USB' album mode. It exposes standard PTP operations for identity and media transfer.",
+      "access_required": "A USB cable and the user-enabled album mode.",
+      "software_only": true,
+      "physical_access": "required",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "DISPROVEN",
+      "status_basis": "Capmtp exposes only PTP operations 0x1001-0x100A. No code execution, shell, ADB, or general-purpose control interface is documented. GetDeviceInfo is read-only identity data.",
+      "capability_if_successful": "Identity observation and media transfer only.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "PTP/MTP album mode",
+        "A USB host"
+      ],
+      "evidence": [
+        "E-010",
+        "E-011",
+        "E-012",
+        "E-015",
+        "E-018"
+      ],
+      "sources": [
+        "switchbrew-capmtp",
+        "libmtp-device-table",
+        "libmtp-bug-1893",
+        "libmtp-ptp-source"
+      ],
+      "notes": "Useful for verifying model, firmware display version, and serial prefix. It is not an exploit surface in the reviewed documentation."
+    },
+    {
+      "id": "EP-005",
+      "surface": "local_wireless_ldn",
+      "name": "Local wireless (ldn)",
+      "layer": "wireless",
+      "description": "Local wireless networking used for nearby multiplayer and local communication.",
+      "access_required": "Adjacent wireless range; no physical access.",
+      "software_only": true,
+      "physical_access": "none",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "UNKNOWN",
+      "status_basis": "CVE-2026-82079 is a stack-based buffer overflow in local wireless that affects versions before 23.0.0 and is fixed in 23.0.0. The target is reported on 23.0.1. No public 23.0.1 chain was found.",
+      "capability_if_successful": "Potentially adjacent code execution in the ldn context; a kernel or bootROM stage would still be required for Atmosphère.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "An ldn code-execution bug",
+        "A kernel/bootROM stage for CFW"
+      ],
+      "evidence": [
+        "E-023",
+        "E-024",
+        "E-029",
+        "E-035"
+      ],
+      "sources": [
+        "cve-2026-82079",
+        "switchbrew-23.0.0",
+        "switchbrew-system-flaws",
+        "nintendo-security-advisory-2026-09-10"
+      ],
+      "notes": "The known public CVE is fixed on the target. UNKNOWN refers to any other public 23.0.1 chain, not to CVE-2026-82079."
+    },
+    {
+      "id": "EP-006",
+      "surface": "bluetooth",
+      "name": "Bluetooth",
+      "layer": "wireless",
+      "description": "The Bluetooth stack used for controllers and wireless peripherals.",
+      "access_required": "Adjacent radio range; controller pairing or connection.",
+      "software_only": true,
+      "physical_access": "none",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "UNKNOWN",
+      "status_basis": "Switchbrew lists Bluetooth stack overflows fixed in 15.0.0, 16.0.0, 21.0.0, and 22.0.0. No public 23.0.1 chain was found.",
+      "capability_if_successful": "Potentially adjacent code execution in the Bluetooth/hid context; a kernel or bootROM stage would still be required for Atmosphère.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "A Bluetooth code-execution bug",
+        "A kernel/bootROM stage for CFW"
+      ],
+      "evidence": [
+        "E-029",
+        "E-031"
+      ],
+      "sources": [
+        "switchbrew-system-flaws"
+      ],
+      "notes": "Absence of a listed public chain is not proof that the stack is unexploitable."
+    },
+    {
+      "id": "EP-007",
+      "surface": "game_saves_cartridges",
+      "name": "Game saves and cartridges",
+      "layer": "game",
+      "description": "Save data, game cards, and game-level parsers.",
+      "access_required": "User save files, a physical game card, or a game-specific service.",
+      "software_only": true,
+      "physical_access": "optional",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "UNKNOWN",
+      "status_basis": "The reviewed flaw list's Games section documents game-level infoleaks and anti-cheat issues, not a public save-data or cartridge code-execution chain on 23.0.1. Save editing is not code execution.",
+      "capability_if_successful": "Potentially game-context code execution; a kernel or bootROM stage would still be required for Atmosphère.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "A game-specific code-execution bug",
+        "A kernel/bootROM stage for CFW"
+      ],
+      "evidence": [
+        "E-036"
+      ],
+      "sources": [
+        "switchbrew-system-flaws"
+      ],
+      "notes": "No public chain found. This surface is game-dependent and is not a generic console entry point."
+    },
+    {
+      "id": "EP-008",
+      "surface": "system_services_sysmodules",
+      "name": "System services and sysmodules (ns2jb lead)",
+      "layer": "userland",
+      "description": "Horizon OS system services and sysmodules, including filesystem (fs), bsdsocket, audio, and other IPC services. A userland/sysmodule compromise can run native code with service privileges.",
+      "access_required": "An initial userland primitive, often from a game or applet. ns2jb uses SmileBASIC 4.4.9.",
+      "software_only": true,
+      "physical_access": "none",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "PARTIALLY VERIFIED",
+      "status_basis": "ns2jb is a real software-only, tethered userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1 but has not been packaged. It runs native code as ordinary sysmodules and fs, without kernel access, CFW, or persistence. No OLED/23.0.1 test is documented.",
+      "capability_if_successful": "Native code as ordinary sysmodules and fs; not kernel, bootROM, or CFW.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "An initial userland primitive",
+        "A compatible game or app",
+        "A kernel/bootROM stage for CFW"
+      ],
+      "evidence": [
+        "E-021",
+        "E-022",
+        "E-024",
+        "E-032",
+        "E-034"
+      ],
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "ns2jb-repository",
+        "switchbrew-23.0.0"
+      ],
+      "notes": "Closest public lead. It shows that a software-only userland/sysmodule chain can exist on recent firmware, but it does not provide a path to Atmosphère by itself. The Switch 1 test's model and firmware are not stated."
+    },
+    {
+      "id": "EP-009",
+      "surface": "kernel_trustzone",
+      "name": "Kernel / TrustZone",
+      "layer": "kernel",
+      "description": "The Horizon OS kernel and TrustZone. Kernel code execution is typically needed for full system control; a bootROM or secure-monitor compromise is needed for pre-boot CFW.",
+      "access_required": "An initial userland or service primitive.",
+      "software_only": true,
+      "physical_access": "none",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "UNKNOWN",
+      "status_basis": "The reviewed public flaw list contains no unpatched Mariko software-only boot chain and no public 23.0.1 kernel/TrustZone chain. The 23.0.0 fixes include bsdsocket and audio service issues; 23.0.1 lists only a stability fix.",
+      "capability_if_successful": "Kernel-level control; not necessarily bootROM access or persistent CFW.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "A userland/service primitive",
+        "A kernel or TrustZone bug",
+        "A boot path for persistent CFW"
+      ],
+      "evidence": [
+        "E-024",
+        "E-025",
+        "E-031",
+        "E-033"
+      ],
+      "sources": [
+        "switchbrew-system-flaws",
+        "switchbrew-23.0.0",
+        "switchbrew-23.0.1"
+      ],
+      "notes": "No public chain found. Atmosphère needs a boot path, not just kernel code execution; a kernel exploit alone may not survive reboot or launch Atmosphère."
+    },
+    {
+      "id": "EP-010",
+      "surface": "hardware_fault_injection_modchip",
+      "name": "Hardware fault injection / modchip",
+      "layer": "physical",
+      "description": "Physical voltage glitching or a modchip that bypasses bootROM verification.",
+      "access_required": "Microsoldering and physical installation.",
+      "software_only": false,
+      "physical_access": "required",
+      "target_reachable": true,
+      "public_chain_on_target": true,
+      "status": "VERIFIED",
+      "status_basis": "The maintained NH Switch Guide documents a hardware modchip as the route for patched/Mariko consoles. It performs CPU voltage glitching to bypass bootROM verification and launch a payload from SD.",
+      "capability_if_successful": "Custom bootloader/CFW launch; the documented route to Atmosphère.",
+      "leads_to_atmosphere": true,
+      "in_scope": false,
+      "requires": [
+        "A compatible modchip",
+        "Microsoldering",
+        "Installation and recovery expertise"
+      ],
+      "evidence": [
+        "E-006",
+        "E-008"
+      ],
+      "sources": [
+        "nh-guide-getting-started",
+        "nh-guide-modchip"
+      ],
+      "notes": "Out of scope. No installation instructions, wiring, firmware, or automation are provided."
+    }
+  ],
+  "leads": [
+    {
+      "id": "L-001",
+      "name": "ns2jb",
+      "surface": "EP-008",
+      "status": "PARTIALLY VERIFIED",
+      "target_applicability": "UNVERIFIED",
+      "leads_to_atmosphere": false,
+      "what_it_is": "A software-only, tethered userland/sysmodule jailbreak for the Nintendo Switch 2 on system software 23.0.1. It runs native code as ordinary sysmodules and as the built-in fs sysmodule.",
+      "what_it_proves": "A software-only userland/sysmodule chain can exist on recent firmware and can run native code without a modchip.",
+      "what_it_does_not_prove": "It does not provide kernel, bootROM, CFW, or persistence. It is packaged for Switch 2, not Switch 1. The author says the chain was also tested on Switch 1, but the model and firmware are not stated and the Switch 1 version is not packaged.",
+      "evidence": [
+        "E-021",
+        "E-022",
+        "E-032",
+        "E-034"
+      ],
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "ns2jb-repository"
+      ],
+      "next_step": "Look for an independent report or author statement identifying the Switch 1 model and firmware. Do not treat the Switch 2 package as an OLED method."
+    },
+    {
+      "id": "L-002",
+      "name": "PegaSwitch",
+      "surface": "EP-003",
+      "status": "DISPROVEN",
+      "target_applicability": "DISPROVEN",
+      "leads_to_atmosphere": false,
+      "what_it_is": "An archived early-Switch browser exploit toolkit. Its documented launch paths target firmware 1.0.0 and the Fake News entry point.",
+      "what_it_proves": "Browser applets were a viable entry-point surface on early Switch firmware.",
+      "what_it_does_not_prove": "Nothing about firmware 23.0.1, Mariko, or the OLED. The repository was archived in 2021 and documents no 23.0.1 support.",
+      "evidence": [
+        "E-026"
+      ],
+      "sources": [
+        "pegaswitch-repository",
+        "switchbrew-internet-browser"
+      ],
+      "next_step": "None for the target. It is recorded to distinguish a historical browser path from a current one."
+    },
+    {
+      "id": "L-003",
+      "name": "Caffeine",
+      "surface": null,
+      "status": "DISPROVEN",
+      "target_applicability": "DISPROVEN",
+      "leads_to_atmosphere": false,
+      "what_it_is": "An old software exploit for patched Erista consoles on firmware 4.1.0.",
+      "what_it_proves": "A software-only path existed on a different hardware and firmware combination.",
+      "what_it_does_not_prove": "Nothing about Mariko/OLED hardware or firmware 23.0.1. The maintained guide places it at 4.1.0 only.",
+      "evidence": [
+        "E-027"
+      ],
+      "sources": [
+        "nh-guide-getting-started"
+      ],
+      "next_step": "None for the target. It is recorded to prevent the historical Erista path from being mistaken for an OLED path."
+    },
+    {
+      "id": "L-004",
+      "name": "CVE-2026-82079",
+      "surface": "EP-005",
+      "status": "DISPROVEN",
+      "target_applicability": "DISPROVEN",
+      "leads_to_atmosphere": false,
+      "what_it_is": "A stack-based buffer overflow in Nintendo Switch local wireless networking, fixed in system version 23.0.0.",
+      "what_it_proves": "A recent public local-wireless vulnerability existed and was patched.",
+      "what_it_does_not_prove": "No public exploit code was found in the reviewed sources. The target is reported on 23.0.1, so this fixed flaw is not available to it.",
+      "evidence": [
+        "E-023",
+        "E-035"
+      ],
+      "sources": [
+        "cve-2026-82079",
+        "switchbrew-23.0.0"
+      ],
+      "next_step": "None for the target. Monitor for a 23.0.1-specific ldn flaw, but do not assume one exists."
+    },
+    {
+      "id": "L-005",
+      "name": "Fusée Gelée",
+      "surface": "EP-001",
+      "status": "DISPROVEN",
+      "target_applicability": "DISPROVEN",
+      "leads_to_atmosphere": false,
+      "what_it_is": "A Tegra bootROM Recovery Mode buffer overflow (CVE-2018-6242) that lets a USB host send an unsigned payload to vulnerable Erista consoles.",
+      "what_it_proves": "The classic software-only entry point for unpatched Erista hardware.",
+      "what_it_does_not_prove": "Nothing about Mariko/OLED. The bootROM is patched; the console can enter RCM but cannot receive the payload.",
+      "evidence": [
+        "E-004",
+        "E-005"
+      ],
+      "sources": [
+        "nvd-cve-2018-6242",
+        "nh-guide-entering-rcm"
+      ],
+      "next_step": "None for the target. Do not attempt payload injection."
+    }
+  ],
+  "fixed_public_flaws": [
+    {
+      "id": "F-001",
+      "surface": "EP-001",
+      "name": "Fusée Gelée",
+      "identifier": "CVE-2018-6242",
+      "fixed_in": "Mariko bootROM",
+      "target_affected": false,
+      "evidence": [
+        "E-004",
+        "E-005"
+      ],
+      "notes": "The bootROM patch is a hardware revision, not a firmware update. Patched consoles can still enter RCM."
+    },
+    {
+      "id": "F-002",
+      "surface": "EP-005",
+      "name": "Local-wireless stack-based buffer overflow",
+      "identifier": "CVE-2026-82079",
+      "fixed_in": "23.0.0",
+      "target_affected": false,
+      "evidence": [
+        "E-023",
+        "E-035"
+      ],
+      "notes": "The CVE record lists affected versions before 23.0.0 and a solution of system update 23.0.0. The target is reported on 23.0.1."
+    },
+    {
+      "id": "F-003",
+      "surface": "EP-008",
+      "name": "bsdsocket AddrInfo deserialization",
+      "identifier": "no CVE identifier in the reviewed source",
+      "fixed_in": "23.0.0",
+      "target_affected": false,
+      "evidence": [
+        "E-024"
+      ],
+      "notes": "Switchbrew 23.0.0 documents a vulnerability fix in the nnSdk AddrInfo deserialization code used by bsdsocket."
+    },
+    {
+      "id": "F-004",
+      "surface": "EP-008",
+      "name": "audio RequestUpdate validation",
+      "identifier": "no CVE identifier in the reviewed source",
+      "fixed_in": "23.0.0",
+      "target_affected": false,
+      "evidence": [
+        "E-024"
+      ],
+      "notes": "Switchbrew 23.0.0 states that audio RequestUpdate now performs additional validation and includes vulnerability fixes."
+    },
+    {
+      "id": "F-005",
+      "surface": "EP-006",
+      "name": "Bluetooth stack overflows",
+      "identifier": "multiple; see Switchbrew",
+      "fixed_in": "15.0.0, 16.0.0, 21.0.0, 22.0.0",
+      "target_affected": false,
+      "evidence": [
+        "E-029"
+      ],
+      "notes": "Switchbrew's flaw list marks the listed Bluetooth stack overflows fixed in those versions. This is not an exhaustive list."
+    }
+  ],
+  "surface_summary": {
+    "total_surfaces": 10,
+    "software_only_surfaces": 9,
+    "public_software_only_chain_on_target": 0,
+    "surfaces_with_public_chain_on_target": [
+      "EP-010"
+    ],
+    "in_scope_surfaces": 9,
+    "out_of_scope_surfaces": [
+      "EP-010"
+    ],
+    "status_counts": {
+      "VERIFIED": 1,
+      "PARTIALLY VERIFIED": 1,
+      "UNVERIFIED": 0,
+      "DISPROVEN": 3,
+      "UNKNOWN": 5
+    }
+  }
+}
