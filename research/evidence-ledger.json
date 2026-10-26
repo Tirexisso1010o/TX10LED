@@ -922,6 +922,21 @@
       "evidence": "Built libwebp commit 7ba44f80f3b94fc0138db159afea770ef06532a0 with -fsanitize=address. Running examples/dwebp on bad.webp and nso.webp produced 'ERROR: AddressSanitizer: heap-buffer-overflow' with a WRITE of size 4 in BuildHuffmanTable (huffman_utils.c:194), called from ReadHuffmanCode (vp8l_dec.c:354). A non-ASAN libwebp 1.3.1 build returned 'Decoding failed. Status: 3(BITSTREAM_ERROR)' for both files.",
       "limitations": "Local x86-64 build with a specific allocator, not the console's ARM build. The console may use a different libwebp version, a platform decoder, or a backported fix. Without ASAN, the overflow may be silent.",
       "last_reviewed": "2026-10-26"
+    },
+    {
+      "id": "E-067",
+      "claim": "The target applet decoded both CVE-2023-4863 reproducer files to 1x1 images without a visible fault, while stock libwebp 1.2.4, 1.3.1, and 1.6.0 reject the same files with BITSTREAM_ERROR.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Console observation, 2026-10-26, plus local comparison builds.",
+      "sources": [
+        "poc-cve-2023-4863",
+        "isosceles-webp-0day",
+        "nvd-cve-2023-4863"
+      ],
+      "evidence": "The portal served bad.webp (236 bytes, color_cache_bits=0) and nso.webp (350 bytes, color_cache_bits=6) to WifiWebAuthApplet. Both fired onload with naturalWidth/naturalHeight 1x1, and the page posted a 'done' marker. Locally, dwebp from libwebp 1.2.4, 1.3.1, and 1.6.0 returned 'Decoding failed. Status: 3(BITSTREAM_ERROR)' for both files. With ASAN on commit 7ba44f8, the same files produced a heap-buffer-overflow in BuildHuffmanTable.",
+      "limitations": "A non-ASAN silent overflow cannot be excluded. The applet's decoder implementation and version are unknown. One console and one run per file.",
+      "last_reviewed": "2026-10-26"
     }
   ]
 }

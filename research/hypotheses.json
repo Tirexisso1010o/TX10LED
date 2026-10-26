@@ -321,7 +321,8 @@
         "E-058",
         "E-064",
         "E-065",
-        "E-066"
+        "E-066",
+        "E-067"
       ],
       "sources": [
         "nvd-cve-2023-4863",
@@ -334,8 +335,8 @@
       "resolution": "open",
       "hardware": "HEG-001 (Mariko), captive-portal applet",
       "firmware": "23.0.1",
-      "results": "Surface reachability confirmed: PNG, JPEG, GIF, BMP, WebP, and SVG all decode, and lossless WebP exercises the Huffman path. The public reproducer was validated locally against libwebp commit 7ba44f8 with ASAN, producing a 4-byte heap overflow in BuildHuffmanTable. On a non-ASAN build the same files return BITSTREAM_ERROR, so a console test that does not crash is inconclusive; only a visible fault would be informative.",
-      "uncertainties": "Whether the console's decoder is libwebp at all, which version it is, and whether Nintendo backported the fix. Without ASAN, a vulnerable decoder may corrupt memory silently. Even a successful trigger would be applet-level userland."
+      "results": "Both reproducer files were served to the applet and decoded to 1x1 images with no visible fault. Stock libwebp 1.2.4, 1.3.1, and 1.6.0 reject the same files. The applet therefore runs a decoder that behaves unlike stock libwebp; acceptance is consistent with an older or custom decoder that lacks the validation, but no fault was observed, so vulnerability is unconfirmed. A silent out-of-bounds write cannot be excluded without ASAN or a visible crash.",
+      "uncertainties": "Whether the decoder wrote out of bounds silently, and whether repeated decoding would accumulate corruption into a visible fault. Even a confirmed crash would be applet-level userland, not homebrew."
     }
   ]
 }

@@ -511,9 +511,10 @@
       "evidence": [
         "E-058",
         "E-064",
-        "E-065"
+        "E-065",
+        "E-067"
       ],
-      "notes": "Surface reachable: all six image formats decode, including lossless WebP. Whether the decoder predates the libwebp fix is untested. CVE-2023-4863 is the leading candidate; a public crash reproducer exists but has not been run against the console."
+      "notes": "Surface reachable: all six image formats decode, including lossless WebP. Both CVE-2023-4863 reproducers were decoded to 1x1 without a fault, while stock libwebp rejects them, so the console decoder is non-stock. Vulnerability is unconfirmed; a silent overflow is possible."
     }
   ],
   "usb_modes": [
