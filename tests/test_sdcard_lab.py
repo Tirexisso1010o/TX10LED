@@ -86,6 +86,25 @@ class AlbumTreeTests(unittest.TestCase):
         low = struct.unpack_from("<H", image, nintendo + 26)[0]
         self.assertEqual((high << 16) | low, 0x0FFFFFF0)
 
+    def test_date_tree_reaches_the_day_directory(self) -> None:
+        image = lab.build_image(64, "album_date_file_oob")
+        layout = lab.layout_for(64)
+        data = layout.data_start * lab.SECTOR
+
+        def at(cluster: int) -> int:
+            return data + (cluster - 2) * lab.SECTOR
+
+        chain = [(2, b"NINTENDO   ", 3), (3, b"ALBUM      ", 4), (4, b"2026       ", 5), (5, b"10         ", 6), (6, b"27         ", 7)]
+        for cluster, name, target in chain:
+            self.assertEqual(image[at(cluster) : at(cluster) + 11], name)
+            low = struct.unpack_from("<H", image, at(cluster) + 26)[0]
+            self.assertEqual(low, target)
+        day = at(7)
+        self.assertEqual(image[day : day + 11], b"OK      JPG")
+        high = struct.unpack_from("<H", image, day + 32 + 20)[0]
+        low = struct.unpack_from("<H", image, day + 32 + 26)[0]
+        self.assertEqual((high << 16) | low, 0x0FFFFFF0)
+
     def test_album_file_points_out_of_range(self) -> None:
         image = lab.build_image(64, "album_file_oob")
         _, _, album = self._offsets()

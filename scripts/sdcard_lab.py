@@ -41,6 +41,7 @@ ANOMALIES = {
     "lfn_bad": "Long-file-name entry has an invalid checksum and length.",
     "two_fats_mismatch": "The two FAT copies disagree about the file chain.",
     "album_file_oob": "Nintendo/Album image entry points at an out-of-range cluster.",
+    "album_date_file_oob": "Nintendo/Album/YYYY/MM/DD image entry points out of range.",
     "album_dir_oob": "Nintendo/Album directory entry points at an out-of-range cluster.",
 }
 
@@ -118,7 +119,7 @@ def _fat(layout: Layout, chain: dict[int, int]) -> bytes:
     table[1] = 0x0FFFFFFF
     table[ROOT_CLUSTER] = EOC
     table[FILE_CLUSTER] = EOC
-    for cluster in (4, 5, 6):
+    for cluster in (4, 5, 6, 7, 8):
         table[cluster] = EOC
     for cluster, value in chain.items():
         table[cluster] = value
@@ -193,7 +194,9 @@ def _build_fs(
         image[13] = 0
 
     data_offset = layout.data_start * SECTOR
-    if anomaly in {"album_file_oob", "album_dir_oob"}:
+    if anomaly == "album_date_file_oob":
+        _album_date_tree(image, layout)
+    elif anomaly in {"album_file_oob", "album_dir_oob"}:
         _album_tree(image, layout, anomaly)
     else:
         image[data_offset : data_offset + SECTOR] = _directory(layout, anomaly)
@@ -234,6 +237,31 @@ def _album_tree(image: bytearray, layout: Layout, anomaly: str) -> None:
     image[at(4) : at(4) + SECTOR] = album
     image[at(5) : at(5) + len(JPEG)] = JPEG
     image[at(6) : at(6) + len(JPEG)] = JPEG
+
+
+def _album_date_tree(image: bytearray, layout: Layout) -> None:
+    data = layout.data_start * SECTOR
+
+    def at(cluster: int) -> int:
+        return data + (cluster - 2) * SECTOR
+
+    entries = [
+        (2, b"NINTENDO   ", 0x10, 3),
+        (3, b"ALBUM      ", 0x10, 4),
+        (4, b"2026       ", 0x10, 5),
+        (5, b"10         ", 0x10, 6),
+        (6, b"27         ", 0x10, 7),
+    ]
+    for cluster, name, attr, target in entries:
+        sector = bytearray(SECTOR)
+        _dir_entry(sector, 0, name, attr, target, 0)
+        image[at(cluster) : at(cluster) + SECTOR] = sector
+
+    day = bytearray(SECTOR)
+    _dir_entry(day, 0, b"OK      JPG", 0x20, 8, len(JPEG))
+    _dir_entry(day, 32, b"TEST    JPG", 0x20, 0x0FFFFFF0, len(JPEG))
+    image[at(7) : at(7) + SECTOR] = day
+    image[at(8) : at(8) + len(JPEG)] = JPEG
 
 
 def build_image(
