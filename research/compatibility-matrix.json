@@ -546,6 +546,21 @@
         "E-077"
       ],
       "notes": "Tested invalid BPB, out-of-range file entries, and out-of-range directory entries. The BPB is rejected at mount, invalid files are skipped, and an invalid directory produces a handled applet error. No memory-safety signal."
+    },
+    {
+      "id": "C-037",
+      "component": "LDN local-wireless pre-auth parser",
+      "version": "23.0.1",
+      "dimension": "Entry point",
+      "status": "UNKNOWN",
+      "applies_to_target": true,
+      "in_scope": true,
+      "evidence": [
+        "E-023",
+        "E-035",
+        "E-078"
+      ],
+      "notes": "CVE-2026-82079 (an ldn stack overflow) is fixed in 23.0.0 and the target is 23.0.1. The LDN protocol is documented and testable with a Linux host and a compatible adapter. Retail traffic is encrypted and needs prod.keys; the plaintext development-mode path is untested on retail. No 23.0.1-specific ldn bug is known."
     }
   ],
   "usb_modes": [

@@ -55,7 +55,7 @@ The status answers a specific claim: **“This surface provides a publicly docum
 | EP-002 | Recovery / Maintenance mode | Physical buttons | No — update/format only | **DISPROVEN** | No |
 | EP-003 | Browser / WebKit applets | Network/applet flow | No public 23.0.1 chain found | **UNKNOWN** | No |
 | EP-004 | PTP / MTP USB album mode | USB cable + user mode | No — identity/media only | **DISPROVEN** | No |
-| EP-005 | Local wireless (`ldn`) | Adjacent wireless | Known CVE fixed before target | **UNKNOWN** | No |
+| EP-005 | Local wireless (`ldn`) | Adjacent wireless | Known CVE fixed; no-key pre-auth test conditional | **UNKNOWN** | No |
 | EP-006 | Bluetooth | Adjacent radio | No public 23.0.1 chain found | **UNKNOWN** | No |
 | EP-007 | Game saves and cartridges | Saves / game card | No public code-execution chain found | **UNKNOWN** | No |
 | EP-008 | System services and sysmodules | Initial userland primitive | Real primitive, but not target/CFW | **PARTIALLY VERIFIED** | No |
@@ -108,7 +108,13 @@ Local wireless is used for nearby multiplayer and local communication. **CVE-202
 
 No public exploit code for the CVE was found in the reviewed sources. Even if one existed, the target is outside the affected range. The surface is `UNKNOWN` for any *other* public 23.0.1 chain, not because CVE-2026-82079 is still open.
 
-A local-wireless primitive would still be userland/service-level; a kernel or bootROM stage would be required for Atmosphère.
+The three sharing paths are not the same:
+
+- **Virtual Game Cards** are account-, internet-, proximity-, and license-gated (`E-079`); a PC cannot be a linked console.
+- **GameShare / `splay`** requires a real Switch 2 host and ECC-verified host data (`E-038`–`E-044`); a PC cannot produce a valid signed host advertisement.
+- **LDN pre-auth** is the only path a PC can reach without a second console or Nintendo signing keys. Retail LDN is AES-encrypted and needs `prod.keys`; the plaintext development-mode path is untested (`E-078`).
+
+`H-010` is the resulting conditional hypothesis. The first step is a passive advertisement capture, which needs no keys and transmits nothing. The active plaintext-host test is described in [`docs/LDN-TEST-PLAN.md`](LDN-TEST-PLAN.md) and requires explicit approval. A local-wireless primitive would still be userland/service-level; a kernel or bootROM stage would be required for Atmosphère.
 
 ## EP-006 — Bluetooth
 

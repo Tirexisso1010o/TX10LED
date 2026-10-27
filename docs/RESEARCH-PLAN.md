@@ -36,8 +36,9 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | **D6** | Artemis save chain-load (`H-007`) | 1 | No — no Switch reproduction or save delivery | 2 | 2 | 1 | **4** | Blocked |
 | **D7** | Browser non-JS parsers: image decoding (`H-008`) | 1 | **Yes** — the portal serves the assets | 4 | 4 | 3 | **48** | **Closed — inconclusive** |
 | **D8** | SD-card FAT32 parser (`H-009`) | 2 | **Yes** — card reader and sacrificial card | 4 | 3 | 4 | **48** | **Closed — negative** |
+| **D9** | LDN local-wireless pre-auth parser (`H-010`) | 2 | **Conditional** — CachyOS PC + compatible adapter; retail needs keys, plaintext path untested | 3 | 4 | 4 | **48** | **Ready — passive capture first** |
 
-`D1` is now closed: the capmtp surface was tested on hardware and produced only documented errors. `D2` is the next runnable direction. `D3` remains the only direction that can close the decisive stage, and it is blocked because the owner cannot provide firmware artifacts.
+`D1`, `D2`, `D7`, and `D8` are closed. `D3`–`D6` are blocked. `D9` is the only open runnable direction, and it is conditional: the passive capture is safe, but the active plaintext-host test needs approval and may be rejected by retail. `D3` remains the only direction that can close the decisive stage, and it is blocked because the owner cannot provide firmware artifacts.
 
 ## D1 — capmtp PTP boundary validation
 
@@ -160,6 +161,30 @@ Both stay in the register as `UNKNOWN` so they are not silently forgotten.
 
 No memory-safety signal appeared. The tested inputs were either validated at mount, skipped at enumeration, or handled as an applet error. Remaining anomalies (cyclic chains, near-boundary clusters) would test hang behaviour rather than code execution, and the surface is a denial-of-service path at best.
 
+## D9 — LDN local-wireless pre-auth parser
+
+**Hypothesis:** `H-010`.
+
+**Why this is now runnable.** The owner has a CachyOS PC and a Wi-Fi adapter that can use monitor mode. The LDN protocol is publicly documented, and `CVE-2026-82079` — a stack overflow in local wireless fixed in 23.0.0 — shows that this parser has recently handled security-relevant input. The target is on 23.0.1, so that specific bug is patched; this direction looks for a different defect.
+
+**Why the "emulate a Switch 2" version does not work.** There are three different sharing paths, and only one is reachable from a PC:
+
+- **Virtual Game Cards** require a Nintendo Account, an internet connection, local-wireless proximity, and a server-issued license (`E-079`). A PC cannot act as a linked console.
+- **GameShare / `splay`** requires a real Switch 2 host. The host's `AdvertiseData` is ECC-verified, the protocol is not publicly specified, and a PC cannot produce a valid signed host advertisement (`E-038`–`E-044`, `L-006`).
+- **LDN pre-auth** is the remaining surface: a PC can observe and, with approval, transmit LDN frames without a second console or Nintendo signing keys.
+
+**The key gate.** Retail LDN uses security mode 1 (AES-encrypted). The key derivation needs `prod.keys`, which the owner does not have. The one no-key path is **security mode 3** (system debug, plaintext). The `kinnay/LDN` package supports it and does not derive a WLAN data key in that mode (`E-078`). Retail may reject the development-only mode. That is the first falsifiable question.
+
+**First step (safe).** Passive capture only. The console hosts a local-wireless room; the PC captures advertisement frames and parses the plaintext `NetworkId` header (title ID, scene ID, SSID, version, format, nonce). The full procedure is in [`docs/LDN-TEST-PLAN.md`](LDN-TEST-PLAN.md). No keys, no transmission, no console state change.
+
+**Second step (needs approval).** Put the console in join/scan mode and host a plaintext, no-challenge LDN network with the captured parameters. If the console joins, the station-side authentication parser is reachable without keys. If it rejects the network, the no-key path is closed and retail LDN research is blocked on a lawful key source.
+
+**Kill criterion.** The console rejects the plaintext network and every no-key variant, or the adapter cannot capture/transmit LDN action frames. Record as blocked on keys. If the console joins but every malformed authentication response is rejected cleanly, record as negative.
+
+**Risk.** A malformed frame could hang or crash the `ldn` sysmodule or Wi-Fi firmware. Recovery is to stop the host, power-cycle the console, and restart the adapter. No storage is written. Active frame injection requires explicit approval for the specific run.
+
+**Capability ceiling.** A pre-auth bug in `ldn` would be stage 2 at best. It would not by itself reach boot-stage execution, and a full chain would still need a kernel or warmboot stage.
+
 ## Task queue
 
 | # | Task | Depends on | Status |
@@ -174,6 +199,8 @@ No memory-safety signal appeared. The tested inputs were either validated at mou
 | T8 | Switch 1 `fs` comparison | Stage-1 primitive | Blocked |
 | T9 | WebP reproducer on the console | Owner approval | **Done — no fault, inconclusive** |
 | T10 | SD FAT32 anomaly matrix | Card reader + sacrificial card | **Done — handled rejects, no memory signal** |
+| T11 | LDN passive capture, then plaintext-host join test | CachyOS PC + compatible adapter + owner approval | **Next — passive capture** |
+| T12 | Malformed LDN authentication responses | T11 join + separate approval | Not started |
 
 ## Program status
 
@@ -187,8 +214,9 @@ Every direction that could be executed with the owner's hardware has now been ei
 - **D6 Artemis**: blocked on save delivery and native escape.
 - **D7 browser image parsers**: closed inconclusive (non-stock decoder accepted the reproducer; no observable fault).
 - **D8 SD-card FAT32 parser**: closed negative on tested anomalies (mount rejection, entry skip, handled applet error; no crash report).
+- **D9 LDN pre-auth parser**: open and conditional. Passive capture is safe and ready. The active plaintext-host test needs approval; retail encrypted LDN needs `prod.keys`, and the no-key plaintext path may be rejected.
 
-No runnable software-only direction remains with the current materials. Further progress requires new public research or a lawful firmware source. That is a statement about available inputs, not proof of impossibility.
+D9 is the only remaining runnable direction. It is conditional, not promised: if the retail console rejects the plaintext development mode, the no-key path is closed and further LDN research needs a lawful key source. A pre-auth `ldn` bug would be stage 2 at best, not a path to Atmosphère on its own. Further progress also requires new public research or a lawful firmware source. That is a statement about available inputs, not proof of impossibility.
 
 ## How results are recorded
 
@@ -203,6 +231,7 @@ Nothing is recorded as an exploit until it has been reproduced on hardware and s
 ## Related records
 
 - [`research/hypotheses.json`](../research/hypotheses.json) — the falsifiable register.
+- [`docs/LDN-TEST-PLAN.md`](LDN-TEST-PLAN.md) — the passive capture and approved plaintext-host procedure.
 - [`docs/GAP-ANALYSIS.md`](GAP-ANALYSIS.md) — the stage model.
 - [`docs/ENTRY-POINTS.md`](ENTRY-POINTS.md) — surfaces and leads.
 - [`docs/SAFETY_AND_RECOVERY.md`](SAFETY_AND_RECOVERY.md) — boundaries and recovery.

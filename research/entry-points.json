@@ -206,27 +206,33 @@
       "target_reachable": true,
       "public_chain_on_target": false,
       "status": "UNKNOWN",
-      "status_basis": "CVE-2026-82079 is a stack-based buffer overflow in local wireless that affects versions before 23.0.0 and is fixed in 23.0.0. The target is reported on 23.0.1. No public 23.0.1 chain was found.",
+      "status_basis": "CVE-2026-82079 is a stack-based buffer overflow in local wireless that affects versions before 23.0.0 and is fixed in 23.0.0. The target is reported on 23.0.1. No public 23.0.1 chain was found. H-010 is a new pre-auth hypothesis: the LDN protocol is documented and testable with a Linux host, but retail traffic needs prod.keys and the plaintext development-mode path is untested.",
       "capability_if_successful": "Potentially adjacent code execution in the ldn context; a kernel or bootROM stage would still be required for Atmosphère.",
       "leads_to_atmosphere": false,
       "in_scope": true,
       "requires": [
         "An ldn code-execution bug",
-        "A kernel/bootROM stage for CFW"
+        "A kernel/bootROM stage for CFW",
+        "A Linux host with a compatible monitor-mode adapter and approval to transmit LDN frames",
+        "For retail encrypted LDN, prod.keys; the no-key plaintext path is conditional"
       ],
       "evidence": [
         "E-023",
         "E-024",
         "E-029",
-        "E-035"
+        "E-035",
+        "E-078"
       ],
       "sources": [
         "cve-2026-82079",
         "switchbrew-23.0.0",
         "switchbrew-system-flaws",
-        "nintendo-security-advisory-2026-09-10"
+        "nintendo-security-advisory-2026-09-10",
+        "switchbrew-ldn",
+        "kinnay-ldn-protocol",
+        "kinnay-ldn"
       ],
-      "notes": "The known public CVE is fixed on the target. UNKNOWN refers to any other public 23.0.1 chain, not to CVE-2026-82079."
+      "notes": "The known public CVE is fixed on the target. UNKNOWN refers to any other public 23.0.1 chain, not to CVE-2026-82079. H-010 is the active pre-auth test: passive capture is safe; active plaintext-host frame injection requires explicit approval and may be rejected by retail."
     },
     {
       "id": "EP-006",

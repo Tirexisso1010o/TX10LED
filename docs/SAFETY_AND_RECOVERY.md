@@ -2,7 +2,7 @@
 
 ## Scope
 
-This project performs **read-only inspection** of USB devices on macOS. It does not modify the console, its storage, its boot configuration, or its firmware.
+This project performs **read-only inspection** of USB devices on macOS and **passive LDN capture** on a Linux host. The only active wireless action in scope is a single, explicitly approved plaintext LDN host test described in [`docs/LDN-TEST-PLAN.md`](LDN-TEST-PLAN.md). The project does not modify the console, its storage, its boot configuration, or its firmware.
 
 The research conclusion is that an unmodified Switch OLED has no publicly documented, reproducible software-only path to Atmosphère. The safe response is not to try increasingly invasive workarounds. It is to stop, document the state, and use a documented route only if you deliberately choose to accept its risks.
 
@@ -18,6 +18,8 @@ Do not use this repository to:
 - bypass macOS security controls;
 - run privileged drivers or commands;
 - kill `ptpcamerad` or another system daemon automatically;
+- transmit LDN frames without explicit approval for the specific run;
+- use the LDN host to play or share a game, bypass the ticket challenge, or impersonate a GameShare or Virtual Game Card host;
 - collect or publish full serial numbers, keys, certificates, tokens, or NAND dumps.
 
 If a procedure requires any of these, it is outside the project's authorization boundary.
@@ -34,6 +36,8 @@ If a procedure requires any of these, it is outside the project's authorization 
 | Update firmware | Irreversible eFuse changes; can break CFW compatibility | Prohibited |
 | Modchip installation | High; microsoldering, warranty, and bricking risk | Out of scope |
 | NAND/eMMC operations | High; data loss and bricking risk | Prohibited |
+| Passive LDN capture (monitor mode) | Low; captures frames on the host adapter, transmits nothing | Allowed; keep the pcap and unredacted output local |
+| Transmit LDN frames / host a plaintext LDN network | Medium; can hang or crash the `ldn` sysmodule or Wi-Fi firmware; active frame injection | Explicit approval for the specific run; follow `docs/LDN-TEST-PLAN.md` |
 
 ## Before any device interaction
 
@@ -62,6 +66,14 @@ The tool never requires RCM for identity inspection.
 - Exit the **Copy to PC via USB** screen with the home button.
 - If the console is still unresponsive, hold the power button until it powers off, then boot normally.
 - Do not perform a factory reset or initialize the console as a first response. That can destroy data and does not address a host-side USB problem.
+
+### The console is unresponsive after an LDN frame test
+
+- Stop the LDN host and the channel-hop loop first.
+- Restore the Linux adapter to managed mode and restart NetworkManager.
+- Hold the console's power button until it powers off, then boot normally.
+- Do not factory-reset or initialize the console as a first response. A wireless hang is not a storage problem.
+- Record the exact frame parameters, the host output, and the console's behavior. If the console produced a crash report or error code, preserve it and do not repeat the frame until the report is copied.
 
 ### The Mac reports the device as busy
 
@@ -112,4 +124,4 @@ If something unexpected happens:
 
 ## Legal and warranty note
 
-Console modification can affect warranty coverage and may violate Nintendo's service terms or local law. This document is not legal advice. Decide deliberately whether to accept those risks; do not treat a research conclusion as authorization.
+Console modification can affect warranty coverage and may violate Nintendo's service terms or local law. This document is not legal advice. Decide deliberately whether to accept those risks; do not treat a research conclusion as authorization. In particular, this project does not authorize bypassing Nintendo's license checks or using LDN research to share games without a valid license.

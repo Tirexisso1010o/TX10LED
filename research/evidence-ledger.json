@@ -1056,6 +1056,34 @@
       "evidence": "The album_date_real image contained the console's exact JPEG bytes and filename at the crafted path, plus a second file whose first cluster is 0x0FFFFFF0. On opening the Album, the real screenshot appeared and no second item appeared. The console stayed responsive and reported no error.",
       "limitations": "The skipped entry was not read, so this shows entry-level validation, not bounds checking inside the read path. One console.",
       "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-078",
+      "claim": "Retail LDN encrypts advertisement and data frames; plaintext LDN is a development security mode, and the kinnay/LDN implementation supports a plaintext mode without deriving a WLAN data key.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Protocol and implementation documentation, 2026-10-27.",
+      "sources": [
+        "switchbrew-ldn",
+        "kinnay-ldn-protocol",
+        "kinnay-ldn"
+      ],
+      "evidence": "Switchbrew's LDN services page documents security mode 1 as product/encrypted, mode 2 as debug, and mode 3 as system debug/plaintext. The kinnay LDN protocol page states that levels 2 and 3 are only allowed during development and that the authentication challenge is always enabled for games but not for system titles. In the kinnay/LDN source, ConnectNetworkParam and CreateNetworkParam require a non-empty keys dictionary, but create_network derives a WLAN data key only when security_mode == SECURITY_MODE_PROD; for SECURITY_MODE_SYSTEM_DEBUG it passes wlan_key=None and AdvertisementFrame.build_advertisement selects the plaintext format. The package README requires Linux, monitor-mode action-frame support, CAP_NET_ADMIN/CAP_NET_RAW, and reports mt7921e as confirmed.",
+      "limitations": "Retail console acceptance of a plaintext network is untested. The fact that the host does not derive a key does not prove the console will accept the development-only mode. The authentication challenge is disabled for system titles but enabled for games.",
+      "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-079",
+      "claim": "Virtual game cards are gated by a Nintendo Account, an internet connection, local-wireless proximity, and a license; a PC cannot simply emulate a second console to join the flow.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Nintendo's virtual-game-card documentation, 2026-10-27.",
+      "sources": [
+        "nintendo-virtual-game-card"
+      ],
+      "evidence": "Nintendo's Virtual Game Card Guide states that a Nintendo Account can have up to two linked consoles that load virtual game cards, that both consoles must be connected to the internet for linking and loading, that local-wireless proximity is required for pairing and lending, and that lending is limited to Nintendo Account family group members. The game remains tied to the account and the license.",
+      "limitations": "This establishes the account/license and server gates, not the exact wire protocol. It does not prove that no implementation bug exists in the virtual-game-card code.",
+      "last_reviewed": "2026-10-27"
     }
   ]
 }

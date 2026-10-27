@@ -287,3 +287,15 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Continue with cyclic chains and near-boundary clusters (rejected: they would produce hangs or reads of unallocated card data, not a memory-safety primitive); treat the `2802-9999` as a crash (rejected: no crash report and the console stayed responsive).
 
 **Consequences:** `E-070` through `E-077`, `C-035`, `C-036`, the plan, and the checkpoint record the result. The sacrificial card can be reformatted. The console is unchanged. No software-only direction with an observable signal remains with the available materials.
+
+## 2026-10-27 — Open the LDN pre-auth direction (D9 / H-010), conditionally
+
+**Decision:** Open `D9` and `H-010` for the local-wireless pre-auth parser. Start with a passive LDN advertisement capture. Do not transmit frames until the owner approves the specific plaintext-host test.
+
+**Reason:** The owner now has a CachyOS PC and a Wi-Fi adapter that can use monitor mode, which makes the LDN surface testable for the first time. The protocol is publicly documented, and `CVE-2026-82079` — a local-wireless stack overflow fixed in 23.0.0 — shows that the parser has recently handled security-relevant input. The target is on 23.0.1, so that specific bug is patched; the direction looks for a different defect, not a re-test of the CVE.
+
+**The key constraint:** Retail LDN uses AES-encrypted security mode 1 and needs `prod.keys`, which the owner does not have. The only no-key path is the plaintext security-mode-3 network supported by `kinnay/LDN`. Retail may reject it. If it does, the direction closes as blocked on keys; the project will not download or use keys.
+
+**Alternatives considered:** Emulating a Switch 2 to spoof GameShare (rejected: requires a real Switch 2 host, the host `AdvertiseData` is ECC-verified, and the protocol is not public); spoofing a Virtual Game Card console (rejected: Nintendo Account, internet, local-wireless proximity, and a server-issued license gate a PC out of the flow); downloading `prod.keys` (rejected: prohibited and untrustworthy).
+
+**Consequences:** `E-078` and `E-079`, `H-010`, `C-037`, `EP-005`, `docs/LDN-TEST-PLAN.md`, `scripts/ldn_probe.py`, and `scripts/ldn_host.py` record the direction. `D9` is conditional: the passive capture is safe and ready; the active plaintext-host test needs approval; a pre-auth `ldn` bug would be stage 2 at best. If the plaintext path is rejected, the program returns to monitoring with no runnable direction.

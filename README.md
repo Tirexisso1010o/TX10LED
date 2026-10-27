@@ -2,7 +2,7 @@
 
 A source-backed investigation into a potential software-only Atmosphère jailbreak for the Nintendo Switch OLED, plus a read-only macOS USB inspection tool.
 
-> **Research snapshot: 2026-10-26. Potential, not achieved.** No publicly documented, reproducible software-only path to Atmosphère was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Atmosphère 1.12.1 and hekate v6.5.4 support the firmware, but firmware compatibility is not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope.
+> **Research snapshot: 2026-10-27. Potential, not achieved.** No publicly documented, reproducible software-only path to Atmosphère was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Atmosphère 1.12.1 and hekate v6.5.4 support the firmware, but firmware compatibility is not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. A new conditional pre-auth LDN direction (`D9`/`H-010`) is planned; it has not produced a result.
 
 This repository does not contain a working exploit, a payload, or a flashing tool. It is a potential-jailbreak research ledger and a read-only USB inspection tool.
 
@@ -50,7 +50,7 @@ The detailed matrix is in [`docs/ENTRY-POINTS.md`](docs/ENTRY-POINTS.md) and [`r
 | Recovery / Maintenance mode | Documented functions are update and initialize/format; no code execution. |
 | Browser / WebKit applets | Historical PegaSwitch targets 1.0.0/Fake News; no public 23.0.1 chain found. |
 | PTP / MTP USB album mode | Observed as `057e:201d`; `GetDeviceInfo` answered without a session. Identity and media transfer only; no shell, ADB, or general-purpose control. |
-| Local wireless (`ldn`) | CVE-2026-82079 is fixed in 23.0.0; the target is reported on 23.0.1. |
+| Local wireless (`ldn`) | CVE-2026-82079 is fixed in 23.0.0; the target is reported on 23.0.1. A conditional pre-auth test (`H-010`) is planned: passive capture first; the active plaintext-host test needs approval, and retail encryption needs `prod.keys`. |
 | Bluetooth | Public stack overflows are fixed before 23.0.1; no public current chain found. |
 | Game saves / cartridges | No public code-execution chain on 23.0.1 found; save editing is not code execution. |
 | System services / sysmodules | `ns2jb` is a real userland/sysmodule chain, but not a path to Atmosphère. |

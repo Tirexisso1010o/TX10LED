@@ -39,6 +39,10 @@ opencode.json
 # Local-only proof-of-concept assets
 scripts/assets.local/
 
+# Local wireless captures (may contain MAC addresses)
+*.pcap
+*.pcapng
+
 # Firmware, keys, and proprietary blobs (never commit)
 firmware/
 keys/

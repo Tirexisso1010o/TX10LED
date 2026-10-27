@@ -628,6 +628,50 @@
       "snapshot": "States that error 2802-9998 may occur when a captured video file has become corrupted, or when trying to view an unsupported video file on Nintendo Switch.",
       "license": "Nintendo support documentation; quoted as vendor documentation.",
       "notes": "Indicates that the 2802-xxxx family covers Album media access errors. The observed code 2802-9999 is a sibling."
+    },
+    {
+      "id": "switchbrew-ldn",
+      "title": "Nintendo Switch Brew: LDN services",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/LDN_services",
+      "retrieved_at": "2026-10-27",
+      "snapshot": "Documents the ldn:m, ldn:s, and ldn:u services; security modes 1 (product, encrypted), 2 (debug), and 3 (system debug, plaintext); the authentication challenge added in 6.0.0; and the WLAN action-frame protocol.",
+      "license": "Community wiki; cited as protocol documentation.",
+      "notes": "The service-level reference for LDN. It establishes that retail uses security mode 1 and that plaintext modes are development-oriented."
+    },
+    {
+      "id": "kinnay-ldn-protocol",
+      "title": "LDN Protocol (NintendoClients wiki)",
+      "publisher": "Yannik Marchand / GitHub",
+      "kind": "protocol-documentation",
+      "url": "https://github.com/kinnay/NintendoClients/wiki/LDN-Protocol",
+      "retrieved_at": "2026-10-27",
+      "snapshot": "Describes the LDN advertisement, authentication, and disconnect frames; the WLAN channels; AES-CTR and AES-GCM modes; and the authentication challenge that is always enabled for games but not for system titles.",
+      "license": "Community protocol documentation; cited as a reference.",
+      "notes": "The clearest public description of the frame layout and the challenge gate. It is a reverse-engineering reference, not a vendor specification."
+    },
+    {
+      "id": "kinnay-ldn",
+      "title": "kinnay/LDN: Python package for local wireless communication with a Nintendo Switch",
+      "publisher": "GitHub",
+      "kind": "source-code",
+      "url": "https://github.com/kinnay/LDN",
+      "retrieved_at": "2026-10-27",
+      "snapshot": "A Linux-only Python implementation that scans, joins, and hosts LDN networks. It requires monitor-mode action-frame support and CAP_NET_ADMIN/CAP_NET_RAW; retail encrypted networks require prod.keys. The source supports security mode 3 (system debug), where create_network does not derive a WLAN data key. The README confirms MediaTek/Realtek drivers and mt7921e.",
+      "license": "GPL-3.0; cited as a research tool, not vendored.",
+      "notes": "The practical host for the no-key plaintext test. It is not a game-sharing tool and does not bypass the ticket challenge."
+    },
+    {
+      "id": "nintendo-virtual-game-card",
+      "title": "Nintendo Support: Virtual Game Card Guide",
+      "publisher": "Nintendo",
+      "kind": "vendor-documentation",
+      "url": "https://en-americas-support.nintendo.com/app/answers/detail/a_id/67891/~/virtual-game-card-guide",
+      "retrieved_at": "2026-10-27",
+      "snapshot": "States that virtual game cards are linked to a Nintendo Account, that up to two consoles can load them, that both consoles must be connected to the internet, that local-wireless proximity is required for pairing and lending, and that lending is limited to Nintendo Account family group members.",
+      "license": "Nintendo support documentation; quoted as vendor documentation.",
+      "notes": "Establishes the account, internet, proximity, and license gates for the virtual-game-card path."
     }
   ]
 }

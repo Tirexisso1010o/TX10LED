@@ -378,6 +378,47 @@
       "firmware": "23.0.1",
       "results": "Tested on the target on 2026-10-27. The control image mounts. An out-of-range file entry is skipped cleanly while a real file in the same directory is listed. An out-of-range Nintendo/Album directory cluster causes the Album applet to hang and report 2802-9999, a handled applet failure with no crash report. Zero sectors-per-cluster is rejected at mount with a format prompt. No memory-safety signal was observed in the tested anomalies.",
       "uncertainties": "Only a subset of anomalies was tested; cyclic chains and near-boundary cluster values were not. A silent fault cannot be excluded, but every tested invalid input was rejected or handled."
+    },
+    {
+      "id": "H-010",
+      "title": "Post-23.0.0 LDN pre-auth parser memory-safety bug",
+      "stage": "2",
+      "surface": "EP-005",
+      "component": "ldn sysmodule and WLAN local-wireless authentication path",
+      "hypothesis": "The Switch 1 23.0.1 LDN implementation may mishandle a malformed advertisement or authentication frame in a way that produces a memory-safety fault before a station is authenticated, even though CVE-2026-82079 was fixed in 23.0.0.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "A Linux PC with a Wi-Fi adapter that can receive and transmit action frames in monitor mode",
+        "The console in an LDN-active state, preferably a local-wireless join/scan screen",
+        "Explicit approval to transmit LDN frames",
+        "For a retail encrypted LDN network: matching prod.keys. The owner does not have them, so the first test uses the plaintext development-mode path."
+      ],
+      "expected_capability": "A fault in the ldn sysmodule or WLAN path; stage 2 at best. It would not by itself provide boot-stage execution.",
+      "test_procedure": "Phase 0: verify the adapter and driver on CachyOS. Phase 1 (passive): have the console host a local-wireless room, capture advertisement frames with tcpdump, and parse the plaintext NetworkId header with scripts/ldn_probe.py. Phase 2 (active, approval required): put the console in join/scan mode, host a security-mode-3 plaintext LDN network with scripts/ldn_host.py using the captured title/scene/SSID/channel, and record whether the console joins. Phase 3 (separate approval): if it joins, send one malformed authentication response at a time and record the console's behavior.",
+      "expected_signal": "A crash, reboot, or error report after a specific malformed frame, reproducible with that frame and not with a well-formed control.",
+      "kill_criteria": "The console rejects or ignores the plaintext network and every malformed pre-auth frame, with no crash report and no loss of responsiveness; or the adapter/driver cannot capture or transmit LDN action frames. Record as blocked on keys and close.",
+      "risks": "A malformed frame could hang or crash the ldn sysmodule or the Wi-Fi firmware. Recovery is to stop the host, power-cycle the console, and restart the adapter. No storage is written. Active frame injection is outside the current authorization until approved.",
+      "blocked_by": null,
+      "evidence": [
+        "E-023",
+        "E-035",
+        "E-078"
+      ],
+      "sources": [
+        "switchbrew-ldn",
+        "kinnay-ldn-protocol",
+        "kinnay-ldn",
+        "cve-2026-82079",
+        "switchbrew-23.0.0"
+      ],
+      "last_reviewed": "2026-10-27",
+      "hardware": "HEG-001 (Mariko), CachyOS PC with a monitor-mode/injection-capable Wi-Fi adapter",
+      "firmware": "23.0.1",
+      "results": "Not tested. The known local-wireless stack overflow (CVE-2026-82079) is fixed in 23.0.0 and the target is 23.0.1. A Linux host and adapter are available; the passive capture is the first step. Retail encrypted LDN needs prod.keys, which the owner does not have; the no-key plaintext path is conditional on retail acceptance.",
+      "uncertainties": "Whether retail 23.0.1 accepts a plaintext development-mode LDN network; whether the parser is in the ARM ldn sysmodule or the Wi-Fi chip firmware; whether the 23.0.0 fix is complete; whether any post-fix bug exists. The system-title-only challenge behaviour may not apply to a game lobby.",
+      "resolution": "open"
     }
   ]
 }
