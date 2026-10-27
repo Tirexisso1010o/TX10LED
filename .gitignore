@@ -38,3 +38,18 @@ opencode.json
 .gitignore
 # Local-only proof-of-concept assets
 scripts/assets.local/
+
+# Firmware, keys, and proprietary blobs (never commit)
+firmware/
+keys/
+*.keys
+*.nca
+*.nsp
+*.xci
+*.kip
+*.kip1
+*.pk11
+*.pkg1
+*.pkg2
+*.nro
+*.nso
