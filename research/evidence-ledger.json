@@ -1406,6 +1406,22 @@
       "evidence": "All 238 NCA headers parsed. Program NCAs: 76; key-generation counts 0x07:1 (flog, 01008bb00013c000), 0x15:1 (miiEdit, 0100000000001009, c5d032046782d4bd6fc4b5c012a4e110.nca, 16,103,424 bytes, crypto type 2), 0x16:7, and 0x17:67. The miiEdit section-0 master hash verified with key_area_key_application_14, and its ExeFS PFS0 contains main, main.npdm, rtld, and sdk; the NPDM name is miiEdit. It is a Mii editor applet, not a remote-input surface. splay's program NCA is b837233731cc2c6b3bc384489be7d46a.nca, 6,722,560 bytes, key generation 0x17, crypto type 2; its meta NCA e481ece5d922f9a3776493f891fa0ef9.cnmt.nca is 3,584 bytes at key generation 0x00 and crypto type 0. The splay CNMT reports title 0100000000001048, version 0x5c0004b0, ContentMetaType 1 (SystemProgram), one Program content entry with content ID b837233731cc2c6b3bc384489be7d46a and size 0x669400 (6,722,560); the CNMT SHA-256 matches the local program NCA exactly. key_area_key_application_16 is absent, so the splay program key area and section remain encrypted.",
       "limitations": "The dump's version is owner-reported and folder-named 23.0.1. Title-name mappings for flog, miiEdit, and splay come from community lists; the title IDs, versions, sizes, and key generations are read from the local headers and CNMT. The miiEdit decryption proves the local NCA path works for key generation 0x15, but it does not provide the missing 0x17 key. No splay code was decrypted or analyzed.",
       "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-104",
+      "claim": "A host-only D10 Phase 0 baseline on 2026-10-29 brought up an open AP (TX10LED-NET) and a WPA2-PSK/CCMP AP (TX10LED-WPA2) on the TP-Link Archer T3U Plus in AP mode. Both SSIDs were visible from an independent macOS CoreWLAN scan at -34 dBm on channel 1. dnsmasq 2.92, radvd 2.20, OpenSSL 3.5.5, Scapy 2.8.0, and tcpdump 4.99.6 passed start/stop checks. A same-phy monitor interface was created while the AP ran but captured zero frames from the AP's BSSID, so management-frame attribution must use hostapd debug logs and the independent scan.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Host-only Phase 0 of docs/WIFI-NETWORK-TEST-PLAN.md on 2026-10-29. The console was not connected, powered on for this test, or otherwise involved. The test transmitted ordinary AP beacons and probe responses only; no malformed frame, DHCP/DNS/IPv6/TLS response, or console-directed data was sent.",
+      "sources": [
+        "switchbrew-wlan",
+        "switchbrew-sockets",
+        "switchbrew-ssl",
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "The adapter enumerated as 2357:0138 with rtw88_8822bu firmware 30.20.0. hostapd 2.11 reached AP-ENABLED on channel 1 (2412 MHz) for both configurations; the WPA2 log records wpa_version=0x2, PSK derivation, and group-key installation. The macOS CoreWLAN wildcard scan saw TX10LED-NET at -34 dBm on channel 1 on the third attempt and TX10LED-WPA2 at -34 dBm on the second attempt, then at -35 dBm during a capture-time scan; the returned BSSIDs were nil. A same-phy monitor interface was added while the AP ran and tcpdump captured 80 ambient channel-1 frames, but zero frames with the adapter BSSID and zero TX10LED frames; the hostapd -dd log recorded probe requests and probe responses, including one at -35 dBm. dnsmasq bound DHCP port 67 and DNS port 53 on 192.168.77.1 and stopped cleanly; radvd started and stopped cleanly with 2001:db8:77::1/64 and IPv6 forwarding, which was restored; OpenSSL s_server started and stopped on 127.0.0.1:8443; Scapy listed the AP interface; tcpdump captured 3 packets on eth0. The adapter was restored to managed mode and all test addresses were removed.",
+      "limitations": "One adapter, one driver, one kernel, and channel 1 only. macOS returned nil BSSIDs for every network, so only SSID, RSSI, and channel were usable. The same-phy monitor did not see the AP's own frames and is not a valid attribution path for injected frames on this driver. Phase 0 did not test client association, DHCP, DNS, IPv6, or TLS with a console. The adapter required a USB detach/attach and module reload after an initial -110 register-write failure. This is feasibility evidence, not a parser or vulnerability result.",
+      "last_reviewed": "2026-10-29"
     }
   ]
 }

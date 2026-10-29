@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-wifi-phase0",
+  "observed_at": "2026-10-29T19:51:37Z",
+  "observed_at_precision": "approximate",
+  "observation_type": "d10-phase0-host-only-ap-baseline",
+  "operator": "hostapd 2.11, dnsmasq 2.92, radvd 2.20, Scapy 2.8.0, OpenSSL 3.5.5, and tcpdump 4.99.6 in an OrbStack Ubuntu 26.04.1 arm64 VM; independent CoreWLAN wildcard scan from macOS 26.3",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not involved in Phase 0.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "host-only-ap-baseline",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; derived from the adapter MAC>"
+  },
+  "host_tooling": {
+    "hostapd": "2.11",
+    "dnsmasq": "2.92",
+    "radvd": "2.20",
+    "scapy": "2.8.0",
+    "openssl": "3.5.5",
+    "tcpdump": "4.99.6"
+  },
+  "phase0": {
+    "open_ap": {
+      "ssid": "TX10LED-NET",
+      "security": "open",
+      "channel": 1,
+      "freq_mhz": 2412,
+      "beacon_interval_ms": 100,
+      "hostapd_state": "AP-ENABLED",
+      "independent_scan_result": "seen at -34 dBm on channel 1",
+      "scan_attempts": 3,
+      "scan_attempt_with_result": 3
+    },
+    "wpa2_ap": {
+      "ssid": "TX10LED-WPA2",
+      "security": "WPA2-PSK, AES/CCMP",
+      "channel": 1,
+      "freq_mhz": 2412,
+      "beacon_interval_ms": 100,
+      "hostapd_state": "AP-ENABLED",
+      "hostapd_log_confirms": "wpa_version=0x2, PSK derived, group key installed",
+      "independent_scan_result": "seen at -34 dBm on channel 1; a later capture-time scan saw it at -35 dBm",
+      "scan_attempts": 3,
+      "scan_attempt_with_result": 2
+    },
+    "independent_scan": {
+      "receiver": "macOS CoreWLAN wildcard scan with Location Services",
+      "bssid_visibility": "nil for every network in the returned array; SSID, RSSI, and channel were usable",
+      "ambient_networks_visible": true
+    },
+    "capture_path": {
+      "same_phy_monitor_created": true,
+      "same_phy_monitor_name": "<redacted>",
+      "monitor_capture_frames": 80,
+      "monitor_capture_adapter_bssid_frames": 0,
+      "monitor_capture_test_ssid_frames": 0,
+      "monitor_channel_set_result": "EBUSY while the AP held channel 1; the monitor followed the AP channel",
+      "hostapd_debug_log": "recorded probe requests and probe responses, including a probe request at -35 dBm on channel 1",
+      "usable_management_capture": "hostapd -dd log plus the independent macOS scan; the same-phy monitor did not see the AP's own frames"
+    },
+    "service_checks": {
+      "dnsmasq": "syntax OK; with 192.168.77.1/24 on the AP interface, DHCP port 67 and DNS port 53 were bound; stopped cleanly",
+      "radvd": "syntax OK; with IPv6 forwarding enabled and 2001:db8:77::1/64 on the AP interface, it started and stopped cleanly",
+      "openssl": "s_server on 127.0.0.1:8443 started and stopped cleanly",
+      "scapy": "2.8.0 imported and listed the AP interface",
+      "tcpdump": "captured 3 packets on the VM's eth0 as a capture sanity check"
+    }
+  },
+  "commands": [
+    {
+      "command": "orbctl usb attach 01130000 -m ldn; sudo modprobe -r rtw88_8822bu after a USB -110 error; orbctl usb detach/attach",
+      "exit_code": 0,
+      "result": "The adapter re-enumerated as <interface> (2357:0138, rtw88_8822bu, firmware 30.20.0). The first attach produced register-write -110 errors and no interface; detach/attach plus a module reload restored it."
+    },
+    {
+      "command": "sudo ip link set <interface> down; sudo iw dev <interface> set type __ap; sudo ip link set <interface> up",
+      "exit_code": 0,
+      "result": "The adapter switched from managed to AP mode; iw reported type AP and the supported-mode list included AP and monitor."
+    },
+    {
+      "command": "sudo hostapd -dd <open-ap.conf>",
+      "exit_code": null,
+      "result": "hostapd reached AP-ENABLED on channel 1 with SSID TX10LED-NET. The macOS scan saw the SSID at -34 dBm on channel 1."
+    },
+    {
+      "command": "sudo hostapd -dd <wpa2-ap.conf>",
+      "exit_code": null,
+      "result": "hostapd reached AP-ENABLED on channel 1 with SSID TX10LED-WPA2, derived the WPA2 PSK, and installed the group key. The macOS scan saw the SSID at -34 dBm and later -35 dBm on channel 1."
+    },
+    {
+      "command": "sudo iw dev <interface> interface add <monitor> type monitor; sudo tcpdump -i <monitor> -c 80 -e -w <local.pcap>",
+      "exit_code": 0,
+      "result": "The monitor interface was created while the AP ran and captured 80 ambient channel-1 frames, but zero frames from the AP's BSSID and zero TX10LED frames. hostapd's debug log recorded the AP's probe RX/TX instead."
+    },
+    {
+      "command": "dnsmasq --test; dnsmasq --no-daemon; radvd --configtest; radvd -n; openssl s_server; scapy get_if_list",
+      "exit_code": 0,
+      "result": "All host services started and stopped cleanly; the temporary IPv4/IPv6 addresses and IPv6 forwarding setting were removed/restored."
+    },
+    {
+      "command": "sudo kill <hostapd>; sudo iw dev <monitor> del; sudo iw dev <interface> set type managed",
+      "exit_code": 0,
+      "result": "hostapd, dnsmasq, radvd, and tcpdump were stopped; the monitor interface was removed; the adapter was restored to managed mode with no test addresses."
+    }
+  ],
+  "interpretation": "Phase 0 met its exit criteria without touching the console. Both the open and WPA2 APs reached AP-ENABLED on channel 1, and the independent macOS scan saw both SSIDs at -34 dBm. dnsmasq, radvd, OpenSSL, Scapy, and tcpdump all passed start/stop checks. The same-phy monitor interface can be created while the AP runs, but it does not capture the AP's own frames; management-frame attribution must therefore use hostapd's debug log and the independent scan. No malformed frame, DHCP/DNS/IPv6/TLS response, or console interaction occurred. This is feasibility evidence for D10, not a vulnerability result.",
+  "authorization": "The owner approved the host-only Phase 0 setup. The test used ordinary AP beacons and probe responses, did not involve the console, and did not send malformed frames.",
+  "limitations": [
+    "One adapter, one driver, one kernel, and one channel (channel 1).",
+    "The macOS scan returned nil BSSIDs for every network, so only SSID, RSSI, and channel were usable.",
+    "The same-phy monitor interface did not capture the AP's own frames; it is not a valid attribution path for injected frames on this driver.",
+    "Phase 0 did not test client association, DHCP, DNS, IPv6, or TLS with a console.",
+    "The adapter needed a USB detach/attach and module reload after an initial -110 register-write failure.",
+    "The test SSIDs and the local WPA2 passphrase are test artifacts; the passphrase is not recorded."
+  ],
+  "redactions": [
+    "Adapter BSSID redacted.",
+    "Interface and monitor names redacted because they are derived from the adapter MAC.",
+    "WPA2 passphrase omitted."
+  ]
+}

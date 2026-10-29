@@ -478,6 +478,16 @@ Decisions are dated and recorded with the reason and the alternatives considered
 
 **Follow-up (2026-10-29):** The owner chose to leave the modded 22.0.0 console untouched. No dump or update of that console is authorized. The project remains read-only with the existing 23.0.1 NCA dump; the 22.0.0 comparative-analysis option is not being pursued.
 
+## 2026-10-29 — D10 Phase 0 host-only baseline completes
+
+**Decision:** Record `D10` Phase 0 as complete and keep Phase 1 blocked pending explicit approval. Use hostapd `-dd` logs and the independent macOS scan for management-frame attribution; do not rely on a same-phy monitor capture on `rtw88_8822bu`.
+
+**Reason:** hostapd 2.11 reached `AP-ENABLED` for the open and WPA2 test APs on channel 1. The macOS CoreWLAN scan saw both SSIDs at -34 dBm on channel 1. dnsmasq, radvd, OpenSSL, Scapy, and tcpdump passed start/stop checks. A same-phy monitor interface was created while the AP ran, but it captured zero frames from the AP's BSSID; the hostapd debug log recorded probe requests and probe responses. The console was not involved and no malformed frames were sent.
+
+**Alternatives considered:** Treat the monitor limitation as a blocker (rejected: hostapd logs and the independent scan provide the attribution needed for Phase 0); use the AP interface capture alone (rejected: management frames are not reliably delivered to the netstack); connect the console for a baseline now (rejected: Phase 1 needs explicit approval); proceed to active fuzzing (rejected: each batch needs approval and Phase 1 has not run).
+
+**Consequences:** `E-104`, `research/hardware-observations/2026-10-29-wifi-phase0.json`, `docs/WIFI-NETWORK-TEST-PLAN.md`, `docs/RESEARCH-PLAN.md`, `docs/SAFETY_AND_RECOVERY.md`, `research/hypotheses.json`, `research/CHECKPOINT.md`, and `README.md` record the result. The adapter was restored to managed mode and all test addresses were removed. Phase 1 remains the next active step and requires explicit approval.
+
 ## 2026-10-29 — General Wi-Fi and network-stack parsing selected as `D10`
 
 **Decision:** Select general Wi-Fi and network-stack parsing as the next gated direction (`D10`), covering `H-011` (802.11 management/EAPOL) and `H-012` (DHCP/DNS/IPv6/TLS). Draft the matrix and approval gates in [`docs/WIFI-NETWORK-TEST-PLAN.md`](WIFI-NETWORK-TEST-PLAN.md). Send no active frames or crafted responses until each exact batch is approved.

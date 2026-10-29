@@ -1,6 +1,6 @@
 # Wi-Fi and Network Stack Test Plan (D10 / H-011, H-012)
 
-> **Status: planned; no active frames or crafted network responses have been sent.** This document is an authorization gate, not an approval. Phase 0 is host-only. Phase 1 changes the console's network settings and needs owner approval. Phases 2–6 transmit malformed 802.11 or network data and each need separate explicit approval for the exact case batch. No console state has changed.
+> **Status: Phase 0 complete (host-only; ordinary AP beacons and probe responses only); Phase 1 not started.** This document is an authorization gate, not an approval. Phase 0 established the AP and tooling baseline on 2026-10-29. Phase 1 changes the console's network settings and needs owner approval. Phases 2–6 transmit malformed 802.11 or network data and each need separate explicit approval for the exact case batch. No malformed frame has been sent and the console has not been involved.
 
 ## What this tests
 
@@ -51,7 +51,7 @@ No public 23.0.1 vulnerability is claimed. Switchbrew's 23.0.0 changelog records
 
 - **Monitor-mode injection does not transmit** on `rtw88_8822bu` (`E-091`). Do not build this plan on monitor-mode TX.
 - **AP-mode beacon injection works** (`E-094`), and a unicast vendor action with a temporary station entry is accepted by the kernel (`E-095`).
-- **AP + monitor concurrency is unverified.** Phase 0 must test whether a same-phy monitor interface can capture while hostapd runs. If it cannot, use the AP interface for capture and hostapd logs, and use the Mac's independent scan for the control beacon. Record the limitation.
+- **AP + monitor concurrency was tested in Phase 0.** A same-phy monitor interface can be created while hostapd runs, but it does not capture the AP's own frames on `rtw88_8822bu`. Use the hostapd `-dd` log for management-frame attribution and the Mac's independent scan for the on-air control. Do not rely on the same-phy monitor for injected-frame evidence.
 - **The driver can wedge after hostapd stops.** Recovery is in [`docs/SAFETY_AND_RECOVERY.md`](SAFETY_AND_RECOVERY.md).
 
 ### Host packages
@@ -82,6 +82,8 @@ Create **new** networks on the console; do not edit or delete the owner's existi
 - After the tests, delete the two test networks. If the console's network settings misbehave, delete only the test network; do **not** initialize the console.
 
 ## Phase 0 — host-only setup (no console interaction)
+
+**Result (2026-10-29): complete.** hostapd 2.11 reached `AP-ENABLED` for both `TX10LED-NET` and `TX10LED-WPA2` on channel 1. The independent macOS CoreWLAN scan saw both SSIDs at -34 dBm on channel 1. dnsmasq 2.92, radvd 2.20, OpenSSL 3.5.5, Scapy 2.8.0, and tcpdump 4.99.6 passed start/stop checks. A same-phy monitor interface was created while the AP ran, but it captured zero frames from the AP's BSSID, so management-frame attribution will use hostapd `-dd` logs and the independent scan. The console was not involved. See `research/hardware-observations/2026-10-29-wifi-phase0.json` and `E-104`.
 
 1. Verify the adapter and driver:
 

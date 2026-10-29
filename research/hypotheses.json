@@ -472,7 +472,8 @@
         "E-090",
         "E-094",
         "E-095",
-        "E-100"
+        "E-100",
+        "E-104"
       ],
       "sources": [
         "switchbrew-wlan",
@@ -482,7 +483,7 @@
       "last_reviewed": "2026-10-29",
       "hardware": "HEG-001 (Mariko), macOS 26.3 host with an OrbStack Ubuntu 26.04 arm64 VM and a TP-Link Archer T3U Plus (2357:0138, rtw88_8822bu) passed through to the VM",
       "firmware": "23.0.1",
-      "results": "Not tested. The gated plan is drafted; no active management or EAPOL frames have been sent.",
+      "results": "Not tested. Phase 0 host-only AP and tooling baseline completed on 2026-10-29 (E-104): both test APs reached AP-ENABLED on channel 1 and the independent scan saw both SSIDs; no console interaction and no active management or EAPOL frames have been sent.",
       "uncertainties": "Whether a normal WPA2 association completes on the test AP; whether the console processes an injected EAPOL-Key rekey; whether the malformed IE reaches the wlan parser or is filtered by the Wi-Fi firmware; whether the parser is in the ARM sysmodule or the firmware; whether any post-23.0.0 defect exists.",
       "resolution": "open"
     },
@@ -511,7 +512,8 @@
       "evidence": [
         "E-024",
         "E-090",
-        "E-094"
+        "E-094",
+        "E-104"
       ],
       "sources": [
         "switchbrew-sockets",
@@ -522,7 +524,7 @@
       "last_reviewed": "2026-10-29",
       "hardware": "HEG-001 (Mariko), macOS 26.3 host with an OrbStack Ubuntu 26.04 arm64 VM and a TP-Link Archer T3U Plus (2357:0138, rtw88_8822bu) passed through to the VM",
       "firmware": "23.0.1",
-      "results": "Not tested. The gated plan is drafted; no crafted DHCP, DNS, IPv6, or TLS responses have been sent.",
+      "results": "Not tested. Phase 0 host-only AP and tooling baseline completed on 2026-10-29 (E-104): the APs and dnsmasq/radvd/TLS tooling start and stop cleanly, but no console was involved and no crafted DHCP, DNS, IPv6, or TLS responses have been sent.",
       "uncertainties": "Whether the console uses IPv6 on the test AP; whether the TLS connectivity-test flow reaches a local listener; whether malformed data reaches the parser before certificate or protocol validation; whether the 23.0.0 bsdsocket fix covers the tested AddrInfo paths; whether the ssl sysmodule uses a patched NSS build.",
       "resolution": "open"
     }

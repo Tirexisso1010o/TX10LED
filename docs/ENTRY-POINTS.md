@@ -170,7 +170,7 @@ These are public fixes, not a public exploit chain. They show that system-servic
 
 ### Planned `D10` network-service test
 
-`D10` targets the same class of service surfaces from the network side: the `wlan` supplicant (802.11 management/EAPOL) and the `bsdsocket`/`sfdnsres`/`nifm`/`ssl` stack (DHCP/DNS/IPv6/TLS), through a dedicated test AP and the console's built-in **Test Connection**. The plan is gated and not executed; see [`docs/WIFI-NETWORK-TEST-PLAN.md`](WIFI-NETWORK-TEST-PLAN.md). A fault there would be stage 1–2 at best and would not reach Atmosphère without boot-stage execution.
+`D10` targets the same class of service surfaces from the network side: the `wlan` supplicant (802.11 management/EAPOL) and the `bsdsocket`/`sfdnsres`/`nifm`/`ssl` stack (DHCP/DNS/IPv6/TLS), through a dedicated test AP and the console's built-in **Test Connection**. Phase 0 (host-only AP/tooling baseline) is complete; the active phases are gated and not started. See [`docs/WIFI-NETWORK-TEST-PLAN.md`](WIFI-NETWORK-TEST-PLAN.md). A fault there would be stage 1–2 at best and would not reach Atmosphère without boot-stage execution.
 
 ## EP-009 — Kernel / TrustZone
 
