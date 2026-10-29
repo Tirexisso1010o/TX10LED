@@ -10,7 +10,7 @@ Last updated: 2026-10-29
 - Console state: unchanged by this project.
 - Hardware validation: **PTP identity observation recorded** on 2026-10-26. The console enumerated as `057e:201d` and answered `GetDeviceInfo` without a session.
 - Target identity: **PARTIALLY VERIFIED**. Firmware 23.0.1 and serial prefix XTJ are PTP-observed; the HEG-001 model number and no-modification history are owner-reported.
-- Publication: the third-run record is committed and pushed at `5c2f78c`; `main` is synced. The GameShare/`splay` read-only record is prepared locally; pushing it requires owner approval. Keys, room SSID, MACs, pcaps, and local-only `Firmware/` files stay out of version control.
+- Publication: the third-run record is committed and pushed at `5c2f78c`, and the GameShare/`splay` read-only record at `03031fa`; `main` is synced. A one-line checkpoint sync commit is local and awaits the next approved push. Keys, room SSID, MACs, pcaps, and local-only `Firmware/` files stay out of version control.
 - Focus: potential software-only jailbreak research, the GameShare receiver surface, the LDN pre-auth surface, and the read-only USB tool.
 - New context (2026-10-28): the owner asked to keep the workflow on macOS. Native macOS cannot inject 802.11 frames, so the radio runs in an OrbStack Ubuntu 26.04 VM with a TP-Link Archer T3U Plus passed through. This makes the LDN pre-auth direction (`D9`, `H-010`) testable without rebooting the Mac.
 - Local artifacts (2026-10-28): the owner supplied `Firmware/prod.keys.txt` and `Firmware/Firmware.23.0.1` from their own modded Switch. Both are excluded from version control. The keys decrypt the Phase 1 advertisement and confirm the retail room is security mode 1 (prod).
