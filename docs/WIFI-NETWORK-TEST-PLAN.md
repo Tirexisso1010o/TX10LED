@@ -1,6 +1,6 @@
 # Wi-Fi and Network Stack Test Plan (D10 / H-011, H-012)
 
-> **Status: Phase 0 and Phase 1 complete (open and WPA2 baselines); Phase 2 not started.** This document is an authorization gate, not an approval. Phase 0 established the AP and tooling baseline; Phase 1 confirmed association, the WPA2 pairwise handshake, DHCP, and DNS on 2026-10-29. Test Connection failed at the internet step with `2110-3128` because the test AP had no NAT. Phases 2–6 transmit malformed 802.11 or network data and each need separate explicit approval for the exact case batch. No malformed frame has been sent.
+> **Status: Phase 0, Phase 1, and Phase 2 Batch 1 complete; Phase 2 Batch 2 not started.** This document is an authorization gate, not an approval. Phase 0 established the AP and tooling baseline; Phase 1 confirmed association, the WPA2 pairwise handshake, DHCP, and DNS. Phase 2 Batch 1 sent the `W-C` control plus `W-01`–`W-08` and produced no crash, reboot, hang, or new error. `W-06` (DS Parameter IE length 3) showed a shorter association lifetime (7.3 s, then 15.4 s) than the 35.4 s control and re-associated; that is a behavioral lead, not a memory-safety finding. Batch 2 and Phases 3–6 each need separate explicit approval for the exact case batch.
 
 ## What this tests
 
@@ -148,6 +148,8 @@ Create **new** networks on the console; do not edit or delete the owner's existi
 **No injection in Phase 1.** Do not send beacons, EAPOL, DHCP, DNS, RA, or TLS data beyond what hostapd/dnsmasq/radvd normally send.
 
 ## Phase 2 — 802.11 management IE fuzzing (active, approval required)
+
+**Result (2026-10-29): Batch 1 complete; W-06 is a behavioral lead.** The `W-C` control and `W-01`–`W-08` produced no crash, reboot, hang, or new console error; the console stayed associated through the valid cases and only the normal `2110-3128` test failure appeared. `W-06` (DS Parameter IE length 3) was the exception: the console disassociated 7.3 s after association in the first run and 15.4 s in the repeat, versus 35.4 s for the `W-C` control and about 35 s for the other cases. It re-associated immediately and remained responsive. This is a behavioral lead, not a memory-safety finding. `W-04`'s first attempt was inconclusive because the console had already left; the approved retry was valid. See `research/hardware-observations/2026-10-29-wifi-phase2-batch1.json` and `E-106`. Batch 2 is not started.
 
 **This phase transmits malformed 802.11 management frames. Do not run it without explicit approval for the exact batch.**
 

@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-wifi-phase2-batch1",
+  "observed_at": "2026-10-29T20:41:03Z",
+  "observed_at_precision": "approximate",
+  "phase_window": "2026-10-29T20:16:57Z to 2026-10-29T20:41:03Z",
+  "observation_type": "d10-phase2-batch1-beacon-information-elements",
+  "operator": "hostapd 2.11 and dnsmasq 2.92 in an OrbStack Ubuntu 26.04.1 arm64 VM; local NL80211_CMD_FRAME helper; the console owner reconnected the console for each approved case",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not enumerated during this test; the firmware value is the owner's report.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "d10-phase2-beacon-injection",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; derived from the adapter MAC>",
+    "ap_ssid": "TX10LED-NET",
+    "ap_security": "open",
+    "channel": 1,
+    "freq_mhz": 2412,
+    "beacon_interval_ms": 1000
+  },
+  "batch": {
+    "phase": "2",
+    "batch": "1",
+    "cases_approved": 9,
+    "frames_per_case": 25,
+    "interval_ms": 200,
+    "valid_batch_frames": 225,
+    "extra_inconclusive_frames": 25,
+    "note": "The valid batch is the W-C control plus W-01 through W-08. W-04's first attempt sent 25 frames after the console had already left; those frames are not counted in the valid batch. The W-04 retry, the W-C repeat, and the W-06 repeat were separately approved.",
+    "cases": [
+      {
+        "id": "W-C",
+        "malformed": "none; well-formed control beacon",
+        "frame_length": 87,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:16:57Z",
+        "result": "no observable fault",
+        "note": "The console stayed associated through the 10-second check. A later W-C repeat showed a 35.4-second association lifetime."
+      },
+      {
+        "id": "W-01",
+        "malformed": "SSID IE length 33 with 33 bytes",
+        "frame_length": 109,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:19:49Z",
+        "result": "no observable fault",
+        "note": "Associated at -30 dBm with connected time 17 s at the 10-second check."
+      },
+      {
+        "id": "W-02",
+        "malformed": "SSID IE length 0",
+        "frame_length": 76,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:22:06Z",
+        "result": "no observable fault",
+        "note": "Associated at -28 dBm with connected time 16 s at the 10-second check."
+      },
+      {
+        "id": "W-03",
+        "malformed": "Supported Rates IE length 0",
+        "frame_length": 79,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:24:13Z",
+        "result": "no observable fault",
+        "note": "Associated at -32 dBm with connected time 16 s at the 10-second check."
+      },
+      {
+        "id": "W-04",
+        "malformed": "Supported Rates IE length 9",
+        "frame_length": 88,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:25:18Z",
+        "result": "first attempt inconclusive; retry no observable fault",
+        "note": "The first attempt was sent after the console's test traffic had stopped for about 23 s; the station entry was stale, so the beacons could not be attributed. The approved retry associated at 20:26:40, stayed at -34 dBm through the 10-second check, and disconnected at 20:27:15 (35 s after association)."
+      },
+      {
+        "id": "W-05",
+        "malformed": "DS Parameter IE length 0",
+        "frame_length": 86,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:28:11Z",
+        "result": "no observable fault",
+        "note": "Associated at -34 dBm with connected time 16 s at the 10-second check."
+      },
+      {
+        "id": "W-06",
+        "malformed": "DS Parameter IE length 3 with three bytes",
+        "frame_length": 89,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:30:44Z",
+        "result": "behavioral lead; no crash or new error",
+        "note": "Disassociated with reason 8 at 20:30:52.3 (7.3 s after association, 1.3 s after the last beacon), then re-associated at 20:31:00.6 and disconnected again at 20:31:35.6 (35 s after the second association). The 10-second check found no station. The repeat associated at 20:40:27.4 and disconnected at 20:40:42.8 (15.4 s); it re-associated at 20:40:43.0 and disconnected at 20:41:03.0 (20 s). Both W-06 runs were shorter than the 35.4-second W-C control and the roughly 35-second other cases."
+      },
+      {
+        "id": "W-07",
+        "malformed": "RSN IE length 1 with one byte",
+        "frame_length": 90,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:32:58Z",
+        "result": "no observable fault",
+        "note": "Associated at -34 dBm with connected time 16 s at the 10-second check."
+      },
+      {
+        "id": "W-08",
+        "malformed": "RSN IE length 255, all 0xff",
+        "frame_length": 344,
+        "frames": 25,
+        "association_utc": "2026-10-29T20:34:56Z",
+        "result": "no observable fault",
+        "note": "Associated at -32 dBm with connected time 15 s at the 10-second check."
+      }
+    ],
+    "control_repeat": {
+      "id": "W-C",
+      "association_utc": "2026-10-29T20:38:56Z",
+      "disconnect_utc": "2026-10-29T20:39:31.4Z",
+      "association_lifetime_seconds": 35.4,
+      "result": "normal timing; no observable fault"
+    },
+    "w06_repeat": {
+      "id": "W-06",
+      "association_utc": "2026-10-29T20:40:27.4Z",
+      "disconnect_utc": "2026-10-29T20:40:42.8Z",
+      "association_lifetime_seconds": 15.4,
+      "reassociation_utc": "2026-10-29T20:40:43.0Z",
+      "second_disconnect_utc": "2026-10-29T20:41:03.0Z",
+      "second_association_lifetime_seconds": 20.0,
+      "result": "short lifetime again; no crash or new error"
+    },
+    "console_error": "2110-3128 at the connect-to-internet step on every automatic Test Connection",
+    "crash_reboot_hang": false,
+    "new_error_code": false,
+    "network_settings": "The two test networks remain saved on the console; no other console setting was changed."
+  },
+  "capture": {
+    "hostapd": "timestamped debug log; the association and disassociation times above come from hostapd",
+    "pcap": "local-only AP-interface capture of DHCP, DNS, and TCP traffic",
+    "management_frames": "injected beacons were submitted through NL80211_CMD_FRAME; the same-phy monitor does not see the AP's own frames, so beacon transmission is inferred from the successful netlink submissions and the console behavior",
+    "eapol": "not applicable; the AP was open"
+  },
+  "interpretation": "Batch 1 produced no crash, reboot, hang, or new console error. The control and seven cases behaved uniformly: the console stayed associated through the 10-second check and disconnected about 35 seconds after association, consistent with its automatic Test Connection timing. W-06 is the exception: the console disassociated 7.3 seconds after association in the first run and 15.4 seconds in the repeat, both shorter than the 35.4-second control, and re-associated immediately. That is a reproducible behavioral difference, not a memory-safety finding. It may mean the console rejected or reset on the malformed DS Parameter IE, or it may reflect variability in the console's automatic test flow. The batch does not prove that every malformed IE reached the parser; the console can ignore duplicate AP beacons. H-011 remains UNVERIFIED.",
+  "authorization": "The owner approved the control-only run first, then each case individually (W-01 through W-08), the W-04 retry, the W-C control repeat, and the W-06 repeat. Each approval named the case and the 25-frame bound.",
+  "limitations": [
+    "One console, one adapter, one driver, and channel 1 only.",
+    "The console automatically runs Test Connection on each association and fails at the internet step with 2110-3128 because the AP has no NAT; this timing is part of the observed behavior.",
+    "The console may ignore duplicate AP beacons, so no case proves that the malformed IE reached the ARM wlan parser or the Wi-Fi firmware parser.",
+    "The W-06 timing difference was not reproduced with an identical duration (7.3 s vs 15.4 s); it is a lead, not a deterministic result.",
+    "The same-phy monitor does not capture the AP's own frames; transmission is inferred from netlink acceptance and console behavior, not from a monitor capture of the injected beacons.",
+    "The first W-04 attempt was inconclusive because it was sent after the console had left; only the retry counts toward the batch.",
+    "The two test networks remain saved on the console until the owner removes them.",
+    "No crash, hang, or reboot occurred; this is not an exploit or a memory-safety proof."
+  ],
+  "redactions": [
+    "Console and adapter MAC addresses redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "WPA2 test passphrase omitted."
+  ]
+}
