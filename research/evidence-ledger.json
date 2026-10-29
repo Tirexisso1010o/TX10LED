@@ -1422,6 +1422,21 @@
       "evidence": "The adapter enumerated as 2357:0138 with rtw88_8822bu firmware 30.20.0. hostapd 2.11 reached AP-ENABLED on channel 1 (2412 MHz) for both configurations; the WPA2 log records wpa_version=0x2, PSK derivation, and group-key installation. The macOS CoreWLAN wildcard scan saw TX10LED-NET at -34 dBm on channel 1 on the third attempt and TX10LED-WPA2 at -34 dBm on the second attempt, then at -35 dBm during a capture-time scan; the returned BSSIDs were nil. A same-phy monitor interface was added while the AP ran and tcpdump captured 80 ambient channel-1 frames, but zero frames with the adapter BSSID and zero TX10LED frames; the hostapd -dd log recorded probe requests and probe responses, including one at -35 dBm. dnsmasq bound DHCP port 67 and DNS port 53 on 192.168.77.1 and stopped cleanly; radvd started and stopped cleanly with 2001:db8:77::1/64 and IPv6 forwarding, which was restored; OpenSSL s_server started and stopped on 127.0.0.1:8443; Scapy listed the AP interface; tcpdump captured 3 packets on eth0. The adapter was restored to managed mode and all test addresses were removed.",
       "limitations": "One adapter, one driver, one kernel, and channel 1 only. macOS returned nil BSSIDs for every network, so only SSID, RSSI, and channel were usable. The same-phy monitor did not see the AP's own frames and is not a valid attribution path for injected frames on this driver. Phase 0 did not test client association, DHCP, DNS, IPv6, or TLS with a console. The adapter required a USB detach/attach and module reload after an initial -110 register-write failure. This is feasibility evidence, not a parser or vulnerability result.",
       "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-105",
+      "claim": "On 2026-10-29 the target console associated to TX10LED-NET (open) and TX10LED-WPA2 (WPA2-PSK/CCMP), completed the WPA2 pairwise handshake, obtained DHCP lease 192.168.77.94, queried ctest.cdn.nintendo.net, and failed at the connect-to-internet step with 2110-3128 because the test AP had no NAT or upstream route. No malformed frames were sent.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "D10 Phase 1 on 2026-10-29. The owner added the two test SSIDs, connected the console, and ran Test Connection once per SSID. The test AP served only DHCP and DNS; it had no NAT or internet forwarding. No malformed 802.11, DHCP, DNS, IPv6, or TLS data was sent.",
+      "sources": [
+        "switchbrew-wlan",
+        "switchbrew-sockets",
+        "switchbrew-ssl"
+      ],
+      "evidence": "Open state: hostapd logged open-system authentication, association with AID 1, and AP-STA-CONNECTED. dnsmasq logged DHCPOFFER/DHCPREQUEST/DHCPACK for 192.168.77.94 with a 12-hour lease, router 192.168.77.1, and DNS server 192.168.77.1. The console queried ctest.cdn.nintendo.net; dnsmasq resolved it through CNAMEs ctest.cdn.nintendo.net.akamaized.net and a1456.g1.akamai.net to 2.19.126.212 and 2.19.126.222. The AP-interface pcap shows a TCP SYN from 192.168.77.94 to 2.19.126.212:80. Test Connection reported 2110-3128 at the connect-to-internet step. WPA2 state: hostapd logged 802.11 authentication, association with AID 1, 1/4 and 3/4 EAPOL-Key messages, 'pairwise key handshake completed (RSN)', authorized=1, and AP-STA-CONNECTED. dnsmasq again logged DHCP for 192.168.77.94 and the same ctest.cdn.nintendo.net query; Test Connection again reported 2110-3128. The console also sent IPv6 router solicitations to ff02::2; no RA was offered. The AP, DHCP/DNS server, and capture were stopped, the test address was removed, and the adapter was restored to managed mode.",
+      "limitations": "The absence of NAT explains the internet-step failure, so this baseline did not reach the TLS endpoint. The console's error code is recorded as displayed and its internal cause was not decoded. EAPOL frames were not visible on the AP interface because hostapd consumed them; the handshake evidence is the hostapd debug log. One console, one adapter, and channel 1 only. The two test networks remain saved on the console until the owner removes them. This is a reachability baseline, not a parser or vulnerability result.",
+      "last_reviewed": "2026-10-29"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Wi-Fi and Network Stack Test Plan (D10 / H-011, H-012)
 
-> **Status: Phase 0 complete (host-only; ordinary AP beacons and probe responses only); Phase 1 not started.** This document is an authorization gate, not an approval. Phase 0 established the AP and tooling baseline on 2026-10-29. Phase 1 changes the console's network settings and needs owner approval. Phases 2–6 transmit malformed 802.11 or network data and each need separate explicit approval for the exact case batch. No malformed frame has been sent and the console has not been involved.
+> **Status: Phase 0 and Phase 1 complete (open and WPA2 baselines); Phase 2 not started.** This document is an authorization gate, not an approval. Phase 0 established the AP and tooling baseline; Phase 1 confirmed association, the WPA2 pairwise handshake, DHCP, and DNS on 2026-10-29. Test Connection failed at the internet step with `2110-3128` because the test AP had no NAT. Phases 2–6 transmit malformed 802.11 or network data and each need separate explicit approval for the exact case batch. No malformed frame has been sent.
 
 ## What this tests
 
@@ -123,6 +123,8 @@ Create **new** networks on the console; do not edit or delete the owner's existi
 **Exit criteria:** the AP is visible, hostapd reaches `AP-ENABLED`, the independent scan sees the test SSID, and the capture path is known. If not, stop and record the host blocker.
 
 ## Phase 1 — baseline association and passive capture (approval required)
+
+**Result (2026-10-29): complete.** The console associated to `TX10LED-NET` (AID 1) and `TX10LED-WPA2`, completed the WPA2 pairwise handshake, obtained `192.168.77.94` by DHCP, and queried `ctest.cdn.nintendo.net`. Test Connection failed at the internet step with `2110-3128` because the AP had no NAT. No malformed frames were sent. See `research/hardware-observations/2026-10-29-wifi-phase1.json` and `E-105`.
 
 **This phase changes the console's network settings. It transmits no malformed frames.**
 

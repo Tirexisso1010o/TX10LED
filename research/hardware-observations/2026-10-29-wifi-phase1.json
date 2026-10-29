@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-wifi-phase1",
+  "observed_at": "2026-10-29T21:06:00Z",
+  "observed_at_precision": "approximate",
+  "phase_window": "2026-10-29T20:59:00Z to 2026-10-29T21:06:00Z",
+  "observation_type": "d10-phase1-console-baseline-open-and-wpa2",
+  "operator": "hostapd 2.11 and dnsmasq 2.92 in an OrbStack Ubuntu 26.04.1 arm64 VM; the console owner added the test networks and ran Test Connection",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not enumerated during this test; the firmware value is the owner's report.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "d10-phase1-console-baseline",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; derived from the adapter MAC>",
+    "upstream": "none; the test AP had no NAT or internet forwarding"
+  },
+  "phase1": {
+    "open": {
+      "ssid": "TX10LED-NET",
+      "security": "open",
+      "channel": 1,
+      "freq_mhz": 2412,
+      "association": {
+        "authentication": "open system",
+        "aid": 1,
+        "ap_sta_connected": true
+      },
+      "dhcp": {
+        "address": "192.168.77.94",
+        "lease_seconds": 43200,
+        "router": "192.168.77.1",
+        "dns_server": "192.168.77.1"
+      },
+      "dns": {
+        "query": "ctest.cdn.nintendo.net",
+        "cnames": [
+          "ctest.cdn.nintendo.net.akamaized.net",
+          "a1456.g1.akamai.net"
+        ],
+        "answers": [
+          "2.19.126.212",
+          "2.19.126.222"
+        ]
+      },
+      "transport_attempt": "TCP SYN from 192.168.77.94 to 2.19.126.212:80",
+      "test_connection_result": "failed at the connect-to-internet step",
+      "test_connection_error": "2110-3128",
+      "expected_failure_reason": "The test AP had no NAT or upstream route, so the TCP SYN received no response."
+    },
+    "wpa2": {
+      "ssid": "TX10LED-WPA2",
+      "security": "WPA2-PSK, AES/CCMP",
+      "channel": 1,
+      "freq_mhz": 2412,
+      "handshake": "hostapd sent 1/4 and 3/4; the log records 'pairwise key handshake completed (RSN)' and authorized=1",
+      "association": {
+        "aid": 1,
+        "ap_sta_connected": true
+      },
+      "dhcp": {
+        "address": "192.168.77.94",
+        "lease_seconds": 43200,
+        "router": "192.168.77.1",
+        "dns_server": "192.168.77.1"
+      },
+      "dns": {
+        "query": "ctest.cdn.nintendo.net",
+        "answers": [
+          "2.19.126.212",
+          "2.19.126.222"
+        ]
+      },
+      "test_connection_result": "failed at the connect-to-internet step",
+      "test_connection_error": "2110-3128",
+      "expected_failure_reason": "The test AP had no NAT or upstream route."
+    },
+    "ipv6": {
+      "observed": "The console sent IPv6 router solicitations to ff02::2.",
+      "ra_offered": false,
+      "ipv6_address_acquired": false,
+      "note": "This is a precondition observation for Phase 5, not an IPv6 test."
+    },
+    "capture": {
+      "open_pcap": "local-only; captured ARP, DHCP, DNS, ICMPv6 router solicitation, and the TCP SYN to the resolved Akamai address",
+      "wpa2_pcap": "local-only; captured DHCP and DNS",
+      "eapol_visibility": "EAPOL frames were not visible on the AP interface because hostapd consumed them; the handshake evidence is the hostapd debug log",
+      "management_attribution": "hostapd -dd log and the console's own Test Connection behavior"
+    },
+    "malformed_frames_sent": false,
+    "console_state": "Two test networks were added for the baseline. The owner was asked to remove them after the D10 work; no other console setting was changed."
+  },
+  "commands": [
+    {
+      "command": "sudo hostapd -dd <open-ap.conf>; sudo dnsmasq --no-daemon --log-queries --log-dhcp; sudo tcpdump -i <interface> -w <local.pcap>",
+      "exit_code": 0,
+      "result": "TX10LED-NET reached AP-ENABLED on channel 1. The console associated with AID 1, obtained 192.168.77.94 over DHCP, queried ctest.cdn.nintendo.net, and attempted TCP port 80. Test Connection reported 2110-3128."
+    },
+    {
+      "command": "sudo hostapd -dd <wpa2-ap.conf>; sudo dnsmasq --no-daemon --log-queries --log-dhcp; sudo tcpdump -i <interface> -w <local.pcap>",
+      "exit_code": 0,
+      "result": "TX10LED-WPA2 reached AP-ENABLED on channel 1. The console completed the WPA2 pairwise handshake, was authorized, obtained 192.168.77.94 over DHCP, queried ctest.cdn.nintendo.net, and reported 2110-3128."
+    },
+    {
+      "command": "sudo kill <hostapd/dnsmasq/tcpdump>; sudo ip addr del 192.168.77.1/24 dev <interface>; restore managed mode",
+      "exit_code": 0,
+      "result": "The AP, DHCP/DNS server, and capture were stopped; the test address was removed; the adapter was restored to managed mode. The raw pcaps and logs remain local-only."
+    }
+  ],
+  "interpretation": "Phase 1 reached the console's ordinary network stack on both the open and WPA2 test APs. The WPA2 pairwise handshake completed and the console obtained a DHCP lease and issued the connectivity-test DNS query. The Test Connection failure is explained by the deliberate absence of NAT or an upstream route: the console's TCP SYN to the resolved Akamai address had no responder. This is a valid baseline for association, DHCP, and DNS, not a parser or vulnerability result. The IPv6 router solicitation shows the console is willing to use IPv6 if a router advertisement is offered, which is relevant to Phase 5.",
+  "authorization": "The owner approved Phase 1. The owner added the two test SSIDs, connected the console, and ran Test Connection once per SSID. No malformed frame, crafted DHCP/DNS/IPv6/TLS response, or other active test was sent.",
+  "limitations": [
+    "No NAT or upstream route was provided, so Test Connection could not reach the TLS endpoint and failed at the internet step.",
+    "One console, one adapter, one driver, and channel 1 only.",
+    "The console's error code is recorded as displayed; its internal cause was not independently decoded.",
+    "EAPOL frames were not visible on the AP interface; the WPA2 handshake evidence comes from hostapd's debug log.",
+    "The two test networks remain saved on the console until the owner removes them.",
+    "The console firmware value is owner-reported; it was not re-read during this test.",
+    "This baseline does not test any parser, malformed input, or exploitability."
+  ],
+  "redactions": [
+    "Console and adapter MAC addresses redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "WPA2 test passphrase omitted."
+  ]
+}
