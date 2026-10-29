@@ -475,7 +475,8 @@
         "E-100",
         "E-104",
         "E-105",
-        "E-106"
+        "E-106",
+        "E-107"
       ],
       "sources": [
         "switchbrew-wlan",
@@ -485,7 +486,7 @@
       "last_reviewed": "2026-10-29",
       "hardware": "HEG-001 (Mariko), macOS 26.3 host with an OrbStack Ubuntu 26.04 arm64 VM and a TP-Link Archer T3U Plus (2357:0138, rtw88_8822bu) passed through to the VM",
       "firmware": "23.0.1",
-      "results": "Phase 1 baseline completed on 2026-10-29 (E-105). Phase 2 Batch 1 completed on 2026-10-29 (E-106): the W-C control and W-01-W-08 produced no crash, reboot, hang, or new error; the console stayed associated through the valid cases. W-06 (DS Parameter IE length 3) showed a shorter association lifetime in two runs (7.3 s and 15.4 s) than the W-C control (35.4 s) and the other cases (about 35 s), then re-associated immediately. That is a behavioral lead, not a memory-safety finding. Batch 2 (W-09-W-14) and Phases 3-6 were not run; H-011 remains UNVERIFIED.",
+      "results": "Phase 1 baseline completed on 2026-10-29 (E-105). Phase 2 Batch 1 completed on 2026-10-29 (E-106): the W-C control and W-01-W-08 produced no crash, reboot, hang, or new error; W-06 (DS Parameter IE length 3) showed 7.3 s and 15.4 s association lifetimes versus the 35.4 s control. Phase 2 Batch 2 completed on 2026-10-29 (E-107): the control and W-09-W-14 produced no crash, reboot, hang, or new error; W-09 (Vendor IE length 0) showed a 14.7 s lifetime versus the 35.6 s control, matching the W-06 pattern. These are behavioral leads, not memory-safety findings. Phase 3-6 were not run; H-011 remains UNVERIFIED.",
       "uncertainties": "Whether a normal WPA2 association completes on the test AP; whether the console processes an injected EAPOL-Key rekey; whether the malformed IE reaches the wlan parser or is filtered by the Wi-Fi firmware; whether the parser is in the ARM sysmodule or the firmware; whether any post-23.0.0 defect exists.",
       "resolution": "open"
     },
