@@ -310,9 +310,11 @@
         "E-039",
         "E-041",
         "E-042",
-        "E-043"
+        "E-043",
+        "E-102",
+        "E-103"
       ],
-      "notes": "The target can act as a GameShare receiver, so a remote host can send data that splay parses. No public vulnerability or exploit was found. A compromise would be applet-level userland, not kernel or bootROM."
+      "notes": "The target can act as a GameShare receiver, so a remote host can send data that splay parses. A read-only review on 2026-10-29 found no public vulnerability or exploit and no post-20.0.0 splay security fix. The local splay program NCA is key generation 0x17 and is blocked by the missing key_area_key_application_16; its meta CNMT is readable and matches the program NCA. A compromise would be applet-level userland, not kernel or bootROM."
     },
     {
       "id": "C-020",

@@ -426,7 +426,7 @@
       "target_reachable": true,
       "public_chain_on_target": false,
       "status": "UNKNOWN",
-      "status_basis": "The splay applet and its data flows are documented, so the surface is real and reachable on a 23.0.1 Switch 1 acting as a GameShare receiver. No public vulnerability, proof of concept, or exploit for splay, the GameShare protocol, or its NACP and JPEG handling was found in the reviewed sources.",
+      "status_basis": "The splay applet and its data flows are documented, so the surface is real and reachable on a 23.0.1 Switch 1 acting as a GameShare receiver. A read-only review on 2026-10-29 found no public vulnerability, proof of concept, or exploit for splay, the GameShare protocol, or its NACP and JPEG handling, and no post-20.0.0 splay security fix: 23.0.0 changed splay's NPDM and RomFS, while 23.0.1 updated only sdb. Locally, the splay program NCA uses key generation 0x17 and is blocked by the missing key_area_key_application_16; its 0x00 meta NCA is readable and its CNMT matches the program NCA.",
       "capability_if_successful": "At most applet-level userland code execution in splay, whose NPDM grants StreamPlaySaveData (FsAccessFlag bit47) and a broad IPC service list. Not kernel, bootROM, or CFW.",
       "leads_to_atmosphere": false,
       "in_scope": true,
@@ -443,17 +443,20 @@
         "E-041",
         "E-042",
         "E-043",
-        "E-044"
+        "E-044",
+        "E-102",
+        "E-103"
       ],
       "sources": [
         "switchbrew-splay-applet",
         "switchbrew-20.0.0",
         "switchbrew-npdm",
         "switchbrew-23.0.0",
+        "switchbrew-23.0.1",
         "nintendo-gameshare-support",
         "switchbrew-system-flaws"
       ],
-      "notes": "This is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. Boundaries: hosting requires a Switch 2, Switch 1 receivers are local-wireless only, the host's AdvertiseData is ECC-verified, and any compromise stops at applet privileges. This is a surface, not an exploit."
+      "notes": "This is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. Boundaries: hosting requires a Switch 2, Switch 1 receivers are local-wireless only, the host's AdvertiseData is ECC-verified, and any compromise stops at applet privileges. The 2026-10-29 review found no public splay/GameShare vulnerability or post-20.0.0 splay security fix. The local splay program NCA is key generation 0x17 and cannot be decrypted with the owner's keys; the only key-generation-0x15 program is the Mii editor applet miiEdit, which is not a remote-input surface. This is a surface, not an exploit."
     }
   ],
   "leads": [
@@ -565,20 +568,25 @@
       "leads_to_atmosphere": false,
       "what_it_is": "A Switch 2 feature that streams a shared game to nearby systems; on the receiving system the session runs in the splay system applet, introduced in 20.0.0.",
       "what_it_proves": "A documented, user-reachable flow exists in which the target parses host-supplied data (NACP, JPEGs, and a video stream) inside a system applet that holds StreamPlaySaveData access.",
-      "what_it_does_not_prove": "No public vulnerability or exploit exists for this flow. It does not provide kernel or bootROM access. Hosting requires a Switch 2, and Switch 1 receivers are local-wireless only.",
+      "what_it_does_not_prove": "No public vulnerability or exploit exists for this flow. It does not provide kernel or bootROM access. Hosting requires a Switch 2, and Switch 1 receivers are local-wireless only. The local splay program NCA is key generation 0x17 and cannot be decrypted with the owner's keys, so its parser has not been analyzed.",
       "evidence": [
         "E-038",
         "E-041",
         "E-042",
         "E-043",
-        "E-044"
+        "E-044",
+        "E-102",
+        "E-103"
       ],
       "sources": [
         "switchbrew-splay-applet",
         "switchbrew-20.0.0",
-        "nintendo-gameshare-support"
+        "switchbrew-23.0.0",
+        "switchbrew-23.0.1",
+        "nintendo-gameshare-support",
+        "switchbrew-system-flaws"
       ],
-      "next_step": "Look for public splay or GameShare protocol research, jpegdec or NACP parsing advisories, and any post-20.0.0 splay fix. Do not spoof a GameShare host or send crafted data to the console."
+      "next_step": "The 2026-10-29 read-only review found no public splay/GameShare vulnerability and no post-20.0.0 splay security fix. The next useful inputs are a Switch 2 host for a supervised receiver test or a key set that covers key generation 0x17 for static analysis; neither is available. Do not spoof a GameShare host or send crafted data to the console."
     }
   ],
   "fixed_public_flaws": [

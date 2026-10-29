@@ -50,7 +50,15 @@
     },
     "highest_key_generation": "0x17",
     "highest_key_generation_name": "23.0.0",
-    "note": "The key generation is the value at NCA header offset 0x220. The effective master-key revision is the maximum of 0x206 and 0x220, minus one, so 0x17 maps to key_area_key_application_16."
+    "note": "The key generation is the value at NCA header offset 0x220. The effective master-key revision is the maximum of 0x206 and 0x220, minus one, so 0x17 maps to key_area_key_application_16.",
+    "program_nca_count": 76,
+    "program_key_generation_counts": {
+      "0x07": 1,
+      "0x15": 1,
+      "0x16": 7,
+      "0x17": 67
+    },
+    "program_key_generation_note": "Counts are for the 76 NCAs whose header content type is Program (0x00). The same NCA set also contains meta, data, and public-data NCAs, so these counts are a subset of the total key-generation counts."
   },
   "ldn_identification": {
     "title_id": "0100000000000018",
@@ -79,10 +87,11 @@
     "nca_sha256_matches_cnmt": true
   },
   "key_coverage": {
-    "required_for_ldn": "key_area_key_application_16",
+    "required_for_ldn_and_splay": "key_area_key_application_16",
     "present_in_keys_file": false,
     "present_key_area_key_application_range": "0x00 through 0x14",
-    "consequence": "The ldn NCA header can be parsed and the ldn meta NCA is readable, but the program NCA's key area and section cannot be decrypted with the supplied keys.",
+    "decryptable_program_key_generation": "0x15 and below (verified with miiEdit)",
+    "consequence": "The ldn and splay program NCA headers can be parsed and their meta NCAs are readable, but the program NCAs key areas and sections cannot be decrypted with the supplied keys. The key generation 0x15 miiEdit program was decrypted successfully with key_area_key_application_14, which confirms the local NCA decryption path but not the missing generation.",
     "ldn_advertisement_note": "The LDN advertisement decryption used KeyDerivation(protocol=1) with master_key_00, which is why it succeeded even though the file does not cover the 23.0.1 NCA key generation."
   },
   "package1": {
@@ -95,23 +104,85 @@
     "header_parser": "local Python script using AES-XTS with the owner's header_key",
     "next_tool_needed": "hactool or equivalent, plus a key set that covers key_area_key_application_15 and key_area_key_application_16"
   },
-  "interpretation": "All 238 NCA headers are valid and parseable with the owner's header_key. The ldn sysmodule is identified as title 0100000000000018, version 0x5c0004b0, NCA 755bcf33085ed666cbbcf34de83d1cb0.nca, a 556,544-byte program NCA whose section 0 is a 556,032-byte AES-CTR PartitionFS. The ldn meta NCA decrypts with key_area_key_application_00 and its CNMT confirms the title version and the program NCA's SHA-256, which matches the local file. The program NCA uses key generation 0x17 (23.0.0), which requires key_area_key_application_16. The owner's prod.keys file stops at key generation 0x14 (20.0.0), so the program key area and section cannot be decrypted. The dump is NCA-only, so package1 is not present. This is a concrete key-coverage and artifact gap, not a failure of the LDN advertisement decryption.",
+  "interpretation": "All 238 NCA headers are valid and parseable with the owner's header_key. The ldn sysmodule is identified as title 0100000000000018, version 0x5c0004b0, NCA 755bcf33085ed666cbbcf34de83d1cb0.nca, a 556,544-byte program NCA whose section 0 is a 556,032-byte AES-CTR PartitionFS. The ldn meta NCA decrypts with key_area_key_application_00 and its CNMT confirms the title version and the program NCA's SHA-256, which matches the local file. The program NCA uses key generation 0x17 (23.0.0), which requires key_area_key_application_16. The owner's prod.keys file stops at key generation 0x14 (20.0.0), so the program key area and section cannot be decrypted. The 76 program NCAs split by key generation into 0x07:1, 0x15:1, 0x16:7, and 0x17:67. The only key-generation-0x15 program is miiEdit (0100000000001009), a Mii editor applet whose section-0 master hash verified with key_area_key_application_14; it is not a remote-input surface. The splay program NCA is key generation 0x17 and remains encrypted, but its key-generation-0x00 meta NCA is readable and its CNMT matches the program NCA. The dump is NCA-only, so package1 is not present. This is a concrete key-coverage and artifact gap, not a failure of the LDN advertisement decryption.",
   "limitations": [
     "The firmware dump's version is owner-reported and folder-named 23.0.1; it was not independently verified with a firmware tool.",
     "The title-ID mapping comes from a community list; the title ID itself is read from the NCA header.",
     "Package1 is absent, so the warmboot direction cannot be analyzed from this dump.",
     "No key values, decrypted NCA content, or proprietary firmware are recorded here.",
-    "No program-NCA content was decrypted; the ldn meta NCA/CNMT was decrypted for title version and hash verification."
+    "No program-NCA content was decrypted; the ldn meta NCA/CNMT was decrypted for title version and hash verification.",
+    "The splay program NCA was not decrypted; only its meta NCA/CNMT and the key-generation-0x15 miiEdit program were decrypted.",
+    "The miiEdit identification shows that the local NCA decryption path works for key generation 0x15, but it does not provide the missing key_area_key_application_16."
   ],
   "redactions": [
     "Key values are not recorded.",
-    "Only one NCA filename is recorded, for the ldn identification.",
+    "NCA filenames are recorded only for the ldn, splay, and miiEdit identifications.",
     "The serial number is reduced to the prefix XTJ.",
     "No decrypted NCAs, KIPs, NSOs, or package1 images are recorded."
   ],
   "metadata_analysis": {
     "method": "The ldn meta NCA was decrypted locally with AES-ECB (key_area_key_application_00) for the key area and AES-CTR for its PFS0 section, then the CNMT was parsed.",
     "result": "The CNMT reports title 0100000000000018, version 0x5c0004b0 (1543505072), content type SystemProgram, one content entry, and the NCA SHA-256 755bcf33085ed666cbbcf34de83d1cb0f7ceaa0ebf7a106dfa54a2d54b193072. That hash matches the local NCA file exactly.",
-    "consequence": "The metadata path is readable with the supplied keys, but the program NCA content still requires key_area_key_application_16, which is absent. The hash match confirms the local ldn NCA is intact and matches its metadata."
+    "consequence": "The metadata path is readable with the supplied keys, but the program NCA content still requires key_area_key_application_16, which is absent. The hash match confirms the local ldn NCA is intact and matches its metadata.",
+    "splay_cnmt": "The splay meta NCA was decrypted locally with AES-ECB (key_area_key_application_00) for the key area and AES-CTR for its PFS0 section. The CNMT reports title 0100000000001048, version 0x5c0004b0 (1543505072), ContentMetaType 1 (SystemProgram), one Program content entry with content ID b837233731cc2c6b3bc384489be7d46a and size 0x669400 (6,722,560), and the SHA-256 b837233731cc2c6b3bc384489be7d46ab0cc50982747a54bfd7b014e57017812. That hash matches the local program NCA exactly."
+  },
+  "splay_identification": {
+    "title_id": "0100000000001048",
+    "title_name": "splay",
+    "title_name_source": "community system-applet title-ID mapping; the title ID and version are read from the decrypted meta CNMT",
+    "program_nca": "b837233731cc2c6b3bc384489be7d46a.nca",
+    "program_content_type": "program",
+    "program_size": 6722560,
+    "program_key_generation": "0x17",
+    "program_key_area_encryption_key_index": "0x00",
+    "program_extraction_status": "blocked",
+    "meta_nca": "e481ece5d922f9a3776493f891fa0ef9.cnmt.nca",
+    "meta_size": 3584,
+    "meta_key_generation": "0x00",
+    "meta_crypto_type": "none",
+    "meta_content_type": "SystemProgram",
+    "title_version": "0x5c0004b0",
+    "title_version_decimal": 1543505072,
+    "content_count": 1,
+    "content_entry": {
+      "content_id": "b837233731cc2c6b3bc384489be7d46a",
+      "content_type": "Program",
+      "size": 6722560,
+      "sha256": "b837233731cc2c6b3bc384489be7d46ab0cc50982747a54bfd7b014e57017812",
+      "sha256_matches_local_nca": true
+    },
+    "required_key": "key_area_key_application_16",
+    "present_in_keys_file": false,
+    "note": "The meta NCA and CNMT are readable, but the program NCA key area and section remain encrypted. No splay code was decrypted."
+  },
+  "mii_edit_identification": {
+    "title_id": "0100000000001009",
+    "title_name": "miiEdit",
+    "title_name_source": "NPDM name read from the decrypted ExeFS",
+    "nca_file": "c5d032046782d4bd6fc4b5c012a4e110.nca",
+    "content_type": "program",
+    "content_size": 16103424,
+    "key_generation": "0x15",
+    "effective_key_area_index": "0x14",
+    "crypto_type": "aes_ctr",
+    "exefs_files": [
+      "main",
+      "main.npdm",
+      "rtld",
+      "sdk"
+    ],
+    "npdm_name": "miiEdit",
+    "section_0": {
+      "media_start_offset": "0xc4de00",
+      "media_end_offset": "0xf5b800",
+      "size": 3201536,
+      "fs_type": "partitionfs",
+      "hash_type": "hierarchical_sha256",
+      "encryption_type": "aes_ctr"
+    },
+    "master_hash_verified": true,
+    "verification_key": "key_area_key_application_14",
+    "extraction_status": "decrypted locally for identification; not published",
+    "note": "A Mii editor applet, not a remote-input surface. Its successful decryption confirms the local NCA path for key generation 0x15 but does not provide the missing 0x17 key."
   }
 }

@@ -1375,6 +1375,37 @@
       "evidence": "The owner ran `bash Firmware/ap_ldn_join_run.sh 90` (an initial `sudo bash` invocation was rejected by the wrapper before any radio action). hostapd logged an authentication request (len=41), `authentication OK (open system)`, an association request (len=127), `association OK (aid 1)`, `AP-STA-CONNECTED`, and `authorized=1`. About one second later hostapd received a disassociation from the console with `reason_code=8` (`sending STA is leaving BSS`), logged `AP-STA-DISCONNECTED`, and later deauthenticated the station due to inactivity. The monitor pcap (`/tmp/ap-ldn-monitor.pcap`, local-only, 229,429 bytes) contains 70 unicast LDN action frames to the console, one console probe request with a 32-byte non-zero SSID, one probe response to the console with a 32-byte non-zero SSID plus the RSN and extended-capabilities IEs, and exactly one console data frame: a 28-byte null-data frame (subtype 4, no payload, unprotected, flags=0x01). There is no console data payload frame and no 0x88B7 frame. The AP raw socket saw one 20-byte frame with ethertype `0x0006` and payload `0001af810100`; it is probably a non-LDN control or null frame. The owner observed `2203-0066` after a few seconds and the game popup `unable to join the room`; the console returned to the game normally. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-ldn-join-third.json.",
       "limitations": "The run was interrupted at about eight seconds, so the full 90-second window was not observed; the console had already disassociated by then. No independent receiver captured the AP's transmissions; the monitor pcap is on the same phy and may include loopback. The console reaction is owner-reported and was not instrumented. No 0x88B7 request was observed, so the run cannot distinguish a console abort before the request from a receive-path miss. The disassociation cause is not proven; the leading remaining host-side difference is that hostapd sends a zero-length beacon SSID while the ldn MonitorAP sends 32 zero bytes. One adapter, driver, kernel, and channel. The host BSSID, interface, console MAC, room SSID, application data, keys, and pcap are redacted or local-only.",
       "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-102",
+      "claim": "A read-only review of the public GameShare/splay documentation and the 23.0.0/23.0.1 changelogs found no public vulnerability, proof of concept, or exploit for splay, the GameShare protocol, or its NACP/JPEG handling. 23.0.0 updated splay's NPDM (FsAccessFlag bit 47, news:c, stpl:sys, KernelVersion 27.1) and RomFS (lyt, message, sound), but the changelog records no splay security fix; 23.0.1 updated only sdb and did not update splay.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Public-source review on 2026-10-29 of Switchbrew's Splay Applet, 20.0.0, 23.0.0, 23.0.1, and Switch System Flaws pages plus Nintendo's GameShare FAQ. No active testing and no GameShare host were used.",
+      "sources": [
+        "switchbrew-splay-applet",
+        "switchbrew-20.0.0",
+        "switchbrew-23.0.0",
+        "switchbrew-23.0.1",
+        "switchbrew-system-flaws",
+        "nintendo-gameshare-support"
+      ],
+      "evidence": "Switchbrew's 23.0.0 page lists splay among the updated applets and records only NPDM and RomFS changes: Fac.FsAccessFlag bit 47 set (0x0000800000000000), service access added news:c and stpl:sys, KernelCap KernelVersion 9.1 -> 27.1, and RomFS updates under /lyt/, /message/, and /sound/splay_action.bksnd. It does not list a splay security fix. The 23.0.1 page lists only sdb among updated sysmodules, with a SystemVersion RomFS update and a stability change-log entry; splay is not listed. The Switch System Flaws page contains no splay, GameShare, StreamPlay, or jpegdec entry. No public advisory, write-up, or repository describing a splay or GameShare exploit was found in the reviewed sources. The 20.0.0 page and Nintendo FAQ still identify splay as the receiver-side GameShare applet.",
+      "limitations": "This is an absence-of-documented-method finding in the reviewed sources, not proof that splay is safe. The 23.0.1 security-flaw field is an unfilled placeholder, and changelogs can omit security fixes. The protocol is not publicly specified, and no public source documents the exact ECC coverage, NACP/JPEG parsing, or stream format. No code or console test was performed.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-103",
+      "claim": "In the owner's local 23.0.1 dump, the 76 program NCAs split by key generation into 0x07:1, 0x15:1, 0x16:7, and 0x17:67. The only 0x15 program is miiEdit (0100000000001009), which decrypts with key_area_key_application_14 and confirms the local NCA decryption path. splay's program NCA is key generation 0x17 and remains encrypted, but its key-generation-0x00 meta NCA is readable and its CNMT matches the program NCA.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only local parsing of the owner's NCA dump and keys on 2026-10-29. Header decryption used header_key; the miiEdit section was decrypted with key_area_key_application_14; the splay meta CNMT was decrypted with key_area_key_application_00. No content was published and no console was involved.",
+      "sources": [
+        "switchbrew-nca"
+      ],
+      "evidence": "All 238 NCA headers parsed. Program NCAs: 76; key-generation counts 0x07:1 (flog, 01008bb00013c000), 0x15:1 (miiEdit, 0100000000001009, c5d032046782d4bd6fc4b5c012a4e110.nca, 16,103,424 bytes, crypto type 2), 0x16:7, and 0x17:67. The miiEdit section-0 master hash verified with key_area_key_application_14, and its ExeFS PFS0 contains main, main.npdm, rtld, and sdk; the NPDM name is miiEdit. It is a Mii editor applet, not a remote-input surface. splay's program NCA is b837233731cc2c6b3bc384489be7d46a.nca, 6,722,560 bytes, key generation 0x17, crypto type 2; its meta NCA e481ece5d922f9a3776493f891fa0ef9.cnmt.nca is 3,584 bytes at key generation 0x00 and crypto type 0. The splay CNMT reports title 0100000000001048, version 0x5c0004b0, ContentMetaType 1 (SystemProgram), one Program content entry with content ID b837233731cc2c6b3bc384489be7d46a and size 0x669400 (6,722,560); the CNMT SHA-256 matches the local program NCA exactly. key_area_key_application_16 is absent, so the splay program key area and section remain encrypted.",
+      "limitations": "The dump's version is owner-reported and folder-named 23.0.1. Title-name mappings for flog, miiEdit, and splay come from community lists; the title IDs, versions, sizes, and key generations are read from the local headers and CNMT. The miiEdit decryption proves the local NCA path works for key generation 0x15, but it does not provide the missing 0x17 key. No splay code was decrypted or analyzed.",
+      "last_reviewed": "2026-10-29"
     }
   ]
 }

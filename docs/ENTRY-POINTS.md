@@ -61,7 +61,7 @@ The status answers a specific claim: **“This surface provides a publicly docum
 | EP-008 | System services and sysmodules | Initial userland primitive | Real primitive, but not target/CFW | **PARTIALLY VERIFIED** | No |
 | EP-009 | Kernel / TrustZone | Post-userland | No public 23.0.1 chain found | **UNKNOWN** | No |
 | EP-010 | Hardware fault injection / modchip | Microsoldering | Yes — hardware route | **VERIFIED** | Yes, but out of scope |
-| EP-011 | GameShare / `splay` receiver | Switch 2 host + local wireless | No public vulnerability found | **UNKNOWN** | No |
+| EP-011 | GameShare / `splay` receiver | Switch 2 host + local wireless | No public vulnerability found; local `splay` program NCA blocked by key generation `0x17` | **UNKNOWN** | No |
 
 Only EP-010 has a documented public chain to Atmosphère on the target, and it is not software-only. The matrix records it for completeness, not as a recommendation.
 
@@ -200,12 +200,24 @@ It is a documented flow in which a nearby device sends data that a system applet
 | Who can host | Only a Switch 2. Nintendo states the feature cannot be used between two Switch 1/OLED/Lite systems. |
 | How a Switch 1 can receive | Local wireless only. Online GameShare via GameChat is documented for Switch 2 systems. |
 
+### Read-only review (2026-10-29)
+
+The public record was reviewed again on **2026-10-29**, and the owner's local dump was inspected without decrypting the `splay` program content:
+
+- **No public vulnerability or exploit was found.** Switchbrew's Splay Applet and Switch System Flaws pages, the 20.0.0/23.0.0/23.0.1 changelogs, and Nintendo's GameShare FAQ contain no `splay`/GameShare advisory, proof of concept, or exploit (`E-102`).
+- **No post-20.0.0 `splay` security fix is documented.** 23.0.0 updated `splay`'s NPDM (`FsAccessFlag` bit 47, `news:c`, `stpl:sys`, KernelVersion 27.1) and RomFS (`lyt`, `message`, `sound`), but the changelog records no security fix. 23.0.1 updated only `sdb`; `splay` was not updated (`E-102`).
+- **The `splay` program NCA is not decryptable locally.** It uses key generation `0x17`, which needs `key_area_key_application_16`; the owner's key file stops at `_14`. Its meta NCA uses key generation `0x00`, and the CNMT reports title `0100000000001048`, version `0x5c0004b0`, one Program content entry, and a SHA-256 that matches the local program NCA (`E-103`).
+- **The only key-generation-`0x15` program is `miiEdit`.** Title `0100000000001009` decrypted with `key_area_key_application_14` and verified its section-0 master hash, which confirms the local NCA decryption path. It is a Mii editor applet, not a remote-input surface (`E-103`).
+
+This review does not change the status: the surface remains `UNKNOWN`. It narrows the next step to a Switch 2 host for a supervised receiver test or a key set covering key generation `0x17` for static analysis. Neither is available.
+
 ### What it proves — and what it does not
 
 | Question | Answer |
 |---|---|
 | Is the surface reachable on the target? | **Yes.** A 23.0.1 Switch 1 can act as a GameShare receiver. |
-| Is there a public vulnerability or exploit? | **No.** None was found for `splay`, the protocol, or its NACP/JPEG handling. |
+| Is there a public vulnerability or exploit? | **No.** None was found for `splay`, the protocol, or its NACP/JPEG handling, and no post-20.0.0 `splay` security fix is documented. |
+| Is the receiver code analyzable locally? | **Not yet.** The `splay` program NCA uses key generation `0x17`; `key_area_key_application_16` is missing. Only its meta CNMT is readable. |
 | Would a compromise give kernel access? | **No.** `splay` is an applet; its documented privileges are applet-level. |
 | Would it give bootROM access or Atmosphère? | **No.** A separate kernel or bootROM stage would still be required. |
 | Can the target host a session itself? | **No.** Hosting requires a Switch 2, so the target cannot be the sender. |
@@ -248,13 +260,13 @@ Both are recorded in the JSON as `L-002` and `L-003`. They are useful for unders
 
 ## What this means
 
-As of **2026-10-26**, the reviewed public documentation supports this conclusion:
+As of **2026-10-29**, the reviewed public documentation supports this conclusion:
 
 > Firmware 23.0.1 is compatible with Atmosphère 1.12.1 and hekate v6.5.4, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to launch Atmosphère. The documented route requires a hardware modchip, which is outside this project's scope.
 
 The closest public lead is `ns2jb`. It is a genuine software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. It does not change the conclusion for the OLED.
 
-GameShare (`EP-011`) was reviewed as a receiver-side remote-input surface and recorded as `UNKNOWN`. It is reachable on the target, but no public vulnerability exists, hosting requires a Switch 2, and any compromise would stop at applet privileges. It does not change the conclusion either.
+GameShare (`EP-011`) was reviewed as a receiver-side remote-input surface and recorded as `UNKNOWN`. It is reachable on the target, but no public vulnerability exists, hosting requires a Switch 2, and any compromise would stop at applet privileges. A second read-only review on 2026-10-29 found no public `splay`/GameShare vulnerability and no post-20.0.0 `splay` security fix; the local `splay` program NCA is blocked by key generation `0x17`, while its meta CNMT is readable (`E-102`, `E-103`). It does not change the conclusion either.
 
 ## What would change this conclusion
 
