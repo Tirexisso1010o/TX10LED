@@ -1467,6 +1467,21 @@
       "evidence": "hostapd 2.11 ran TX10LED-NET open on channel 1 with beacon_int=1000. W-09 Vendor IE length 0 (89-byte frame), W-10 Vendor IE length 255 with OUI 00:22:aa and type 0x04 (344), W-11 Extended Capabilities length 0 (79), W-12 HT Capabilities length 1 (90), W-13 VHT Capabilities length 1 (90), W-14 Country length 1 (90). The runner logged send_rc=0 and station_after_10s=1 for all seven cases. Association lifetimes from the timestamped hostapd log: W-C 35.6 s, W-09 14.7 s, W-10 35.4 s, W-11 35.3 s, W-12 35.3 s, W-13 35.4 s, W-14 35.3 s. The console re-associated for each case and reported 2110-3128 every time; no crash, hang, or new error code occurred. The AP, DHCP/DNS server, and capture were stopped, the test address was removed, and the adapter was restored to managed mode.",
       "limitations": "One console, one adapter, one driver, and channel 1 only. The console may ignore duplicate AP beacons, so the batch does not prove that the malformed IEs reached the parser. W-09's 14.7 s lifetime was observed once; W-06 was 7.3 s and 15.4 s in two runs, so the effect is not deterministic. The console's automatic Test Connection flow contributes timing variability. No crash, hang, or reboot occurred. This is a behavioral lead, not an exploit or a memory-safety proof.",
       "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-108",
+      "claim": "Phase 3 control E-C and Batch 1 (E-01-E-08) produced no crash, reboot, hang, or new console error. The control completed the WPA2 pairwise handshake and three hostapd group rekeys and stayed associated for 35.4 s without any malformed EAPOL. Batch 1 sent one EAPOL-Key frame per association through the AP control port; all eight sends were accepted, the station was still associated at the 10-second check, and association lifetimes were 35.0-35.4 s. This is a clean negative for the tested header/descriptor cases, with a zero-MIC limitation.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "D10 Phase 3 control E-C and Batch 1 on 2026-10-29. The owner approved the control only, then the full Batch 1 sequence (E-01-E-08, one frame per association). The WPA2 AP ran TX10LED-WPA2 with WPA2-PSK/CCMP and wpa_group_rekey=10; the test passphrase is local-only. No EAPOL outside the approved cases was sent.",
+      "sources": [
+        "switchbrew-wlan",
+        "linux-mac80211-mgmt-tx",
+        "switchbrew-23.0.0"
+      ],
+      "evidence": "Control E-C: the console associated at 21:03:34, completed the WPA2 pairwise key handshake, completed group rekeys at 21:03:43, 21:03:53, and 21:04:03, and disconnected with reason 8 at 21:04:10 (35.4 s); no malformed EAPOL was sent. Batch 1: the local helper built a 99-byte EAPOL-Key frame (version 2, type 3, descriptor 2, key info 0x0982, key length 16, replay 1, zero nonce/IV/RSC/key-ID/MIC, key-data length 0) and sent it through NL80211_CMD_CONTROL_PORT_FRAME with ethertype 0x888E. E-01 version 0, E-02 version 255, E-03 descriptor 0, E-04 descriptor 255, E-05 key info 0x0000, E-06 key info 0xffff, E-07 key length 0, E-08 key length 0xffff. The runner logged send_rc=0 and station_after_10s=1 for E-01-E-07; E-08 was sent by the one-shot watcher after a runner timing miss and also showed the station associated at 10 s. Lifetimes: E-01 35.3 s, E-02 35.3 s, E-03 35.2 s, E-04 35.4 s, E-05 35.2 s, E-06 35.0 s, E-07 35.2 s, E-08 35.4 s. The console reported 2110-3128 every time; no crash, hang, or new error code occurred. The AP, DHCP/DNS server, and capture were stopped, the test address was removed, and the adapter was restored to managed mode.",
+      "limitations": "One console, one adapter, one driver, and channel 1 only. The hand-built EAPOL-Key frames carried a zero MIC, so the console may discard them before parsing the deeper key-data fields; the header/descriptor fields are the tested surface. The control used hostapd's own group rekey, not a hand-built pairwise rekey. The console may ignore unauthenticated EAPOL frames, so the batch does not prove the malformed fields reached the parser. The console's automatic Test Connection contributes timing variability. No crash, hang, or reboot occurred. This is a clean negative for the tested cases, not an exploit or a memory-safety proof.",
+      "last_reviewed": "2026-10-29"
     }
   ]
 }

@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-wifi-phase3-batch1",
+  "observed_at": "2026-10-29T21:29:49Z",
+  "observed_at_precision": "approximate",
+  "phase_window": "2026-10-29T21:03:34Z to 2026-10-29T21:29:49Z",
+  "observation_type": "d10-phase3-eapol-control-and-batch1",
+  "operator": "hostapd 2.11 and dnsmasq 2.92 in an OrbStack Ubuntu 26.04.1 arm64 VM; local NL80211_CMD_CONTROL_PORT_FRAME helper; the console owner reconnected for the control and for each EAPOL case",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not enumerated during this test; the firmware value is the owner's report.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "d10-phase3-eapol",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; derived from the adapter MAC>",
+    "ap_ssid": "TX10LED-WPA2",
+    "ap_security": "WPA2-PSK, AES/CCMP",
+    "channel": 1,
+    "freq_mhz": 2412,
+    "wpa_group_rekey_seconds": 10
+  },
+  "control": {
+    "id": "E-C",
+    "association_utc": "2026-10-29T21:03:34Z",
+    "handshake": "WPA2 pairwise key handshake completed (RSN)",
+    "group_rekeys_completed": 3,
+    "group_rekey_times_utc": [
+      "2026-10-29T21:03:43Z",
+      "2026-10-29T21:03:53Z",
+      "2026-10-29T21:04:03Z"
+    ],
+    "disconnect_utc": "2026-10-29T21:04:10Z",
+    "association_lifetime_seconds": 35.4,
+    "malformed_eapol_sent": false,
+    "result": "control passed; the console processed the hostapd group rekeys and stayed associated"
+  },
+  "batch": {
+    "phase": "3",
+    "batch": "1",
+    "cases_approved": 8,
+    "frames_per_case": 1,
+    "total_frames": 8,
+    "eapol_frame": {
+      "type": "EAPOL-Key",
+      "eapol_type": 3,
+      "descriptor_type": 2,
+      "base_key_info": "0x0982",
+      "key_length": 16,
+      "replay_counter": 1,
+      "nonce": "32 zero bytes",
+      "iv": "16 zero bytes",
+      "rsc": "8 zero bytes",
+      "key_id": "8 zero bytes",
+      "mic": "16 zero bytes",
+      "key_data_length": 0,
+      "frame_length": 99
+    },
+    "send_path": "NL80211_CMD_CONTROL_PORT_FRAME with control-port ethertype 0x888E",
+    "cases": [
+      {"id": "E-01", "malformed": "EAPOL version 0", "association_utc": "2026-10-29T21:09:24Z", "association_lifetime_seconds": 35.3, "result": "sent; no observable fault"},
+      {"id": "E-02", "malformed": "EAPOL version 255", "association_utc": "2026-10-29T21:10:29Z", "association_lifetime_seconds": 35.3, "result": "sent; no observable fault"},
+      {"id": "E-03", "malformed": "Descriptor type 0", "association_utc": "2026-10-29T21:12:42Z", "association_lifetime_seconds": 35.2, "result": "sent; no observable fault"},
+      {"id": "E-04", "malformed": "Descriptor type 255", "association_utc": "2026-10-29T21:14:14Z", "association_lifetime_seconds": 35.4, "result": "sent; no observable fault"},
+      {"id": "E-05", "malformed": "Key info 0x0000", "association_utc": "2026-10-29T21:15:23Z", "association_lifetime_seconds": 35.2, "result": "sent; no observable fault"},
+      {"id": "E-06", "malformed": "Key info 0xffff", "association_utc": "2026-10-29T21:17:15Z", "association_lifetime_seconds": 35.0, "result": "sent; no observable fault"},
+      {"id": "E-07", "malformed": "Key length 0", "association_utc": "2026-10-29T21:19:42Z", "association_lifetime_seconds": 35.2, "result": "sent; no observable fault"},
+      {"id": "E-08", "malformed": "Key length 0xffff", "association_utc": "2026-10-29T21:29:13Z", "association_lifetime_seconds": 35.4, "result": "sent; no observable fault"}
+    ],
+    "send_errors": 0,
+    "station_after_10_seconds": "all eight cases: associated",
+    "console_error": "2110-3128 at the connect-to-internet step on every automatic Test Connection",
+    "crash_reboot_hang": false,
+    "new_error_code": false,
+    "network_settings": "The two test networks remain saved on the console; no other console setting was changed. The WPA2 test passphrase was changed locally to TX10LED1 and is not published."
+  },
+  "capture": {
+    "hostapd": "timestamped debug log; association, handshake, group-rekey, and disassociation times come from hostapd",
+    "pcap": "local-only AP-interface capture of DHCP, DNS, and TCP traffic",
+    "eapol": "the one-frame cases were sent through the AP control port; the console's EAPOL processing is inferred from association state and the control group-rekey behavior",
+    "management_frames": "not applicable; the AP was WPA2 and hostapd handled the handshake"
+  },
+  "interpretation": "The control passed: the console completed the WPA2 pairwise handshake, processed three hostapd group rekeys, and stayed associated for 35.4 seconds, so the console's EAPOL-Key path is reachable and responsive. Batch 1 sent one EAPOL-Key frame per association with E-01-E-08 malformed header/descriptor fields. All eight control-port sends were accepted, the station was still associated 10 seconds after every frame, and the association lifetimes were 35.0-35.4 seconds - indistinguishable from the control. No crash, reboot, hang, or new console error occurred. This is a clean negative for the tested header/descriptor cases, not proof that the deeper key-data parser was reached; the frames carried a zero MIC, which may cause the console to discard them before deeper parsing. H-011 remains UNVERIFIED; Batch 2 (E-09-E-14) was not run.",
+  "authorization": "The owner approved the Phase 3 control E-C only, then the full Batch 1 sequence (E-01-E-08, one frame per association, eight frames total). The owner reconnected the console for the control and each case. No EAPOL frame outside the approved cases was sent.",
+  "limitations": [
+    "One console, one adapter, one driver, and channel 1 only.",
+    "The hand-built EAPOL-Key frames carried a zero MIC; the console may discard them before parsing the deeper key-data fields.",
+    "The control used hostapd's own group rekey, not a hand-built pairwise rekey.",
+    "The console automatically runs Test Connection on each association and fails at the internet step with 2110-3128 because the AP has no NAT; this timing is part of the observed behavior.",
+    "The console may ignore duplicate or unauthenticated EAPOL frames, so the batch does not prove the malformed fields reached the parser.",
+    "The two test networks remain saved on the console until the owner removes them.",
+    "No crash, hang, or reboot occurred; this is not an exploit or a memory-safety proof."
+  ],
+  "redactions": [
+    "Console and adapter MAC addresses redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "WPA2 test passphrase omitted."
+  ]
+}
