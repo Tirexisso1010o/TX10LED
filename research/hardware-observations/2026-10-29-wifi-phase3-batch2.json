@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-wifi-phase3-batch2",
+  "observed_at": "2026-10-29T22:24:56Z",
+  "observed_at_precision": "approximate",
+  "phase_window": "2026-10-29T22:19:14Z to 2026-10-29T22:24:56Z",
+  "observation_type": "d10-phase3-batch2-eapol-key-data",
+  "operator": "hostapd 2.11 and dnsmasq 2.92 in an OrbStack Ubuntu 26.04.1 arm64 VM; local NL80211_CMD_CONTROL_PORT_FRAME helper; the console owner reconnected for each EAPOL case",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not enumerated during this test; the firmware value is the owner's report.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "d10-phase3-eapol",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; derived from the adapter MAC>",
+    "ap_ssid": "TX10LED-WPA2",
+    "ap_security": "WPA2-PSK, AES/CCMP",
+    "channel": 1,
+    "freq_mhz": 2412,
+    "wpa_group_rekey": "disabled for this batch"
+  },
+  "batch": {
+    "phase": "3",
+    "batch": "2",
+    "cases_approved": 6,
+    "frames_per_case": 1,
+    "total_frames": 6,
+    "eapol_frame": {
+      "type": "EAPOL-Key",
+      "eapol_type": 3,
+      "descriptor_type": 2,
+      "base_key_info": "0x0982 (E-12/E-13/E-14) or 0x0182 (E-09/E-10/E-11)",
+      "key_length": 16,
+      "replay_counter": "1 (E-12: all 0xff)",
+      "nonce": "0xAA x 32 (E-13: all zero)",
+      "iv": "16 zero bytes",
+      "rsc": "8 zero bytes",
+      "key_id": "8 zero bytes",
+      "mic": "0xAA x 16 (E-14: all zero)",
+      "frame_length": "99-111 bytes depending on key data"
+    },
+    "send_path": "NL80211_CMD_CONTROL_PORT_FRAME with control-port ethertype 0x888E",
+    "cases": [
+      {"id": "E-09", "malformed": "Key data length 0xffff with only 2 bytes present", "frame_length": 101, "association_utc": "2026-10-29T22:19:14Z", "association_lifetime_seconds": 35.2, "result": "sent; no observable fault"},
+      {"id": "E-10", "malformed": "Key data RSN IE length 0", "frame_length": 101, "association_utc": "2026-10-29T22:20:10Z", "association_lifetime_seconds": 35.1, "result": "sent; no observable fault"},
+      {"id": "E-11", "malformed": "Key data RSN IE length 255, truncated", "frame_length": 111, "association_utc": "2026-10-29T22:21:08Z", "association_lifetime_seconds": 35.5, "result": "sent; no observable fault"},
+      {"id": "E-12", "malformed": "Replay counter all 0xff", "frame_length": 99, "association_utc": "2026-10-29T22:22:06Z", "association_lifetime_seconds": 35.3, "result": "sent; no observable fault"},
+      {"id": "E-13", "malformed": "Nonce all zero", "frame_length": 99, "association_utc": "2026-10-29T22:23:01Z", "association_lifetime_seconds": 35.2, "result": "sent; no observable fault"},
+      {"id": "E-14", "malformed": "MIC all zero", "frame_length": 99, "association_utc": "2026-10-29T22:24:21Z", "association_lifetime_seconds": 35.2, "result": "sent; no observable fault"}
+    ],
+    "send_errors": 0,
+    "station_after_10_seconds": "all six cases: associated",
+    "console_error": "2110-3128 at the connect-to-internet step on every automatic Test Connection",
+    "crash_reboot_hang": false,
+    "new_error_code": false,
+    "runner_note": "The first Batch 2 runner timed out before the console connected; no frames were sent. The second runner completed all six cases.",
+    "network_settings": "The two test networks remain saved on the console; no other console setting was changed. The WPA2 test passphrase is local-only."
+  },
+  "capture": {
+    "hostapd": "timestamped debug log; association and disassociation times come from hostapd",
+    "pcap": "local-only AP-interface capture of DHCP, DNS, and TCP traffic",
+    "eapol": "the one-frame cases were sent through the AP control port; the console's EAPOL processing is inferred from association state and the hostapd logs",
+    "management_frames": "not applicable; the AP was WPA2 and hostapd handled the handshake"
+  },
+  "interpretation": "Batch 2 sent one EAPOL-Key frame per association with E-09-E-14 malformed key-data, replay, nonce, and MIC fields. All six control-port sends were accepted, the station was still associated 10 seconds after every frame, and association lifetimes were 35.1-35.5 seconds - indistinguishable from the control. No crash, reboot, hang, or new console error occurred. This is a clean negative for the tested key-data/replay/nonce/MIC cases, not proof that the deeper parser was reached: the frames carried an invalid MIC (0xAA or zero), and the RSN key data was unencrypted, so the console may discard them before deeper parsing. Phase 3 is complete (control E-C, Batch 1, Batch 2); H-011 remains UNVERIFIED. Phase 4 (DHCP/DNS) was not run.",
+  "authorization": "The owner approved the full Batch 2 sequence (E-09-E-14, one frame per association, six frames total) with stop-on-anomaly between cases. The first runner timed out before any association; the second runner completed the sequence. No EAPOL frame outside the approved cases was sent.",
+  "limitations": [
+    "One console, one adapter, one driver, and channel 1 only.",
+    "The hand-built EAPOL-Key frames carried an invalid MIC (0xAA or zero), so the console may discard them before parsing the deeper fields.",
+    "The RSN key data in E-10/E-11 was sent unencrypted (key info 0x0182); a production message 3/4 would encrypt it.",
+    "The console may ignore unauthenticated EAPOL frames, so the batch does not prove the malformed fields reached the parser.",
+    "The console automatically runs Test Connection on each association and fails at the internet step with 2110-3128 because the AP has no NAT; this timing is part of the observed behavior.",
+    "The two test networks remain saved on the console until the owner removes them.",
+    "No crash, hang, or reboot occurred; this is not an exploit or a memory-safety proof."
+  ],
+  "redactions": [
+    "Console and adapter MAC addresses redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "WPA2 test passphrase omitted."
+  ]
+}
