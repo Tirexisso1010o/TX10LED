@@ -1497,6 +1497,21 @@
       "evidence": "The local helper built EAPOL-Key frames with key info 0x0182 for E-09/E-10/E-11 and 0x0982 for E-12/E-13/E-14, key length 16, replay 1, and an invalid 0xAA MIC (E-14 used zero). E-09 key data length 0xffff with only 2 bytes present (101-byte frame); E-10 RSN IE length 0 (101); E-11 RSN IE length 255, truncated (111); E-12 replay counter all 0xff (99); E-13 nonce all zero (99); E-14 MIC all zero (99). The runner logged send_rc=0 and station_after_10s=1 for all six cases. Lifetimes: E-09 35.2 s, E-10 35.1 s, E-11 35.5 s, E-12 35.3 s, E-13 35.2 s, E-14 35.2 s. The console reported 2110-3128 every time; no crash, hang, or new error code occurred. The first runner timed out before any association and sent no frames; the second runner completed the sequence. The AP, DHCP/DNS server, and capture were stopped, the test address was removed, and the adapter was restored to managed mode.",
       "limitations": "One console, one adapter, one driver, and channel 1 only. The hand-built frames carried an invalid MIC (0xAA or zero), and the RSN key data was unencrypted (key info 0x0182), so the console may discard them before deeper parsing. The console may ignore unauthenticated EAPOL frames, so the batch does not prove the malformed fields reached the parser. One runner timed out before the console connected; the completed run is the recorded result. No crash, hang, or reboot occurred. This is a clean negative for the tested cases, not an exploit or a memory-safety proof.",
       "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-110",
+      "claim": "The D10 Phase 4 control passed the DHCP and DNS stages: the console obtained a valid lease, resolved ctest.cdn.nintendo.net to 2.19.126.212, and attempted TCP to 2.19.126.212:80, failing only at the internet step with 2110-3129 because there was no NAT. D-01 then sent one DHCPOFFER with the subnet-mask option length 0; the console rejected the offer, sent repeated DHCPREQUESTs, and reported 2110-2963. It stayed responsive and disconnected normally after about 30 seconds; no crash, reboot, hang, or new error occurred. The remaining DHCP/DNS cases were not completed because the adapter's AP data path became intermittent.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "D10 Phase 4 control C and D-01 on 2026-10-29. The owner approved the control, then D-01 only. The full D-02-D-08 sequence was approved later, but the adapter data path failed before D-02 could be tested; no D-02-D-08 frames were sent, and no malformed DNS case was sent.",
+      "sources": [
+        "switchbrew-sockets",
+        "switchbrew-ssl",
+        "switchbrew-23.0.0"
+      ],
+      "evidence": "The local AF_PACKET responder bound UDP 53/67 to suppress ICMP port-unreachable and sent DHCP/DNS frames with Scapy. Control C: DHCPOFFER/DHCPACK for 192.168.77.94, DNS A 2.19.126.212 for ctest.cdn.nintendo.net, TCP SYN from 192.168.77.94 to 2.19.126.212:80, final console error 2110-3129. D-01: DHCPOFFER option 1 length 0 (276-byte frame); the console sent repeated DHCPREQUEST frames and the responder intentionally withheld a valid ACK; final console error 2110-2963; association lifetime 30.1 s; no crash or new error. A first D-01 attempt was inconclusive: no DHCP frame reached the responder or pcap, the console showed 2110-1100, and the AP data path had wedged. A driver reload produced the valid retry. The D-02 runner could not bring the AP/hostapd path up reliably; the ldn2 interface/hostapd cleanup later hung.",
+      "limitations": "One console, one adapter, one driver, and channel 1 only. The rtw88_8822bu AP data path is intermittent and required a driver reload between control and D-01; D-02 could not be started reliably. The local responder is not a production DHCP/DNS server. D-01 was observed once after a reload; the first attempt was inconclusive because no DHCP frame reached the host. No malformed DNS case was sent. The two test networks remain saved on the console. No crash, hang, or reboot occurred; this is not an exploit or a memory-safety proof.",
+      "last_reviewed": "2026-10-29"
     }
   ]
 }

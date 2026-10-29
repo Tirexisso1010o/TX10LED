@@ -519,7 +519,8 @@
         "E-090",
         "E-094",
         "E-104",
-        "E-105"
+        "E-105",
+        "E-110"
       ],
       "sources": [
         "switchbrew-sockets",
@@ -530,7 +531,7 @@
       "last_reviewed": "2026-10-29",
       "hardware": "HEG-001 (Mariko), macOS 26.3 host with an OrbStack Ubuntu 26.04 arm64 VM and a TP-Link Archer T3U Plus (2357:0138, rtw88_8822bu) passed through to the VM",
       "firmware": "23.0.1",
-      "results": "Phase 1 baseline completed on 2026-10-29 (E-105): the console obtained DHCP lease 192.168.77.94 and queried ctest.cdn.nintendo.net on both the open and WPA2 APs. No crafted DHCP, DNS, IPv6, or TLS responses have been sent.",
+      "results": "Phase 1 baseline completed on 2026-10-29 (E-105): the console obtained DHCP lease 192.168.77.94 and queried ctest.cdn.nintendo.net on both the open and WPA2 APs. Phase 4 control C and D-01 completed on 2026-10-29 (E-110): the valid control passed the DHCP/DNS stages and failed at the internet step with 2110-3129; D-01 (DHCPOFFER option 1 length 0) caused 2110-2963 with no crash and a normal 30.1-second association lifetime. The first D-01 attempt was inconclusive because the AP data path wedged, and D-02-D-08 plus the DNS cases were not completed because the adapter data path remained intermittent. H-012 remains UNVERIFIED.",
       "uncertainties": "Whether the console uses IPv6 on the test AP; whether the TLS connectivity-test flow reaches a local listener; whether malformed data reaches the parser before certificate or protocol validation; whether the 23.0.0 bsdsocket fix covers the tested AddrInfo paths; whether the ssl sysmodule uses a patched NSS build.",
       "resolution": "open"
     }

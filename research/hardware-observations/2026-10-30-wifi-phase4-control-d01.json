@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-30-wifi-phase4-control-d01",
+  "observed_at": "2026-10-29T23:12:00Z",
+  "observed_at_precision": "approximate",
+  "phase_window": "2026-10-29T23:06:00Z to 2026-10-29T23:13:00Z",
+  "observation_type": "d10-phase4-control-and-dhcp-d01",
+  "operator": "hostapd 2.11 and a local Scapy/AF_PACKET DHCP-DNS responder in an OrbStack Ubuntu 26.04.1 arm64 VM; console owner reconnected the console for the control and D-01",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not enumerated during this test; the firmware value is the owner's report.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "d10-phase4-dhcp-dns",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5 (fresh ldn2 VM after a USB-controller failure)",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; derived from the adapter MAC>",
+    "ap_ssid": "TX10LED-NET",
+    "ap_security": "open",
+    "channel": 1,
+    "freq_mhz": 2412
+  },
+  "control": {
+    "id": "C",
+    "result": "passed network step",
+    "dhcp": "valid offer and ACK delivered by the local responder",
+    "dns": "valid A response for ctest.cdn.nintendo.net -> 2.19.126.212",
+    "transport_attempt": "TCP SYN from 192.168.77.94 to 2.19.126.212:80; no responder/NAT",
+    "test_connection_error": "2110-3129 at the connect-to-internet step",
+    "crash_reboot_hang": false
+  },
+  "case": {
+    "id": "D-01",
+    "malformed": "DHCPOFFER option 1 (subnet mask) length 0",
+    "frames": 1,
+    "result": "console rejected the DHCP exchange",
+    "dhcp_offer_length": 276,
+    "console_requests": "the console sent repeated DHCPREQUEST frames after the malformed OFFER; the responder intentionally did not send a valid ACK",
+    "test_connection_error": "2110-2963 (unable to obtain IP address)",
+    "association_lifetime_seconds": 30.1,
+    "crash_reboot_hang": false,
+    "new_error_code": false,
+    "note": "A first D-01 attempt was inconclusive: no DHCP frame reached the responder or pcap, the console showed 2110-1100, and the AP data path had wedged. After a driver reload, the retry produced the valid exchange above."
+  },
+  "blocker": {
+    "summary": "The rtw88_8822bu AP data path becomes unreliable after a test cycle; the first D-01 attempt and the D-02 attempt produced no DHCP frames/hostapd AP-ENABLED state until the driver was reloaded. The ldn2 interface/hostapd path later hung during iw/hostapd cleanup.",
+    "remaining_cases": "D-02-D-08 and N-01-N-10 were not completed.",
+    "malformed_dns_sent": false,
+    "console_state": "The two test networks remain saved; no other console setting was changed."
+  },
+  "interpretation": "The control passed the DHCP and DNS stages: the console obtained a valid lease, resolved ctest.cdn.nintendo.net, and attempted TCP to the resolved Akamai address, failing only at the internet step with 2110-3129 because there was no NAT. D-01 then sent a single DHCPOFFER with the subnet-mask option length 0; the console rejected the offer, sent repeated DHCPREQUESTs, and reported 2110-2963. It stayed responsive and disconnected normally after about 30 seconds. No crash, reboot, hang, or new error code occurred. This is a clean negative for D-01. The remaining DHCP/DNS cases are blocked by the adapter's intermittent AP data path, not by a console result; no malformed DNS was sent. H-012 remains UNVERIFIED.",
+  "authorization": "The owner approved the Phase 4 control C, then D-01 only. The full D-02-D-08 sequence was approved later, but the adapter data path failed before D-02 could be tested; no D-02-D-08 frames were sent.",
+  "limitations": [
+    "One console, one adapter, one driver, and channel 1 only.",
+    "The rtw88_8822bu AP data path is intermittent and required a driver reload between the control and D-01; D-02 could not be started reliably.",
+    "The local DHCP/DNS responder uses raw AF_PACKET and Scapy send; it is not a production DHCP server.",
+    "D-01 was observed once after a reload; the first attempt was inconclusive because no DHCP frame reached the host.",
+    "No malformed DNS case was sent; the DNS surface is untested beyond the valid control.",
+    "The two test networks remain saved on the console until the owner removes them.",
+    "No crash, hang, or reboot occurred; this is not an exploit or a memory-safety proof."
+  ],
+  "redactions": [
+    "Console and adapter MAC addresses redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "WPA2 test passphrase omitted."
+  ]
+}
