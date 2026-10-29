@@ -1,6 +1,6 @@
 # Firmware Analysis
 
-> **Status: owner dump and keys present locally; `ldn` and `splay` identified, `miiEdit` decrypted for identification, content extraction blocked by key coverage.** `Firmware/prod.keys.txt` and `Firmware/Firmware.23.0.1` are owner-supplied artifacts from the owner's own modded Switch. Both are ignored by git and must never be committed, published, or shared. The dump is NCA-only and the key file stops at key generation 0x14 (20.0.0), so the 23.0.1 program/data NCAs that use the newer generation cannot be decrypted. The meta NCAs use generation 0x00 and are readable; the `ldn` and `splay` CNMTs were parsed. The only program NCA at key generation `0x15` (`miiEdit`) decrypted with `key_area_key_application_14` and verified its section-0 master hash; it is a Mii editor applet, not a remote-input surface. No `hactool` or `nxdump` is installed. This document defines the read-only handling and analysis plan; it does not authorize obtaining firmware or keys from anyone else.
+> **Status: owner dump and keys present locally; `ldn` and `splay` identified, `miiEdit` decrypted for identification, content extraction blocked by key coverage.** `Firmware/prod.keys.txt` and `Firmware/Firmware.23.0.1` are owner-supplied artifacts from a modded 23.0.1 Switch that the owner no longer has; the dump and keys remain valid local artifacts, but the source console is not available for further dumps. Both are ignored by git and must never be committed, published, or shared. The dump is NCA-only and the key file stops at key generation 0x14 (20.0.0), so the 23.0.1 program/data NCAs that use the newer generation cannot be decrypted. The meta NCAs use generation 0x00 and are readable; the `ldn` and `splay` CNMTs were parsed. The only program NCA at key generation `0x15` (`miiEdit`) decrypted with `key_area_key_application_14` and verified its section-0 master hash; it is a Mii editor applet, not a remote-input surface. No `hactool` or `nxdump` is installed. This document defines the read-only handling and analysis plan; it does not authorize obtaining firmware or keys from anyone else.
 
 ## What is present
 
@@ -35,7 +35,7 @@ The `ldn` **meta** NCA decrypts with `key_area_key_application_00`, so the CNMT 
 
 The dump contains no `package1`, `package2`, KIP, or other non-NCA file. Package1 lives in the BOOT0 partition, so this dump cannot support the warmboot direction. The sanitized record is [`research/hardware-observations/2026-10-29-firmware-inventory.json`](../research/hardware-observations/2026-10-29-firmware-inventory.json).
 
-To unblock `ldn` and `splay` extraction, the owner would need a key set that includes `key_area_key_application_15` and `key_area_key_application_16` (or `master_key_15`/`master_key_16` plus the generation sources). To unblock package1 analysis, the owner would need a BOOT0/package1 dump from a console they own. Do not download either.
+To unblock `ldn` and `splay` extraction, the owner would need a key set that includes `key_area_key_application_15` and `key_area_key_application_16` (or `master_key_15`/`master_key_16` plus the generation sources). To unblock package1 analysis, the owner would need a 23.0.1 BOOT0/package1 dump from a console they own or control. The original modded 23.0.1 source console is no longer available, and the remaining modded console runs 22.0.0, so a matching dump is not currently obtainable. Do not download either.
 
 ## Second read-only result (2026-10-29): program key coverage and `splay`
 
@@ -93,7 +93,7 @@ This downloads **tool source only**, not firmware or keys. Building it is allowe
 
 1. **Switch 1 firmware 23.0.1.** The owner's dump is folder-named 23.0.1 and is the right platform. A Switch 2 dump would be a different platform and is not useful for this target.
 2. **`prod.keys` matching the console.** Package1 on Mariko is RSA-signed and AES-encrypted; NCAs and KIPs need keys. The owner's keys decrypt the LDN advertisement but stop at key generation 0x14, so they do not cover the 23.0.1 NCA key generation used by `ldn` and `splay` (`0x17`). A matching key set must include the generation used by the target NCAs; the key-generation-`0x15` `miiEdit` program is the only program that decrypts with the current file.
-3. **A lawful source.** A dump from a console you own that already runs CFW, or a dump you already possess. The owner's artifacts come from their own modded Switch. This project does not use dumps downloaded from the internet, and does not help obtain them.
+3. **A lawful source.** A dump from a console you own that already runs CFW, or a dump you already possess. The owner's 23.0.1 artifacts come from a modded 23.0.1 Switch that is no longer available; the remaining modded console runs 22.0.0 and cannot supply 23.0.1 keys or BOOT0. This project does not use dumps downloaded from the internet, and does not help obtain them.
 
 ## Handling rules
 
@@ -134,7 +134,7 @@ This downloads **tool source only**, not firmware or keys. Building it is allowe
 
 This is the decisive missing stage. Warmboot is package1 section 0.
 
-- **Blocked:** the owner's dump is NCA-only and contains no package1. Package1 is stored in BOOT0, so a separate BOOT0/package1 image from a console the owner owns is required.
+- **Blocked:** the owner's dump is NCA-only and contains no package1. Package1 is stored in BOOT0, so a separate 23.0.1 BOOT0/package1 image is required. The modded 23.0.1 source console is no longer available, and the remaining modded console is on 22.0.0; a matching image is not currently obtainable.
 - Once available, decrypt and extract package1 (`-t pk11`).
 - Split section 0 (warmboot), section 1 (NX bootloader), section 2 (Secure Monitor).
 - Disassemble the warmboot and TSEC payloads with Capstone.

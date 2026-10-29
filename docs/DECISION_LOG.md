@@ -465,3 +465,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Treat the absence of a public `splay` advisory as proof that `splay` is safe (rejected: absence of evidence is not evidence of safety, and the 23.0.1 security-flaw field is an unfilled placeholder); treat the `miiEdit` decryption as a way into `splay` (rejected: different title and key generation); spoof a GameShare host to test the parser (rejected: no Switch 2, the protocol is not public, host `AdvertiseData` is ECC-verified, and active testing would need new approval); download a key set covering generation `0x17` (rejected: prohibited).
 
 **Consequences:** `E-102`, `E-103`, `C-019`, `EP-011`, `L-006`, `docs/ENTRY-POINTS.md`, `docs/FIRMWARE_ANALYSIS.md`, `docs/RESEARCH-PLAN.md`, `research/CHECKPOINT.md`, `README.md`, and `research/hardware-observations/2026-10-29-firmware-inventory.json` record the result. `D5` remains blocked on a Switch 2 host and on `key_area_key_application_16`; the target console remains unmodified and no console state changed.
+
+## 2026-10-29 — The modded 23.0.1 source console is no longer available
+
+**Decision:** Record the hardware constraint and keep `D3` and `D5` blocked for the 23.0.1 target. Do not treat a 22.0.0 dump as a substitute for 23.0.1 package1 or key generation `0x17`. Do not download 23.0.1 keys or BOOT0.
+
+**Reason:** The owner no longer has the modded 23.0.1 console that produced `Firmware/Firmware.23.0.1` and `Firmware/prod.keys.txt`. The remaining hardware is a modded 22.0.0 Switch and the unmodded 23.0.1 target. The existing 23.0.1 dump is NCA-only and its key file stops at generation `0x14`; the 22.0.0 console's keys cover at most generation `0x16` and cannot decrypt the 23.0.1 `ldn`/`splay` program NCAs at `0x17`. A 22.0.0 BOOT0/package1 dump would describe the 22.0.0 boot chain, not the target's 23.0.1 boot chain.
+
+**Alternatives considered:** Update the modded 22.0.0 console to 23.0.1 and dump keys/BOOT0 (not rejected on technical grounds, but it is an irreversible console write that needs explicit approval, a compatible modchip/CFW, and a key dumper that supports 23.0.1; deferred); use the 22.0.0 console for comparative `ldn`/`splay` analysis (possible, but it cannot confirm the target's 23.0.1 code, and the 22.0.0 `ldn` predates the 23.0.0 fix); download 23.0.1 keys or BOOT0 (rejected: prohibited and untrustworthy).
+
+**Consequences:** `research/CHECKPOINT.md`, `docs/FIRMWARE_ANALYSIS.md`, `docs/RESEARCH-PLAN.md`, and `research/known-limitations.md` record the constraint. `D3` remains blocked for 23.0.1; `D5` remains blocked on a Switch 2 host and key generation `0x17`. The target console remains unmodified and no console state changed.
