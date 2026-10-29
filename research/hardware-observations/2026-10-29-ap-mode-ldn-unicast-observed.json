@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ap-mode-ldn-unicast-observed",
+  "observed_at": "2026-10-29T02:01:00+01:00",
+  "observed_at_precision": "approximate; hostapd log mtime",
+  "observation_type": "console-observed-ap-mode-ldn-join-attempt",
+  "operator": "owner at the console; hostapd 2.11 and Firmware/ap_ldn_run.sh in an OrbStack Ubuntu VM",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not instrumented for this test. The owner was present, had the console on the Dragon Ball FighterZ local-wireless search screen, and observed the room and the error code.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "adapter-tx-test",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; AP mode during the test>"
+  },
+  "commands": [
+    {
+      "command": "sudo bash Firmware/ap_ldn_run.sh 60",
+      "exit_code": null,
+      "result": "hostapd 2.11 reached AP-ENABLED with the test configuration; Firmware/ap_ldn_unicast_test.py ran the real LDN unicast advertisement and null-SSID beacon path for 60 seconds. The wrapper's final exit status and the advertisement count from this specific run were not preserved in the sanitized record."
+    }
+  ],
+  "hostapd_log": {
+    "path": "/tmp/hostapd-apldn.log in the OrbStack VM (local-only; not committed)",
+    "summary": "rfkill: Cannot open RFKILL control device; interface state UNINITIALIZED->ENABLED; AP-ENABLED; interface state ENABLED->DISABLED; AP-DISABLED; CTRL-EVENT-TERMINATING; nl80211 deinit.",
+    "authentication_events": 0,
+    "association_events": 0,
+    "station_events": 0,
+    "note": "The log contains no 'IEEE 802.11: authenticated', 'AP-STA-CONNECTED', or other station event. Default hostapd verbosity would log these events if they occurred."
+  },
+  "console_observation": {
+    "room_name": "TX10LED",
+    "room_appeared": true,
+    "action": "selected the room",
+    "error_code": "2203-0065",
+    "error_timing": "immediate on selection",
+    "search_screen_after_error": "closed",
+    "console_state_after_error": "returned to the game normally; the console remained responsive",
+    "observer": "owner"
+  },
+  "test_configuration": {
+    "hostapd_ssid": "TX10LED-TEST",
+    "hostapd_security": "open, wpa=0",
+    "room_ssid_source": "the captured LDN network ID; the LDN client joins the 32-character hexadecimal WLAN SSID, not the 16 raw bytes",
+    "room_ssid_used_as_wlan_ssid": false,
+    "rsn_ie_sent": false,
+    "advertisement": "the real captured AES-CTR LDN advertisement from the room, sent as a unicast vendor action with the AP BSSID",
+    "beacon": "null-SSID LDN beacon with the AP BSSID"
+  },
+  "interpretation": "The console received the advertisement well enough to display the room, so the AP-BSSID unicast advertisement reached the LDN scan path. The join then failed immediately with 2203-0065, and hostapd recorded no authentication or association event. The hostapd WLAN SSID was TX10LED-TEST with open security, while the LDN client joins the room's 32-character hexadecimal SSID and expects the LDN RSN IE. The immediate failure is therefore consistent with the console not finding the expected BSSID/SSID or rejecting the AP parameters before association, not with a fault in the LDN parser. The console stayed responsive and returned to the game normally. This is a host-configuration mismatch, not a vulnerability.",
+  "limitations": [
+    "The console reaction is owner-reported and was not instrumented; no pcap or independent receiver captured the join attempt.",
+    "The hostapd log is not a packet capture. The absence of authentication or association events is consistent with the console rejecting the AP before association, but it does not prove which frame the console sent or omitted.",
+    "The hostapd SSID and security did not match the room: TX10LED-TEST/open instead of the room's 32-character hexadecimal SSID with the LDN RSN IE.",
+    "The exact advertisement count and wrapper exit status from this run were not preserved.",
+    "One adapter, driver, kernel, and channel.",
+    "The host adapter BSSID, interface name, console station MAC, room SSID, application data, and keys are redacted."
+  ],
+  "redactions": [
+    "Host adapter BSSID redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "Console station MAC redacted; it is stored only in the local ignored file Firmware/console-mac.local.txt.",
+    "Room SSID and application data redacted; the room parameters are stored locally in Firmware/ldn-room.json."
+  ]
+}

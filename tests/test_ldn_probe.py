@@ -9,6 +9,7 @@ from pathlib import Path
 from scripts.ldn_probe import (
     Advertisement,
     extract_advertisements,
+    ieee80211_body,
     parse_authentication,
     parse_ldn_action,
     unique_advertisements,
@@ -207,6 +208,14 @@ class PcapTests(unittest.TestCase):
             path.write_bytes(bytes(data))
             found = extract_advertisements(path)
         self.assertEqual(found, [])
+
+    def test_radiotap_fcs_is_removed(self) -> None:
+        body = advertisement_body()
+        # Radiotap: version 0, pad 0, length 9, present flags = Flags.
+        radiotap = bytes([0, 0, 9, 0]) + struct.pack("<I", 2) + bytes([0x10])
+        frame = struct.pack("<H", 0x00D0) + b"\x00" * 22 + body
+        packet = radiotap + frame + b"\xde\xad\xbe\xef"
+        self.assertEqual(ieee80211_body(packet, 127), body)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-26",
+  "last_reviewed": "2026-10-29",
   "target": {
     "model": "HEG-001",
     "family": "Nintendo Switch OLED",
@@ -20,11 +20,11 @@
     "notes": "The owner manually confirmed the model, firmware, serial prefix, and no modification history on 2026-10-26. PTP GetDeviceInfo on the same date observed firmware 23.0.1 and serial prefix XTJ*** with 10 operations and no session. The DeviceInfo model string is generic ('Nintendo Switch'), so the HEG-001 model number and no-modification history remain owner-reported. PTP does not prove OLED-versus-LCD hardware, integrity, or exploitability. Do not update the firmware to verify it."
   },
   "conclusion": {
-    "claim": "A publicly documented, reproducible software-only path to Atmosphère exists for an unmodified Switch OLED on firmware 23.0.1.",
+    "claim": "A publicly documented, reproducible software-only path to Atmosph\u00e8re exists for an unmodified Switch OLED on firmware 23.0.1.",
     "claim_status": "DISPROVEN",
     "software_only_path_documented": false,
     "scope": "Reviewed public documentation as of 2026-10-26.",
-    "summary": "No publicly documented, reproducible software-only path to Atmosphère was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosphère 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. GameShare (the splay applet) is recorded as a newly reviewed receiver-side surface: a documented remote-input path with no public vulnerability and an applet-level capability ceiling.",
+    "summary": "No publicly documented, reproducible software-only path to Atmosph\u00e8re was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosph\u00e8re 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. GameShare (the splay applet) is recorded as a newly reviewed receiver-side surface: a documented remote-input path with no public vulnerability and an applet-level capability ceiling.",
     "undisclosed_exploit_status": "UNKNOWN",
     "evidence": [
       "E-007",
@@ -52,7 +52,7 @@
   "rows": [
     {
       "id": "C-001",
-      "component": "Atmosphère",
+      "component": "Atmosph\u00e8re",
       "version": "1.12.1",
       "dimension": "firmware",
       "status": "VERIFIED",
@@ -87,11 +87,11 @@
       "evidence": [
         "E-003"
       ],
-      "notes": "The OLED uses Mariko/Tegra X1+ hardware, not the Erista hardware targeted by Fusée Gelée."
+      "notes": "The OLED uses Mariko/Tegra X1+ hardware, not the Erista hardware targeted by Fus\u00e9e Gel\u00e9e."
     },
     {
       "id": "C-004",
-      "component": "Fusée Gelée (CVE-2018-6242)",
+      "component": "Fus\u00e9e Gel\u00e9e (CVE-2018-6242)",
       "version": "RCM bootROM exploit",
       "dimension": "entry_point",
       "status": "DISPROVEN",
@@ -354,12 +354,12 @@
         "E-048",
         "E-049"
       ],
-      "notes": "A userland claim with no public package, technical detail, or reproduction. Even if accurate, it would not by itself provide kernel, bootROM, CFW, or Atmosphère."
+      "notes": "A userland claim with no public package, technical detail, or reproduction. Even if accurate, it would not by itself provide kernel, bootROM, CFW, or Atmosph\u00e8re."
     },
     {
       "id": "C-023",
       "component": "Warmboot / pre-Horizon code execution on Mariko",
-      "version": "Required for Atmosphère; no public Mariko artifact for modern firmware",
+      "version": "Required for Atmosph\u00e8re; no public Mariko artifact for modern firmware",
       "dimension": "Boot stage",
       "status": "UNKNOWN",
       "applies_to_target": true,
@@ -558,9 +558,30 @@
       "evidence": [
         "E-023",
         "E-035",
-        "E-078"
+        "E-078",
+        "E-080",
+        "E-081",
+        "E-083",
+        "E-084",
+        "E-085",
+        "E-086",
+        "E-087",
+        "E-088",
+        "E-089",
+        "E-090",
+        "E-091",
+        "E-092",
+        "E-093",
+        "E-094",
+        "E-095",
+        "E-096",
+        "E-097",
+        "E-098",
+        "E-099",
+        "E-100"
       ],
-      "notes": "CVE-2026-82079 (an ldn stack overflow) is fixed in 23.0.0 and the target is 23.0.1. The LDN protocol is documented and testable with a Linux host and a compatible adapter. Retail traffic is encrypted and needs prod.keys; the plaintext development-mode path is untested on retail. No 23.0.1-specific ldn bug is known."
+      "notes": "CVE-2026-82079 (an ldn stack overflow) is fixed in 23.0.0 and the target is 23.0.1. On 2026-10-28 the target's Dragon Ball FighterZ LDN advertisement was captured passively: title 0100a250097f0000, scene 0, LDN version 4, AES-CTR, channel 1. The plaintext NetworkId header is readable without keys. Phase 2 was approved once and executed: the plaintext host started with --compat-no-active-ack and advertised for 30 seconds, but the console showed no room, the host logged no JOIN, and dmesg reported 'failed to get tx report from firmware'. Host transmission was unconfirmed, so the run was inconclusive rather than a clean rejection of security mode 3. The owner then supplied prod.keys and a 23.0.1 NCA-only dump; the keys decrypt the Phase 1 advertisement (security mode 1, challenge enabled, max 2 participants, app version 26). On 2026-10-28/29 a prod-mode host was run for 30 seconds with the captured title/scene/SSID/channel and the local keys. It emitted 373 AES-CTR advertisements; the first frame decrypted to the same fields as the Phase 1 room. The console reported no rooms after a roughly one-second search, the host logged no JOIN, and the captures saw no frames from the console. The same-phy capture may include loopback and the rtw88_8822bu driver logged another TX-report failure, so RF transmission is not independently confirmed. The macOS directed-SSID scan is invalid: it returned FOUND for a random non-existent 16-byte SSID with a nil BSSID (E-086). The next check is a wildcard CoreWLAN scan for the host BSSID or a second monitor-mode receiver. No 23.0.1-specific ldn bug is known. The ldn sysmodule is identified as title 0100000000000018, version 0x5c0004b0 (E-083). Its meta NCA is readable and confirms the program NCA hash, but the program content cannot be decrypted because the owner's key file stops at generation 0x14 while the NCA needs key_area_key_application_16. A second approved prod-mode run repeated the test with the console search triggered after the host was advertising. The host again logged no JOIN, the console again reported no rooms, and dmesg TX-report failures rose from 4 to 5. The wrapper's tcpdump processes failed with 'Permission denied' on the previous run's tcpdump-owned pcaps, so there is no valid run-2 capture. Ten wildcard CoreWLAN scans during the run did not find the host BSSID, but a post-run control scan showed that macOS returned a nil BSSID for every ambient network, so that check is invalid rather than negative (E-088). A second monitor-mode receiver, a phone Wi-Fi analyzer that shows hidden BSSIDs, or the CachyOS PC/mt7921e path is now required. The repeat run is recorded as E-087 and in research/hardware-observations/2026-10-29-ldn-prod-host-run2.json. On 2026-10-29 a third prod-mode run with the fixed wrapper again produced no join and no room; the independent Location Services-enabled CoreWLAN scan did not see the host BSSID, although it saw a hidden ambient BSSID on channel 1. The same-phy captures contained only the host's own frames, and each injected frame appeared as a radiotap pair with txflags=0x0 (E-089). An AP-mode control proved the adapter can transmit: a hostapd beacon on channel 1 was received at -32 dBm (E-090). A monitor-mode control using the ldn package's MonitorAP beaconed a test SSID for 12 seconds but was not seen by the Mac, so monitor-mode injection on rtw88_8822bu does not put frames on the air (E-091). Location Services restored real BSSIDs for the independent scan (E-092). The current monitor-mode host path is blocked; the next path is AP-mode management-frame injection (NL80211_CMD_FRAME on an AP interface), hostapd vendor elements, or a different adapter/driver with working monitor-mode TX. E-093 records the AP-mode source limit: NL80211_CMD_FRAME can send an AP beacon, but a non-public vendor action frame on an AP interface needs a station entry, so a broadcast LDN action frame is rejected. The next AP test must either use a unicast vendor action to a known console station or a different adapter/driver. On 2026-10-29 an approved AP-mode control sent 20 test beacons through NL80211_CMD_FRAME on an AP interface; the Mac saw the injected TX10LED-APINJ beacon at -28 dBm with the adapter BSSID in all 12 scans, alongside the hostapd TX10LED-TEST beacon (E-094). The AP-mode beacon half of management-frame injection therefore works on this adapter. The remaining limit is the vendor action frame: E-093 shows that a non-public action frame on an AP interface needs a station entry, so a broadcast LDN action frame is rejected with -ENOLINK. The next AP test is a unicast vendor action to the console's station MAC, with new explicit approval, or a different adapter/driver. A follow-up approved unicast control added a temporary station entry for the console's MAC and submitted five unicast vendor actions with a non-LDN test OUI through NL80211_CMD_FRAME; all five requests returned without a netlink error and the station entry was removed (E-095). This confirms the kernel-level station-lookup half of the AP path. It does not show that the console received the frame or that its LDN parser reacted; the next AP-mode prod-mode run must use a real LDN vendor action and observe the console, with new approval. On 2026-10-29 a real LDN unicast run sent 568 valid AES-CTR advertisements and 568 null-SSID LDN beacons with the AP BSSID through NL80211_CMD_FRAME; all requests were accepted, the station entry was removed, and monitor mode was restored (E-096). The console was off/away, so the room appearance and parser reaction were not observed; the run is inconclusive. A diagnostic showed that the driver rejects a broadcast-BSSID action frame with EINVAL, while the same frame with the AP BSSID is accepted (E-097), so the AP path cannot reproduce the original broadcast advertisement exactly. A supervised rerun on 2026-10-29 then made the room TX10LED appear on the console; selecting it produced 2203-0065 immediately, the search screen closed, and the console returned to the game normally. hostapd logged only AP-ENABLED and AP-DISABLED, with no authentication, association, or station event (E-098). The console therefore accepts the AP-BSSID advertisement at the scan layer, but the join failed before hostapd saw an association. The hostapd SSID was TX10LED-TEST with open security, not the room's 32-character hexadecimal WLAN SSID and LDN RSN IE, so the next test must correct the WLAN configuration and add a userspace responder for the custom 0x88B7 authentication exchange. A second supervised run on 2026-10-29 used the room's 32-character hexadecimal WLAN SSID and the LDN RSN IE. The console authenticated, associated with AID 1, and was marked authorized, then disassociated itself with reason_code=8 about one second later. No 0x88B7 request was observed; the monitor saw a 28-byte null-data frame and the AP socket saw a 20-byte ethertype 0x0006 frame. The console showed 2203-0066 after a few seconds and a game popup 'unable to join the room' (E-099). The association response included an RSN IE that the ldn MonitorAP does not send, so the next run omits it. A local control showed that the AP control port rejects 0x88B7 with EINVAL, while the raw authorized-station path transmits it protected with KeyID 0 (E-100).",
+      "last_reviewed": "2026-10-29"
     }
   ],
   "usb_modes": [

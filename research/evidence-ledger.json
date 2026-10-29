@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-26",
+  "last_reviewed": "2026-10-29",
   "entries": [
     {
       "id": "E-001",
-      "claim": "Atmosphère 1.12.1 supports firmware 23.0.1.",
+      "claim": "Atmosph\u00e8re 1.12.1 supports firmware 23.0.1.",
       "status": "VERIFIED",
       "confidence": "high",
       "scope": "Firmware compatibility only; not entry-point compatibility.",
@@ -14,7 +14,7 @@
         "nh-guide-updating",
         "atmosphere-issue-2883"
       ],
-      "evidence": "The 1.12.1 release notes add support for 23.0.0 and describe the 23.0.0 changes. The maintained NH Switch Guide compatibility checker lists Atmosphère 1.12.1 as supporting firmware 23.0.1. A community reply in Atmosphère issue #2883 also states that the latest release supports 23.0.1.",
+      "evidence": "The 1.12.1 release notes add support for 23.0.0 and describe the 23.0.0 changes. The maintained NH Switch Guide compatibility checker lists Atmosph\u00e8re 1.12.1 as supporting firmware 23.0.1. A community reply in Atmosph\u00e8re issue #2883 also states that the latest release supports 23.0.1.",
       "limitations": "The release notes explicitly name 23.0.0; 23.0.1 support is established by the maintained guide and issue discussion. Firmware support does not imply that an entry point exists on Mariko.",
       "last_reviewed": "2026-10-26"
     },
@@ -47,7 +47,7 @@
     },
     {
       "id": "E-004",
-      "claim": "CVE-2018-6242 (Fusée Gelée) is a Tegra BootROM Recovery Mode buffer overflow affecting Tegra mobile processors released before 2016.",
+      "claim": "CVE-2018-6242 (Fus\u00e9e Gel\u00e9e) is a Tegra BootROM Recovery Mode buffer overflow affecting Tegra mobile processors released before 2016.",
       "status": "VERIFIED",
       "confidence": "high",
       "scope": "Vulnerability description.",
@@ -88,7 +88,7 @@
     },
     {
       "id": "E-007",
-      "claim": "A publicly documented, reproducible software-only entry point to Atmosphère exists for an unmodified Switch OLED on firmware 23.0.1.",
+      "claim": "A publicly documented, reproducible software-only entry point to Atmosph\u00e8re exists for an unmodified Switch OLED on firmware 23.0.1.",
       "status": "DISPROVEN",
       "confidence": "high",
       "scope": "Reviewed public documentation as of 2026-10-26.",
@@ -100,13 +100,13 @@
         "hekate-release-v6.5.4",
         "pepsipu-ns2jb-blog"
       ],
-      "evidence": "No reviewed source describes a software-only Mariko/OLED entry point to Atmosphère. The authoritative maintained guide explicitly routes patched/Mariko consoles to a modchip and states that RCM payload injection does not work on them. Atmosphère and hekate document firmware support, not an OLED entry point. The ns2jb write-up reports a software-only userland/sysmodule chain tested on Switch 1, but it is unpackaged, does not provide CFW or kernel access, and is not shown on OLED/23.0.1 (E-022, E-032).",
-      "limitations": "This is an absence-of-documented-method finding, not proof that no undisclosed exploit exists. It does not deny that a userland/sysmodule chain exists; it denies that a public chain to Atmosphère on the target exists. The search was limited to public documentation and releases reviewed on 2026-10-26; it was not an exhaustive audit of private research.",
+      "evidence": "No reviewed source describes a software-only Mariko/OLED entry point to Atmosph\u00e8re. The authoritative maintained guide explicitly routes patched/Mariko consoles to a modchip and states that RCM payload injection does not work on them. Atmosph\u00e8re and hekate document firmware support, not an OLED entry point. The ns2jb write-up reports a software-only userland/sysmodule chain tested on Switch 1, but it is unpackaged, does not provide CFW or kernel access, and is not shown on OLED/23.0.1 (E-022, E-032).",
+      "limitations": "This is an absence-of-documented-method finding, not proof that no undisclosed exploit exists. It does not deny that a userland/sysmodule chain exists; it denies that a public chain to Atmosph\u00e8re on the target exists. The search was limited to public documentation and releases reviewed on 2026-10-26; it was not an exhaustive audit of private research.",
       "last_reviewed": "2026-10-26"
     },
     {
       "id": "E-008",
-      "claim": "The documented route to Atmosphère on an unmodified OLED is a hardware modchip, which is outside this project's software-only scope.",
+      "claim": "The documented route to Atmosph\u00e8re on an unmodified OLED is a hardware modchip, which is outside this project's software-only scope.",
       "status": "VERIFIED",
       "confidence": "high",
       "scope": "Documented alternative route; not a software-only method.",
@@ -223,7 +223,7 @@
     },
     {
       "id": "E-017",
-      "claim": "Firmware compatibility with Atmosphère and hekate does not establish that an entry point exists on Mariko/OLED hardware.",
+      "claim": "Firmware compatibility with Atmosph\u00e8re and hekate does not establish that an entry point exists on Mariko/OLED hardware.",
       "status": "VERIFIED",
       "confidence": "high",
       "scope": "Analytical distinction between firmware support and exploit compatibility.",
@@ -232,7 +232,7 @@
         "nh-guide-getting-started",
         "nh-guide-entering-rcm"
       ],
-      "evidence": "Atmosphère and hekate document support for the firmware's system modules and boot process. The NH Switch Guide separately documents that patched/Mariko consoles cannot receive an RCM payload and require a modchip. These are independent axes.",
+      "evidence": "Atmosph\u00e8re and hekate document support for the firmware's system modules and boot process. The NH Switch Guide separately documents that patched/Mariko consoles cannot receive an RCM payload and require a modchip. These are independent axes.",
       "limitations": "This is a conclusion drawn from the cited sources; it does not add new hardware evidence.",
       "last_reviewed": "2026-10-26"
     },
@@ -299,8 +299,8 @@
       "sources": [
         "pepsipu-ns2jb-blog"
       ],
-      "evidence": "The write-up states: 'The exploit has also been tested on the Switch 1, but I haven’t gotten around to packaging it yet. It wouldn’t provide the capabilities of a modchip, but it wouldn’t require any external hardware.'",
-      "limitations": "The write-up does not identify the Switch 1 model, firmware version, or whether it was an OLED/Mariko unit. 'Tested' is not a reproducible package. The published repository is Switch 2 only. This does not establish a path to Atmosphère, kernel, or bootROM.",
+      "evidence": "The write-up states: 'The exploit has also been tested on the Switch 1, but I haven\u2019t gotten around to packaging it yet. It wouldn\u2019t provide the capabilities of a modchip, but it wouldn\u2019t require any external hardware.'",
+      "limitations": "The write-up does not identify the Switch 1 model, firmware version, or whether it was an OLED/Mariko unit. 'Tested' is not a reproducible package. The published repository is Switch 2 only. This does not establish a path to Atmosph\u00e8re, kernel, or bootROM.",
       "last_reviewed": "2026-10-26"
     },
     {
@@ -432,7 +432,7 @@
     },
     {
       "id": "E-032",
-      "claim": "The ns2jb userland/sysmodule chain does not provide custom firmware, kernel access, or persistence, and therefore is not a path to Atmosphère by itself.",
+      "claim": "The ns2jb userland/sysmodule chain does not provide custom firmware, kernel access, or persistence, and therefore is not a path to Atmosph\u00e8re by itself.",
       "status": "VERIFIED",
       "confidence": "high",
       "scope": "Capability boundary of the ns2jb chain.",
@@ -440,7 +440,7 @@
         "pepsipu-ns2jb-blog",
         "ns2jb-repository"
       ],
-      "evidence": "The write-up states that ns2jb runs native code as ordinary sysmodules and fs, and its conclusion describes the work as a step toward CFW rather than CFW itself. It also says the Switch 1 version 'wouldn’t provide the capabilities of a modchip.' The README states that the demo does not install custom firmware or persistence.",
+      "evidence": "The write-up states that ns2jb runs native code as ordinary sysmodules and fs, and its conclusion describes the work as a step toward CFW rather than CFW itself. It also says the Switch 1 version 'wouldn\u2019t provide the capabilities of a modchip.' The README states that the demo does not install custom firmware or persistence.",
       "limitations": "It could be a stepping stone if combined with additional vulnerabilities; the author says it may help the community make progress toward CFW. It is not a complete chain, and no public kernel or bootROM stage is included.",
       "last_reviewed": "2026-10-26"
     },
@@ -456,7 +456,7 @@
         "pepsipu-ns2jb-blog",
         "atmosphere-release-1.12.1"
       ],
-      "evidence": "No reviewed source connects a userland/sysmodule primitive to kernel or bootROM access on Mariko/OLED. The ns2jb chain stops at sysmodule/fs code execution and explicitly does not provide CFW or kernel access. The maintained NH Switch Guide routes Mariko consoles to a modchip. Atmosphère documents firmware support, not an OLED entry point.",
+      "evidence": "No reviewed source connects a userland/sysmodule primitive to kernel or bootROM access on Mariko/OLED. The ns2jb chain stops at sysmodule/fs code execution and explicitly does not provide CFW or kernel access. The maintained NH Switch Guide routes Mariko consoles to a modchip. Atmosph\u00e8re documents firmware support, not an OLED entry point.",
       "limitations": "This is an absence-of-documented-method finding, not proof that no undisclosed chain exists. The ns2jb Switch 1 test is a lead, but it is unpackaged and its model/firmware are not stated.",
       "last_reviewed": "2026-10-26"
     },
@@ -603,7 +603,7 @@
     },
     {
       "id": "E-044",
-      "claim": "Even a complete compromise of the splay applet would yield applet-level userland code execution, not kernel, bootROM, or Atmosphère access.",
+      "claim": "Even a complete compromise of the splay applet would yield applet-level userland code execution, not kernel, bootROM, or Atmosph\u00e8re access.",
       "status": "PARTIALLY VERIFIED",
       "confidence": "medium",
       "scope": "Capability ceiling of the GameShare surface.",
@@ -686,7 +686,7 @@
     },
     {
       "id": "E-050",
-      "claim": "Caffeine is a warmboot exploit that let patched Erista consoles on 4.0.0-4.1.0 run full CFW without Fusée Gelée, which shows a software-only CFW path on a patched console is possible when the boot stage itself is exploitable.",
+      "claim": "Caffeine is a warmboot exploit that let patched Erista consoles on 4.0.0-4.1.0 run full CFW without Fus\u00e9e Gel\u00e9e, which shows a software-only CFW path on a patched console is possible when the boot stage itself is exploitable.",
       "status": "VERIFIED",
       "confidence": "high",
       "scope": "Historical precedent for a warmboot-based CFW path on patched hardware.",
@@ -1084,6 +1084,282 @@
       "evidence": "Nintendo's Virtual Game Card Guide states that a Nintendo Account can have up to two linked consoles that load virtual game cards, that both consoles must be connected to the internet for linking and loading, that local-wireless proximity is required for pairing and lending, and that lending is limited to Nintendo Account family group members. The game remains tied to the account and the license.",
       "limitations": "This establishes the account/license and server gates, not the exact wire protocol. It does not prove that no implementation bug exists in the virtual-game-card code.",
       "last_reviewed": "2026-10-27"
+    },
+    {
+      "id": "E-080",
+      "claim": "The 2026-10-28 Phase 2 plaintext LDN host run produced no JOIN and no room on the target, but the host's transmission is unconfirmed because the rtw88_8822bu driver reported 'failed to get tx report from firmware'.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Hardware observation, 2026-10-28. Owner report for the console screen; host log and dmesg for the host side.",
+      "sources": [
+        "kinnay-ldn",
+        "rtw88-8822bu-tx-report"
+      ],
+      "evidence": "The host was started with --compat-no-active-ack for 2 seconds and then 30 seconds on channel 1 with title 0100a250097f0000, scene 0, security mode 3, and challenge disabled. Both runs ended with 'Host stopped.' and no JOIN. The console showed no room. dmesg reported 'failed to get tx report from firmware' after each run. A follow-up 60-second run on 2026-10-28 also produced no JOIN; three CoreWLAN scans from the Mac's built-in Wi-Fi did not show the 32-character SSID, but that check is invalid because the LDN host beacon uses a 32-byte null SSID and the network ID is carried in vendor action frames. dmesg logged a third TX-report failure. No valid independent receiver was used, so the host's frames may not have been on air. The sanitized record is research/hardware-observations/2026-10-28-ldn-phase2.json.",
+      "limitations": "The console screen is an owner report, not an automated capture. The adapter's TX path is unconfirmed. The 60-second CoreWLAN scan could not see the null-SSID beacon and is not a valid transmission check. One game and three runs were tested. The result does not show whether retail 23.0.1 would accept security mode 3 if the host transmitted.",
+      "last_reviewed": "2026-10-28"
+    },
+    {
+      "id": "E-081",
+      "claim": "The owner-provided prod.keys decrypt the Phase 1 Dragon Ball FighterZ LDN advertisement, confirming that the retail room uses security mode 1 (product/encrypted) with the challenge enabled.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Hardware observation and local decryption, 2026-10-28. The keys and firmware dump are owner-provided and excluded from version control.",
+      "sources": [
+        "kinnay-ldn",
+        "kinnay-ldn-protocol",
+        "switchbrew-ldn"
+      ],
+      "evidence": "The owner supplied a prod.keys file and a firmware 23.0.1 dump from their own modded Switch. Both are local-only and ignored by git. Using the kinnay/LDN KeyDerivation with key-derivation protocol 1 and the captured Phase 1 pcap, the advertisement decrypted and its SHA-256 validated. The decrypted payload reports security mode 1 (prod), challenge present, channel 1, band 2.4 GHz, max_participants 2, num_participants 1, app_version 26, and 4 bytes of application data. The title ID and scene ID match the plaintext header (0100a250097f0000, 0). The sanitized record is research/hardware-observations/2026-10-28-ldn-phase1.json.",
+      "limitations": "The keys are from the owner's other modded Switch, not from the target. The target remains unmodified. The decryption proves key compatibility and the room's security mode; it does not prove that the PC can transmit or join. The firmware dump's version is owner-reported and folder-named 23.0.1; it was not independently verified with a firmware tool. SSID, MAC addresses, server random, application data, and key material are not recorded.",
+      "last_reviewed": "2026-10-28"
+    },
+    {
+      "id": "E-082",
+      "claim": "The owner supplied a local 23.0.1 firmware dump and a prod.keys file from their own modded Switch; both are excluded from version control and available for read-only analysis.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Local artifact inventory, 2026-10-28. The target console remains unmodified.",
+      "sources": [
+        "switchbrew-package1"
+      ],
+      "evidence": "Firmware/Firmware.23.0.1 contains 238 files (117 program/data NCAs and 121 cnmt.nca files) and is about 325 MB. Firmware/prod.keys.txt contains 222 well-formed keys, including master_key_00 through master_key_14, aes_kek_generation_source, and aes_key_generation_source. .gitignore excludes Firmware/, Firmware.*/, and prod.keys*; git check-ignore confirms both paths are ignored. The keys decrypt the Phase 1 LDN advertisement (E-081). No hactool or nxdump is installed, so package1 and the NCAs have not been extracted or independently verified.",
+      "limitations": "The dump's version is owner-reported and folder-named 23.0.1; it was not verified with a firmware tool. The keys are from the owner's other modded Switch, not from the target. Artifact contents, hashes, and decrypted modules must remain local and must never be committed, published, or shared.",
+      "last_reviewed": "2026-10-28"
+    },
+    {
+      "id": "E-083",
+      "claim": "The owner's 23.0.1 firmware dump is an NCA-only set whose ldn sysmodule is title 0100000000000018, version 0x5c0004b0; the supplied keys decrypt its metadata but not the NCA key generation needed to decrypt the program content.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only NCA header and metadata parsing of the owner's local firmware dump, 2026-10-29. No program NCA content was decrypted.",
+      "sources": [
+        "switchbrew-nca",
+        "switchbrew-ldn"
+      ],
+      "evidence": "The dump contains 238 NCA files and no package1 or other non-NCA files. All 238 NCA headers decrypted as valid NCA3 with the owner's header_key. Content types: 76 program, 121 meta, 38 data, 3 public data. Key-generation counts: 126 at 0x00, 2 at 0x07, 1 at 0x0b, 1 at 0x10, 3 at 0x14, 1 at 0x15, 8 at 0x16, and 96 at 0x17. The ldn NCA is 755bcf33085ed666cbbcf34de83d1cb0.nca, title 0100000000000018, a 556,544-byte program NCA with key generation 0x17 and a 556,032-byte AES-CTR PartitionFS section 0. The ldn meta NCA 5bc39286ff59b4bd3abc2bbca467e86c.cnmt.nca decrypted with key_area_key_application_00 and reports title version 0x5c0004b0 (1543505072), content type SystemProgram, and the NCA SHA-256 755bcf33085ed666cbbcf34de83d1cb0f7ceaa0ebf7a106dfa54a2d54b193072, which matches the local NCA file. Key generation 0x17 requires key_area_key_application_16; the prod.keys file contains key_area_key_application_00 through _14 only. The sanitized record is research/hardware-observations/2026-10-29-firmware-inventory.json.",
+      "limitations": "The dump's version is owner-reported and folder-named 23.0.1; it was not independently verified. The title-ID mapping for ldn comes from a community list, though the title ID and version are read from the decrypted CNMT. The program NCA content was not decrypted, so this does not analyze the parser. Package1 is absent, so the warmboot direction cannot use this dump.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-084",
+      "claim": "The prod-mode LDN host built from the captured Dragon Ball FighterZ room emitted 373 AES-CTR advertisements to the monitor interfaces; the frames decrypt with the owner's keys to the same title, scene, security mode, challenge state, participant limit, app version, application-data length, and SSID as the Phase 1 room.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One 30-second prod-mode host run on 2026-10-28/29, with same-phy monitor captures and local decryption.",
+      "sources": [
+        "kinnay-ldn",
+        "switchbrew-ldn"
+      ],
+      "evidence": "The host ran with security mode 1, challenge enabled, max 2 participants, app version 26, LDN version 4, protocol 1, and the captured title/scene/SSID/channel. The existing monitor interface captured 660 beacons and 373 vendor action frames from the host adapter; the ldn interface captured 1222 beacons and 655 action frames. The action frames were 1364 bytes with a 1280-byte payload, 1312-byte ciphertext, and aes-ctr format. The first captured action frame decrypted with KeyDerivation(protocol=1) and validated its SHA-256; its fields were title 0100a250097f0000, scene 0, LDN version 4, security mode 1, challenge present, max 2, num 1, app version 26, application-data length 4, and 8 participant slots. The decrypted SSID matched the local room file. The host log ended with 'Host stopped. Join events observed: 0.' The sanitized record is research/hardware-observations/2026-10-29-ldn-prod-host.json.",
+      "limitations": "The captures were made on the host's own phy and may include loopback; they do not independently prove RF transmission. The rtw88_8822bu driver logged one new 'failed to get tx report from firmware' message (count 3 to 4). The host used a 7-byte participant name instead of the captured 21-byte name. The pcap, room file, and keys are local-only and must never be committed or shared.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-085",
+      "claim": "The target console did not join the prod-mode host and reported no rooms; the host logged no JOIN and the same-phy captures saw no frames from the console.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Owner observation and same-phy capture during the 30-second prod-mode run on 2026-10-28/29.",
+      "sources": [
+        "kinnay-ldn"
+      ],
+      "evidence": "The owner reports that Dragon Ball FighterZ searches for about one second and then says it did not find any rooms. The host log contains no JOIN and ends with 'Join events observed: 0.' The captures contain 373 action frames and 660 beacons from the host adapter, but no frames from any other source. The console's room list was not observed automatically.",
+      "limitations": "The console screen was observed by the owner, not captured automatically. The roughly one-second search duration is an owner report. The search may not have overlapped the host's advertisement window, and the host's RF transmission is not independently confirmed. This does not show that the console rejected the prod-mode room.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-086",
+      "claim": "A macOS CoreWLAN directed scan for a 16-byte SSID is not a valid transmission check; it returned FOUND for a random non-existent SSID with a nil BSSID and inconsistent channel.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Control scans on 2026-10-29 with the LDN host stopped.",
+      "sources": [],
+      "evidence": "scanForNetworks(withSSID:) returned FOUND for the room SSID at -90 dBm on channel 6 and later -94 dBm on channel 13, both with a nil BSSID, while the host was configured for channel 1. A random 16-byte SSID that does not exist also returned FOUND at -81 dBm on channel 1 with a nil BSSID. A wildcard scanForNetworks(withSSID: nil) returned 6 networks and did not include the host BSSID when the host was stopped.",
+      "limitations": "One macOS version and one Wi-Fi interface. The wildcard BSSID check has not yet been run while the host is active, so it is a proposed independent check rather than a confirmed one.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-087",
+      "claim": "A second approved prod-mode LDN host run started and advertised for 30 seconds but produced no join; the console again reported no rooms, and the run has no valid pcap because the wrapper could not overwrite the previous tcpdump-owned capture files.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "One repeat prod-mode host run on 2026-10-28/29, with a wildcard CoreWLAN scan from macOS and same-phy capture attempted.",
+      "sources": [
+        "kinnay-ldn",
+        "switchbrew-ldn"
+      ],
+      "evidence": "The host log contains 'Advertising now' and ends with 'Host stopped. Join events observed: 0.' The owner reports that Dragon Ball FighterZ again searched briefly and said it did not find any rooms. The search was pressed after the host was already advertising. dmesg TX-report failures increased from 4 to 5. The wrapper's tcpdump processes failed with 'Permission denied' on the previous run's tcpdump-owned pcap files, so the summary's frame counts and probe output are from run 1; there is no run-2 pcap. The sanitized record is research/hardware-observations/2026-10-29-ldn-prod-host-run2.json.",
+      "limitations": "No valid run-2 frame counts, console-frame check, or fresh frame decryption. RF transmission is still not independently confirmed. The console screen was observed by the owner, not captured automatically. The search duration is an owner report.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-088",
+      "claim": "macOS 26.3 CoreWLAN returned a nil BSSID for every scanned network, so a wildcard BSSID comparison cannot serve as an independent LDN transmission check on this Mac.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Ten wildcard scans during the second prod-mode host run and one post-run control scan on the same Mac and Wi-Fi interface.",
+      "sources": [],
+      "evidence": "Each of the ten scans during the host window printed 'BSSID not found in 8 scan result(s)'. A post-run control scan returned 10 results, including known ambient networks on channels 1, 6, 11, 36, and 100; every CWNetwork.bssid value was nil. The result is a platform privacy/redaction limitation, not evidence that the host was absent.",
+      "limitations": "One macOS version and one built-in Wi-Fi interface. BSSID may be available with Location Services permission, a different API, a phone Wi-Fi analyzer that shows hidden BSSIDs, or a second monitor-mode receiver. The scan count varied between 8 and 10 because of ambient networks. E-092 records that granting Location Services to a local scanner restored real BSSIDs; the original nil-BSSID result still applies to an unpermitted process.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-089",
+      "claim": "A third prod-mode LDN host run again produced no join, and a Location Services-enabled independent CoreWLAN scan did not report the host BSSID, although it did report a hidden ambient BSSID on channel 1; the same-phy captures contained only the host's own frames.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "One 30-second prod-mode host run on 2026-10-29, with 20 independent CoreWLAN scans and same-phy captures on the existing monitor interface and the ldn interface.",
+      "sources": [
+        "kinnay-ldn",
+        "switchbrew-ldn"
+      ],
+      "evidence": "The host started at 2026-10-29T00:09:39Z, advertised for 30 seconds on channel 1 with security mode 1 and the captured room parameters, and ended with 'Host stopped. Join events observed: 0.' The owner reports that Dragon Ball FighterZ again searched briefly and said it did not find any rooms; the search was pressed inside the advertisement window. The wrapper produced valid pcaps (777 packets on the existing monitor interface, 1,373 on the ldn interface); the probe found 373 and 656 AES-CTR advertisements for title 0100a250097f0000, scene 0. dmesg TX-report failures rose from 5 to 6. The Mac ran 20 wildcard CoreWLAN scans with Location Services authorization status 3; the host adapter BSSID was absent from all 20, while a hidden ambient BSSID on channel 1 was present in several scans. The captures contained only the host's own beacons and action frames and no ambient AP beacons. Every injected frame appeared as a pair: one copy with an 8-byte radiotap header and no fields, and one with a 13-byte header, rate 2 (1.0 Mb/s), and txflags=0x0. The sanitized record is research/hardware-observations/2026-10-29-ldn-prod-host-run3.json.",
+      "limitations": "The captures were made on the host's own phy and may include loopback. The independent scan is not a frame capture, and the LDN beacon's 32-byte null SSID may be filtered differently from a normal hidden SSID. The console screen was observed by the owner, not captured automatically. The search duration is an owner report. Firmware was not re-queried. This run does not show that the console rejected the prod-mode room.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-090",
+      "claim": "The TP-Link Archer T3U Plus and the in-kernel rtw88_8822bu driver can transmit in AP mode: a hostapd beacon on channel 1 was received by the Mac at -32 dBm with the adapter's BSSID.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One AP-mode control test on 2026-10-29, using hostapd 2.11, an open test SSID, channel 1, and a Location Services-enabled CoreWLAN scan from macOS.",
+      "sources": [],
+      "evidence": "hostapd was started with hw_mode=g, channel 1, and the test SSID TX10LED-TEST. Its log reached 'AP-ENABLED'. A CoreWLAN scan from the Mac saw TX10LED-TEST at -32 dBm on channel 1 with the host adapter BSSID. hostapd was stopped after 30 seconds and the adapter was restored to monitor mode on channel 1. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-tx.json.",
+      "limitations": "One adapter, one driver, one kernel, and one channel. The test transmitted a normal AP beacon, not an LDN beacon or vendor action frame. The Mac scan is a reception check, not a frame capture. The host adapter BSSID is redacted.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-091",
+      "claim": "Monitor-mode injection on rtw88_8822bu does not put frames on the air: the ldn package's MonitorAP beaconed a test SSID for 12 seconds, but the Mac did not see it, while the AP-mode control on the same adapter and channel was visible.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One monitor-mode control test on 2026-10-29, using the ldn package's MonitorAP, two monitor interfaces on the same phy, a test SSID on channel 1, and a Location Services-enabled CoreWLAN scan from macOS.",
+      "sources": [
+        "kinnay-ldn"
+      ],
+      "evidence": "Firmware/monitor_beacon_test.py created two monitor interfaces on phy1, logged 'Creating monitor AP TX10LED-MON on channel 1' and 'beaconing as <redacted>', and ran for 12 seconds. The interfaces existed on channel 1 and were removed at exit. Two CoreWLAN scans during the window did not see TX10LED-MON or the host adapter BSSID, while ambient networks on channels 1, 6, 11, and 100 were visible. The same adapter, driver, channel, and Mac had just received a normal AP beacon at -32 dBm (E-090). The sanitized record is research/hardware-observations/2026-10-29-monitor-mode-tx.json.",
+      "limitations": "One test, one driver, one adapter, and one channel. The test used a normal test SSID, not the LDN room parameters; a null-SSID LDN beacon could still be filtered even if a normal test SSID is not. The Mac scan is not a frame capture. The monitor test used the same phy as the host path and does not rule out a frame-type-specific firmware quirk.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-092",
+      "claim": "Granting Location Services to a local CoreWLAN scanner restored real BSSIDs on macOS 26.3: a wildcard scan returned 12 networks with BSSIDs on channels 1, 6, 11, 36, and 100.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Local tooling observation on 2026-10-29, using a locally built ad-hoc-signed CoreWLAN app with NSLocationWhenInUseUsageDescription and authorization status 3.",
+      "sources": [],
+      "evidence": "Before authorization, CWNetwork.bssid was nil for every network. After the owner allowed Location Services for the local app (bundle ID local.tx10led.locationscan, authorization status 3), a wildcard scan returned 12 networks with non-nil BSSIDs on channels 1, 6, 11, 36, and 100. The scanner wrote its results to a local file. The app is local-only and not part of the repository.",
+      "limitations": "One macOS version and one built-in Wi-Fi interface. The app is ad-hoc signed and may re-prompt if rebuilt. Location Services permission is a system privacy setting; it does not change the console. The scan still cannot capture 802.11 frames, and the LDN beacon's 32-byte null SSID may be filtered differently from a normal hidden SSID.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-093",
+      "claim": "In upstream mac80211, NL80211_CMD_FRAME can transmit an AP beacon through the normal TX path, but a non-public action frame on an AP interface requires a station entry; a broadcast destination is not a station, so an LDN vendor action frame cannot be broadcast from an AP interface through this path.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Source-level analysis of upstream Linux mac80211/nl80211 on 2026-10-29. Not tested on the running OrbStack kernel or the adapter.",
+      "sources": [
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "cfg80211_mgmt_tx_check requires the BSSID of a non-public action frame on an AP interface to equal the AP address. ieee80211_mgmt_tx then looks up a station for the frame's destination address and returns -ENOLINK if none exists. NL80211_ATTR_FRAME_NO_STA sets params.no_sta, but the upstream code still returns -ENOLINK for a non-public action frame with no station. Beacon frames skip the action-category and station checks, and the AP TX frame-type mask includes beacon (0x80), so a beacon can be sent through NL80211_CMD_FRAME. The source is the upstream mac80211 offchannel.c and net/wireless/nl80211.c, reviewed 2026-10-29.",
+      "limitations": "The running kernel is 7.2.12-orbstack-00394-gbecdd6130068, not upstream master. A driver or kernel patch could differ. The source analysis does not show whether a unicast vendor action frame to a station entry is accepted by the console's LDN parser. It also does not test the adapter's AP-mode NL80211_CMD_FRAME path.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-094",
+      "claim": "The adapter, rtw88_8822bu, and mac80211 can transmit a beacon submitted through NL80211_CMD_FRAME on an AP interface: a 20-frame TX10LED-APINJ beacon burst was visible at -28 dBm with the adapter BSSID in all 12 Mac scans.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One AP-mode management-frame injection control on 2026-10-29, using hostapd 2.11 and NL80211_CMD_FRAME on channel 1, with a Location Services-enabled CoreWLAN scan from macOS.",
+      "sources": [
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "Firmware/ap_inject_run.sh started hostapd with SSID TX10LED-TEST on channel 1 and waited for AP-ENABLED. Firmware/ap_frame_test.py then submitted 20 beacon frames with SSID TX10LED-APINJ through NL80211_CMD_FRAME at 100 ms intervals; every request returned without a netlink error. Twelve CoreWLAN scans during the window all reported TX10LED-APINJ and TX10LED-TEST at -28 dBm on channel 1 with the host adapter BSSID, while ambient networks on channels 1, 6, 11, 36, and 100 were also visible. The adapter was restored to monitor mode on channel 1. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-frame-injection.json.",
+      "limitations": "One test, one driver, one adapter, and one channel. The test transmitted beacon frames, not LDN beacons or vendor action frames, and did not touch the console. The Mac scan is a reception check, not a frame capture. E-093 still blocks a broadcast non-public vendor action frame on an AP interface without a station entry. The host adapter BSSID and interface name are redacted.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-095",
+      "claim": "The running mac80211/rtw88_8822bu stack accepted a unicast vendor action frame on an AP interface after a temporary station entry was added: NL80211_CMD_NEW_STATION succeeded, five NL80211_CMD_FRAME requests returned without a netlink error, and the station entry was removed.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One approved AP-mode unicast vendor-action control on 2026-10-29, using hostapd 2.11 and a non-LDN test OUI on channel 1, with a temporary station entry for the console's MAC recovered from the local Phase 1 pcap.",
+      "sources": [
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "Firmware/ap_unicast_run.sh started hostapd with TX10LED-TEST on channel 1 and waited for AP-ENABLED. Firmware/ap_unicast_test.py then added a temporary station entry for the console's MAC through NL80211_CMD_NEW_STATION, submitted five unicast vendor action frames (category 0x7f, test OUI 00:11:22, type 0x01, payload TX10LED-UNICAST) through NL80211_CMD_FRAME at 250 ms intervals, and removed the station entry through NL80211_CMD_DEL_STATION. All five requests returned without a netlink error; the script logged 'station entry added', 'sent 1/5' through 'sent 5/5', 'station entry removed', and 'done'. The adapter was restored to monitor mode on channel 1. dmesg again reported 'failed to get tx report from firmware' after the test. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-unicast-vendor.json.",
+      "limitations": "The test proves the kernel accepted the station lookup and queued the unicast action; it does not prove the console received it or that its LDN parser reacted. The test used a non-LDN OUI and no independent receiver captured the frame. The station entry was synthetic and unassociated. The console's reaction was not observed. dmesg reported a known TX-report failure after the test. One adapter, driver, kernel, and channel. The console station MAC and host BSSID are redacted.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-096",
+      "claim": "The running mac80211/rtw88_8822bu stack accepted 568 real LDN unicast vendor action frames and 568 null-SSID LDN beacons on an AP interface after a temporary station entry was added; every NL80211_CMD_FRAME request returned without a netlink error, and the station entry was removed. The console was off/away, so reception and parser reaction were not observed.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One approved 60-second AP-mode real-LDN run on 2026-10-29, using hostapd 2.11, the captured Dragon Ball FighterZ room, the owner's local prod.keys, and a temporary station entry for the console's MAC on channel 1. The claim covers kernel acceptance, not RF reception or a console reaction.",
+      "sources": [
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "Firmware/ap_ldn_run.sh started hostapd 2.11 with TX10LED-TEST on channel 1 and waited for AP-ENABLED. Firmware/ap_ldn_unicast_test.py added a temporary station entry for the console's MAC through NL80211_CMD_NEW_STATION, then submitted a null-SSID LDN beacon and a valid 1,364-byte AES-CTR advertisement for title 0100a250097f0000, scene 0, security mode 1, at 100 ms intervals through NL80211_CMD_FRAME. The action frame used the AP's BSSID and a unicast destination. The script logged 'station entry added', 'sent 10' through 'sent 560', 'station entry removed; sent 568 advertisements', and 'done'; hostapd logged AP-ENABLED and then AP-DISABLED. All 568 requests returned without a netlink error. The adapter was restored to monitor mode. The console was off/away during the run, so no room appearance or parser reaction was observed. dmesg reported 'failed to get tx report from firmware' during the run and a firmware download failure after hostapd stopped; the adapter required a USB deauthorize/reauthorize cycle before it probed cleanly again. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-ldn-unicast.json.",
+      "limitations": "The test proves the kernel accepted the station lookup and queued 568 real LDN action frames; it does not prove the frames were on air, that the console received them, or that its LDN parser reacted. The console was off/away, no independent receiver captured the frames, and the station entry was synthetic and unassociated. The original LDN advertisement uses a broadcast BSSID, but this path can only use the AP BSSID because the driver rejects broadcast-BSSID action frames (E-097). The driver's TX-report failure and the post-run firmware download failure mean the RF result is not independently confirmed. One adapter, driver, kernel, and channel. The host BSSID, interface name, console MAC, SSID, and application data are redacted.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-097",
+      "claim": "rtw88_8822bu rejects a vendor action frame whose BSSID is the broadcast address with EINVAL, even after a temporary station entry is added; the same frame with the AP's BSSID is accepted. This holds for both the 1,388-byte LDN advertisement and a 42-byte short control.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One AP-mode diagnostic on 2026-10-29 on channel 1, using NL80211_CMD_FRAME and a temporary station entry. Four action-frame variants were tested: LDN broadcast BSSID, LDN AP BSSID, short broadcast BSSID, and short AP BSSID. Beacon variants were tested separately.",
+      "sources": [
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "Firmware/ap_action_variants.py added a temporary station entry for the console's MAC, then submitted four action frames through NL80211_CMD_FRAME. The output was: FAIL LDN broadcast BSSID (1388 bytes): [Errno 22] Invalid argument; OK LDN AP BSSID (1388 bytes); FAIL short broadcast BSSID (42 bytes): [Errno 22] Invalid argument; OK short AP BSSID (42 bytes). The station entry was removed afterward. A separate beacon diagnostic, Firmware/ap_beacon_variants.py, accepted the 89-byte null-SSID LDN beacon and five other beacon variants, so the rejection is specific to the action frame's broadcast BSSID rather than the beacon, the frame length, or the LDN payload. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-ldn-unicast.json.",
+      "limitations": "One adapter, driver, kernel, and channel. The diagnostic used a synthetic station entry and did not observe the console. The AP-BSSID variant is not the same as the original broadcast LDN advertisement; whether the console's LDN parser accepts it is unproven. The driver's TX-report failure remains, and the diagnostic does not show that any frame was on air.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-098",
+      "claim": "In a supervised AP-mode LDN rerun on 2026-10-29, the console displayed the advertised room TX10LED and rejected the join immediately with error 2203-0065. hostapd logged only AP-ENABLED and AP-DISABLED; it recorded no authentication, association, or station event.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "One supervised 60-second AP-mode rerun on 2026-10-29 with the console on the Dragon Ball FighterZ local-wireless search screen. The room appearance and error code are owner-reported; the hostapd log is preserved in the OrbStack VM. The run used the same hostapd test SSID TX10LED-TEST, open security, and the real LDN advertisement/beacon path from E-096.",
+      "sources": [
+        "kinnay-ldn-protocol",
+        "kinnay-ldn",
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "The owner ran `sudo bash Firmware/ap_ldn_run.sh 60` with the console on the Dragon Ball FighterZ Local Wireless search screen. The console displayed the room TX10LED. The owner selected it; error 2203-0065 appeared immediately, the search screen closed, and the console returned to the game normally. The hostapd log at /tmp/hostapd-apldn.log contains only the rfkill warning, interface state UNINITIALIZED->ENABLED, AP-ENABLED, ENABLED->DISABLED, AP-DISABLED, CTRL-EVENT-TERMINATING, and nl80211 deinit; it contains no `IEEE 802.11: authenticated`, `AP-STA-CONNECTED`, or station event. The exact advertisement count and wrapper exit status from this run were not preserved in the sanitized record. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-ldn-unicast-observed.json.",
+      "limitations": "The console reaction is owner-reported and was not instrumented; no pcap or independent receiver captured the join attempt. The hostapd log is not a packet capture, so the absence of authentication or association events is consistent with a pre-association rejection but does not prove which frame the console sent or omitted. The hostapd SSID and security did not match the room: TX10LED-TEST/open instead of the room's 32-character hexadecimal SSID with the LDN RSN IE. The exact frame count is not recorded. One adapter, driver, kernel, and channel. The host BSSID, interface, console MAC, SSID, application data, and keys are redacted.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-099",
+      "claim": "In a second supervised AP-mode LDN join attempt on 2026-10-29, the console completed open-system authentication, associated with AID 1, and was marked authorized by hostapd; it then disassociated itself with reason code 8 about one second later. No 0x88B7 authentication request was observed. The monitor captured one 28-byte console data frame consistent with a null-data frame, and the AP raw socket captured one 20-byte frame with ethertype 0x0006. The console showed 2203-0066 after a few seconds and the game displayed 'unable to join the room'.",
+      "status": "VERIFIED",
+      "confidence": "high for the host-side sequence; medium for the console reaction, which is owner-reported",
+      "scope": "One supervised 90-second AP-mode LDN join attempt on 2026-10-29, using hostapd 2.11 with the room's 32-character hexadecimal WLAN SSID and the LDN RSN IE, a same-phy mon-ldn monitor vif, and Firmware/ap_ldn_join_test.py on channel 1. The console was on the Dragon Ball FighterZ local-wireless search screen and the owner selected the room.",
+      "sources": [
+        "kinnay-ldn-protocol",
+        "kinnay-ldn",
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "The owner ran `sudo bash Firmware/ap_ldn_join_run.sh 90`. hostapd logged an authentication request (len=41), `authentication OK (open system)`, an association request (len=127), `association OK (aid 1)`, `AP-STA-CONNECTED`, and a station authorization (`authorized=1`). About one second later hostapd received a disassociation from the console with `reason_code=8` (`sending STA is leaving BSS`), logged `AP-STA-DISCONNECTED`, and later deauthenticated the station due to inactivity. The join harness sent 54 advertisements, received 0 0x88B7 authentication frames, and ended with `joined=False`. The monitor vif saw one console data frame with `len=28`, `flags=16` (FCS included), which is a 24-byte 802.11 header and no payload, i.e. a null-data frame, not the 946-byte LDN authentication request. The AP-interface raw socket saw one 20-byte frame with `ethertype=0x0006` and a 6-byte payload; its raw hex was not preserved. The owner observed `2203-0066` after a few seconds, then a game popup `unable to join the room`; the search screen closed and the console returned to the game normally. The sanitized record is research/hardware-observations/2026-10-29-ap-mode-ldn-join-observed.json.",
+      "limitations": "No pcap or raw hex was preserved from this run, so the 28-byte frame's null-data identity is inferred from its length and the monitor's 802.11 type check, and the 20-byte 0x0006 frame is unidentified. No 0x88B7 request was observed, so the run cannot distinguish a console abort before the request from a receive-path miss. The console reaction is owner-reported and was not instrumented. The association response included an RSN IE that the ldn package's MonitorAP does not send; that mismatch is a candidate explanation for the disassociation, not a proven cause. One adapter, driver, kernel, and channel. The host BSSID, interface, console MAC, room SSID, application data, and keys are redacted.",
+      "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-100",
+      "claim": "On the AP interface, NL80211_CMD_CONTROL_PORT_FRAME with ethertype 0x88B7 is rejected with EINVAL, while the same command with EAPOL ethertype 0x888E is accepted. An AF_PACKET raw Ethernet frame with ethertype 0x88B7 is transmitted as a protected CCMP data frame with KeyID 0 when the station is authorized and the pairwise key is installed; without station authorization, the same raw 0x88B7 frame is accepted by the socket but not transmitted.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Local AP-mode control on 2026-10-29 with a fake station, a synthetic CCMP key, the rtw88_8822bu AP interface on channel 1, and the same-phy mon-ldn monitor vif. No console was involved.",
+      "sources": [
+        "linux-mac80211-mgmt-tx"
+      ],
+      "evidence": "The AP interface reached AP-ENABLED with the room's SSID and the LDN RSN IE. A fake station (`02:00:00:00:00:01`) was added with AID 1, a synthetic pairwise CCMP key was installed, and a control-port frame with ethertype 0x88B7 returned `[Errno 22] Invalid argument`; the same command with ethertype 0x888E was accepted and the monitor captured it as a protected data frame with KeyID 0. A raw AF_PACKET send of an Ethernet frame with ethertype 0x88B7 returned success (27 bytes) but the monitor saw only the 0x888E frame, because the fake station was not authorized. The test then authorized the station with NL80211_CMD_SET_STATION (`NL80211_ATTR_STA_FLAGS2` mask/set 0x2 and the nested `NL80211_STA_FLAG_AUTHORIZED` flag), installed the same pairwise key, and sent both raw frames. The monitor captured two protected data frames to the fake station with IV 1 and IV 2 and KeyID 0; the 0x88B7 frame was the second. This is the response path the harness uses after association, because the control-port command cannot carry the LDN ethertype on this driver.",
+      "limitations": "The station was synthetic and no console received the frames. The monitor capture is on the same phy and may include loopback; it shows the AP's protected TX frames, not independent RF reception. The test used one adapter, driver, kernel, and channel. The exact authorization flag combination was redundant (flags2 and nested flags were both set), so the test does not isolate which encoding is required; it only shows that an authorized station with an installed pairwise key transmits the raw 0x88B7 frame. The raw path requires the station to be authorized and the pairwise key to be installed before the send. The host BSSID, interface, and fake station MAC are local test values; the console MAC and room SSID are not used in this record.",
+      "last_reviewed": "2026-10-29"
     }
   ]
 }

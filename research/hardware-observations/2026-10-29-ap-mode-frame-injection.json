@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ap-mode-frame-injection",
+  "observed_at": "2026-10-29T01:40:00Z",
+  "observed_at_precision": "approximate",
+  "observation_type": "adapter-ap-mode-mgmt-frame-injection",
+  "operator": "hostapd 2.11 and Firmware/ap_frame_test.py in an OrbStack Ubuntu VM; Location Services-enabled CoreWLAN scan from macOS",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not involved in this control test.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "adapter-tx-control",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; AP mode during the test>"
+  },
+  "commands": [
+    {
+      "command": "sudo ip link set <interface> down; sudo iw dev <interface> set type managed; sudo ip link set <interface> up",
+      "exit_code": 0,
+      "result": "The adapter was switched from monitor mode to managed mode."
+    },
+    {
+      "command": "sudo timeout 40 hostapd Firmware/hostapd-test.conf",
+      "exit_code": null,
+      "result": "hostapd reached 'AP-ENABLED' on channel 1 with SSID TX10LED-TEST. It was stopped by the wrapper after the injection window."
+    },
+    {
+      "command": "sudo python Firmware/ap_frame_test.py --ifname <interface> --ssid TX10LED-APINJ --channel 1 --freq 2412 --count 20 --interval 0.1",
+      "exit_code": 0,
+      "result": "Twenty beacon frames were submitted through NL80211_CMD_FRAME. Each request returned without a netlink error and the script logged 'sent 1/20' through 'sent 20/20'."
+    },
+    {
+      "command": "LocationScan.app: CoreWLAN scanForNetworks(withSSID: nil), 12 scans at one-second intervals",
+      "exit_code": 0,
+      "result": "All 12 scans reported both TX10LED-APINJ and TX10LED-TEST at -28 dBm on channel 1 with the host adapter BSSID. Ambient networks on channels 1, 6, 11, 36, and 100 were also visible."
+    },
+    {
+      "command": "sudo pkill -x hostapd; restore monitor mode on channel 1",
+      "exit_code": 0,
+      "result": "hostapd stopped and the adapter was restored to monitor mode on channel 1. The wrapper's cleanup trap completed."
+    }
+  ],
+  "injection_test": {
+    "ap_ssid": "TX10LED-TEST",
+    "injected_ssid": "TX10LED-APINJ",
+    "channel": 1,
+    "freq_mhz": 2412,
+    "frame_type": "beacon (0x80)",
+    "injection_path": "NL80211_CMD_FRAME on an AP interface",
+    "frame_length_bytes": 70,
+    "frames_submitted": 20,
+    "interval_ms": 100,
+    "hostapd_version": "2.11",
+    "hostapd_state": "AP-ENABLED",
+    "receiver": "macOS CoreWLAN wildcard scan with Location Services authorization",
+    "scans": 12,
+    "scans_with_injected_ssid": 12,
+    "scans_with_ap_ssid": 12,
+    "observed_rssi_dbm": -28,
+    "observed_channel": 1,
+    "observed_bssid": "<redacted>",
+    "ambient_networks_visible": true
+  },
+  "interpretation": "The adapter, the in-kernel rtw88_8822bu driver, and mac80211 can put a beacon submitted through NL80211_CMD_FRAME on an AP interface on the air. The Mac received the injected TX10LED-APINJ beacon at -28 dBm with the adapter BSSID in all 12 scans, alongside the hostapd beacon TX10LED-TEST. This removes the AP-mode beacon half of the injection question. It does not show that a vendor action frame can be sent: E-093 records that a non-public action frame on an AP interface needs a station entry, so a broadcast LDN vendor action frame is rejected before it reaches the driver.",
+  "authorization": "The owner approved a harmless AP-mode beacon test on channel 1 with a test SSID. The test did not touch the console and did not send LDN frames or vendor action frames.",
+  "limitations": [
+    "One adapter, one driver, one kernel, and one channel.",
+    "The test transmitted beacon frames, not LDN beacons or vendor action frames.",
+    "The Mac scan is a reception check, not a frame capture.",
+    "The AP-mode interface requires hostapd or an equivalent AP setup; the test used hostapd on channel 1.",
+    "The host adapter BSSID and interface name are redacted."
+  ],
+  "redactions": [
+    "Host adapter BSSID redacted.",
+    "Interface name redacted because it is derived from the adapter MAC."
+  ]
+}

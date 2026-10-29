@@ -45,8 +45,11 @@ scripts/assets.local/
 
 # Firmware, keys, and proprietary blobs (never commit)
 firmware/
+Firmware/
+Firmware.*/
 keys/
 *.keys
+prod.keys*
 *.nca
 *.nsp
 *.xci

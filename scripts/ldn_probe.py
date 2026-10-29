@@ -242,13 +242,30 @@ def pcap_packets(path: Path) -> Iterator[tuple[float, int, bytes]]:
         yield ts_sec + ts_frac / 1_000_000, linktype, packet
 
 
+def radiotap_fcs_present(packet: bytes) -> bool:
+    """Return True when the radiotap flags field says the FCS is included."""
+    if len(packet) < 8:
+        return False
+    present = struct.unpack_from("<I", packet, 4)[0]
+    offset = 8
+    if present & 1:  # TSFT
+        offset += 8
+    if not present & 2:  # Flags
+        return False
+    if len(packet) <= offset:
+        return False
+    return bool(packet[offset] & 0x10)
+
+
 def ieee80211_body(packet: bytes, linktype: int) -> bytes | None:
     """Return the 802.11 payload after the MAC header, or None."""
+    fcs = False
     if linktype == 127:  # IEEE802_11_RADIO (radiotap)
         if len(packet) < 4:
             return None
         radiotap_len = struct.unpack_from("<H", packet, 2)[0]
         frame = packet[radiotap_len:]
+        fcs = radiotap_fcs_present(packet)
     elif linktype == 105:  # IEEE802_11
         frame = packet
     else:
@@ -259,7 +276,10 @@ def ieee80211_body(packet: bytes, linktype: int) -> bytes | None:
     frame_control = struct.unpack_from("<H", frame, 0)[0]
     if (frame_control & ACTION_FRAME_MASK) != ACTION_FRAME_VALUE:
         return None
-    return frame[24:]
+    body = frame[24:]
+    if fcs and len(body) >= 4:
+        body = body[:-4]
+    return body
 
 
 def extract_advertisements(path: Path) -> list[Advertisement]:

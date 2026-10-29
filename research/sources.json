@@ -658,7 +658,7 @@
       "kind": "source-code",
       "url": "https://github.com/kinnay/LDN",
       "retrieved_at": "2026-10-27",
-      "snapshot": "A Linux-only Python implementation that scans, joins, and hosts LDN networks. It requires monitor-mode action-frame support and CAP_NET_ADMIN/CAP_NET_RAW; retail encrypted networks require prod.keys. The source supports security mode 3 (system debug), where create_network does not derive a WLAN data key. The README confirms MediaTek/Realtek drivers and mt7921e.",
+      "snapshot": "A Linux-only Python implementation that scans, joins, and hosts LDN networks. It requires monitor-mode action-frame support and CAP_NET_ADMIN/CAP_NET_RAW; retail encrypted networks require prod.keys. The source supports security mode 3 (system debug), where create_network does not derive a WLAN data key. Its host beacon uses SSIDElement(\"\\x00\" * 32); the network ID is carried in vendor action frames, not in the beacon SSID. The README confirms MediaTek/Realtek drivers and mt7921e.",
       "license": "GPL-3.0; cited as a research tool, not vendored.",
       "notes": "The practical host for the no-key plaintext test. It is not a game-sharing tool and does not bypass the ticket challenge."
     },
@@ -672,6 +672,40 @@
       "snapshot": "States that virtual game cards are linked to a Nintendo Account, that up to two consoles can load them, that both consoles must be connected to the internet, that local-wireless proximity is required for pairing and lending, and that lending is limited to Nintendo Account family group members.",
       "license": "Nintendo support documentation; quoted as vendor documentation.",
       "notes": "Establishes the account, internet, proximity, and license gates for the virtual-game-card path."
+    },
+    {
+      "id": "rtw88-8822bu-tx-report",
+      "title": "Improve the 8822bu rtw88 in-kernel driver. Need testers...",
+      "publisher": "morrownr/88x2bu-20210702 GitHub issue",
+      "kind": "issue",
+      "url": "https://github.com/morrownr/88x2bu-20210702/issues/224",
+      "retrieved_at": "2026-10-28",
+      "snapshot": "A community testing thread for the in-kernel rtw88_8822bu driver. Participants report 'failed to get tx report from firmware' and beacon transmission failures in AP mode.",
+      "license": "GitHub issue content; cited as a community report, not as authoritative documentation.",
+      "notes": "Supports the interpretation that the Phase 2 host may not have transmitted. It does not prove that monitor-mode TX is impossible."
+    },
+    {
+      "id": "switchbrew-nca",
+      "title": "Nintendo Switch Brew: NCA",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/NCA",
+      "retrieved_at": "2026-10-29",
+      "snapshot": "Documents the NCA header layout, AES-XTS header encryption with a non-standard tweak, content types, key-generation fields, FsEntry and FsHeader structures, and the PartitionFS section format.",
+      "license": "Community wiki; cited as format documentation.",
+      "notes": "Used for read-only NCA header parsing. It does not provide keys or firmware."
+    },
+    {
+      "id": "linux-mac80211-mgmt-tx",
+      "title": "Linux mac80211 management-frame TX path",
+      "publisher": "Linux kernel",
+      "kind": "source",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/mac80211/offchannel.c",
+      "retrieved_at": "2026-10-29",
+      "snapshot": "Reviewed ieee80211_mgmt_tx, ieee80211_mgmt_tx_skb, cfg80211_mgmt_tx_check, and the nl80211 FRAME_NO_STA attribute on 2026-10-29.",
+      "license": "GPL-2.0; cited as implementation documentation.",
+      "notes": "AP interfaces can send beacon frames through NL80211_CMD_FRAME. Non-public action frames require a station entry; FRAME_NO_STA does not bypass that check."
     }
-  ]
+  ],
+  "last_reviewed": "2026-10-29"
 }

@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ldn-prod-host-run3",
+  "observed_at": "2026-10-29T00:09:39Z",
+  "observed_at_precision": "second",
+  "observation_type": "ldn-prod-host-independent-scan",
+  "operator": "scripts/ldn_host.py and tcpdump in an OrbStack Ubuntu VM; Location Services-enabled CoreWLAN scans from macOS",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "Firmware was not re-queried during this run. The 2026-10-26 PTP observation recorded 23.0.1.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this run does not detect modifications"
+  },
+  "connection": {
+    "mode": "local-wireless-host",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; monitor mode>"
+  },
+  "commands": [
+    {
+      "command": "Firmware/ldn_prod_run.sh 30",
+      "exit_code": 0,
+      "result": "The host started, advertised, and stopped cleanly. The log ended with 'Host stopped. Join events observed: 0.' The wrapper used a unique run ID and removed old tcpdump-owned pcaps with sudo, so both captures were written successfully."
+    },
+    {
+      "command": "LocationScan.app: CoreWLAN scanForNetworks(withSSID: nil) every second for 20 scans",
+      "exit_code": 0,
+      "result": "The authorization status was 3 (authorized). The host adapter BSSID was not present in any of the 20 scans. A hidden ambient BSSID on channel 1 was present in several scans, so the receiver can report hidden networks."
+    },
+    {
+      "command": "scripts/ldn_probe.py --pcap <wlx pcap> --json --redact",
+      "exit_code": 0,
+      "result": "373 AES-CTR advertisement frames, title 0100a250097f0000, scene 0, LDN version 4, payload length OK."
+    },
+    {
+      "command": "scripts/ldn_probe.py --pcap <ldn pcap> --json --redact",
+      "exit_code": 0,
+      "result": "656 AES-CTR advertisement frames, title 0100a250097f0000, scene 0, LDN version 4, payload length OK."
+    },
+    {
+      "command": "tcpdump -r <pcap> -nn -e -vvv and a radiotap parser",
+      "exit_code": 0,
+      "result": "Every injected frame appeared as a pair: one copy with an 8-byte radiotap header and no fields, and one copy with a 13-byte header, rate 2 (1.0 Mb/s), and txflags=0x0. Neither capture contained ambient AP beacons or a frame from the console."
+    }
+  ],
+  "ldn": {
+    "game": "Dragon Ball FighterZ",
+    "title_id": "0100a250097f0000",
+    "scene_id": 0,
+    "channel": 1,
+    "security_mode": 1,
+    "security_mode_name": "prod / encrypted",
+    "challenge_enabled": true,
+    "max_participants": 2,
+    "app_version": 26,
+    "application_data_len": 4,
+    "ldn_version": 4,
+    "protocol": 1,
+    "host_duration_seconds": 30,
+    "console_state": "Dragon Ball FighterZ Local Communication Battle search",
+    "console_note": "The owner reports that the game again searched briefly and said it did not find any rooms. The search was pressed inside the host's advertisement window.",
+    "join_observed": false,
+    "authentication_request_observed": false,
+    "room_observed_on_console": false,
+    "host_log": "Creating LDN network. Press Ctrl-C to stop. title ID 0100a250097f0000, scene 0, channel 1. security mode 1 (prod / encrypted), challenge enabled. SSID: <redacted; 16 bytes>. Waiting for the console to join. No application data is sent. Advertising now. Host stopped. Join events observed: 0."
+  },
+  "frame_validation": {
+    "method": "Parsed the plaintext NetworkId header and AES-CTR format with scripts/ldn_probe.py. No fresh payload decryption was performed for this run.",
+    "result": "The probe found 373 advertisements on the existing monitor interface and 656 on the ldn interface, all for title 0100a250097f0000, scene 0, LDN version 4. Run 1's key-based payload decryption remains the field-level validation.",
+    "note": "The host used the same room file and keys as run 1. This run's purpose was an independent transmission check, not a new payload validation."
+  },
+  "independent_scan": {
+    "method": "macOS CoreWLAN wildcard scan with Location Services authorization status 3, compared against the host adapter BSSID",
+    "scans": 20,
+    "target_bssid_seen": false,
+    "hidden_ambient_bssid_seen": true,
+    "hidden_ambient_note": "A hidden ambient network on channel 1 was visible, so the receiver was not filtering all hidden BSSIDs. The LDN beacon carries a 32-byte null SSID rather than a zero-length hidden SSID, so macOS may still handle it differently; the result is suggestive but not conclusive on its own.",
+    "validity": "VALID as a check that the host BSSID was not reported by this receiver. The scan is not a frame capture, and the null-SSID beacon may be filtered, so an absent BSSID is not proof that no frame was transmitted."
+  },
+  "adapter_tx": {
+    "same_phy_capture": true,
+    "tx_confirmed_on_air": false,
+    "frames_captured_wlx": 373,
+    "frames_captured_ldn": 656,
+    "console_frames_captured": 0,
+    "dmesg_tx_report_failures_before": 5,
+    "dmesg_tx_report_failures_after": 6,
+    "note": "The captures prove that the frames reached the host's own monitor interfaces, not that they reached the air. The independent scan did not report the host BSSID. The AP-mode control later proved the adapter can transmit, and the monitor-mode control showed that this injection path does not transmit (E-090, E-091)."
+  },
+  "radiotap": {
+    "paired_frames": true,
+    "first_copy": "8-byte radiotap header, present flags 0, no fields",
+    "second_copy": "13-byte radiotap header, present flags 0x00028004, rate 2 (1.0 Mb/s), txflags 0x0",
+    "ambient_frames": "None. The capture contained only the host's own beacons and action frames.",
+    "interpretation": "The txflags value is 0x0, so the radiotap header does not assert that the frame was transmitted. The paired copies are consistent with a loopback path on the same phy."
+  },
+  "authorization": "The owner approved one more 30-second prod-mode run and an independent Location Services-enabled BSSID scan. This record covers that run. Another active run requires new explicit approval.",
+  "interpretation": "The third prod-mode host started and advertised, but the console again reported no rooms and the host logged no JOIN. The independent scan did not report the host BSSID, although it did report a hidden ambient BSSID on channel 1. The captures contained only the host's own frames and no ambient beacons. The AP-mode control proves the adapter can transmit, while the monitor-mode control shows that the LDN package's monitor-mode injection does not reach the air. The current host path is therefore blocked by the driver's monitor-mode TX path, not by the console's response to the room. This run does not show that retail 23.0.1 rejects the prod-mode room.",
+  "limitations": [
+    "The same-phy capture is not an independent receiver; it may see injected frames that never reached the air.",
+    "The independent scan is not a frame capture, and the LDN beacon's 32-byte null SSID may be filtered differently from a normal hidden SSID.",
+    "The console screen was observed by the owner, not captured automatically.",
+    "The console's search duration is an owner report, not a measurement.",
+    "Only one game and one prod-mode room were tested.",
+    "Firmware was not re-queried during this run.",
+    "The SSID, interface name, MAC addresses, and pcap paths are redacted."
+  ],
+  "redactions": [
+    "SSID redacted.",
+    "Host adapter BSSID redacted.",
+    "Ambient BSSIDs redacted.",
+    "Monitor interface name redacted because it is derived from the adapter MAC.",
+    "Pcap paths redacted.",
+    "Serial number reduced to the three-character prefix XTJ."
+  ]
+}

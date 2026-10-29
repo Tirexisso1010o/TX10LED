@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ap-mode-tx",
+  "observed_at": "2026-10-29T01:12:00Z",
+  "observed_at_precision": "approximate",
+  "observation_type": "adapter-ap-mode-tx-control",
+  "operator": "hostapd 2.11 in an OrbStack Ubuntu VM; Location Services-enabled CoreWLAN scan from macOS",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not involved in this control test.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "adapter-tx-control",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; AP mode during the test>"
+  },
+  "commands": [
+    {
+      "command": "sudo ip link set <interface> down; sudo iw dev <interface> set type managed; sudo ip link set <interface> up",
+      "exit_code": 0,
+      "result": "The adapter was switched from monitor mode to managed mode."
+    },
+    {
+      "command": "sudo timeout 30 hostapd Firmware/hostapd-test.conf",
+      "exit_code": 124,
+      "result": "hostapd ran until the 30-second timeout. Its log reached 'AP-ENABLED' and later 'AP-DISABLED' on termination."
+    },
+    {
+      "command": "LocationScan.app: CoreWLAN scanForNetworks(withSSID: nil)",
+      "exit_code": 0,
+      "result": "The test SSID TX10LED-TEST was visible at -32 dBm on channel 1, with the host adapter BSSID. The hostapd log confirms AP-ENABLED."
+    },
+    {
+      "command": "sudo pkill -x hostapd; restore monitor mode on channel 1",
+      "exit_code": 0,
+      "result": "hostapd stopped and the adapter was restored to monitor mode on channel 1."
+    }
+  ],
+  "ap_test": {
+    "ssid": "TX10LED-TEST",
+    "channel": 1,
+    "hw_mode": "g",
+    "security": "open (no WPA)",
+    "duration_seconds": 30,
+    "hostapd_version": "2.11",
+    "hostapd_state": "AP-ENABLED",
+    "receiver": "macOS CoreWLAN wildcard scan with Location Services authorization",
+    "observed_rssi_dbm": -32,
+    "observed_channel": 1,
+    "observed_bssid": "<redacted>",
+    "visible": true
+  },
+  "interpretation": "The adapter and the in-kernel rtw88_8822bu driver can transmit a normal 2.4 GHz AP beacon on channel 1. The Mac received it at -32 dBm with the adapter's BSSID. This is a positive control for the monitor-mode test: the RF path and the adapter's AP-mode TX path work, so a failure in monitor mode is specific to monitor-mode injection, not to the hardware's ability to transmit.",
+  "authorization": "The owner approved a normal AP-mode transmission test on channel 1 with a test SSID. The test did not touch the console and did not send LDN frames.",
+  "limitations": [
+    "One adapter, one driver, one kernel, and one channel.",
+    "The test transmitted a normal AP beacon, not an LDN beacon or vendor action frame.",
+    "The Mac scan is a reception check, not a frame capture.",
+    "The host adapter BSSID is redacted."
+  ],
+  "redactions": [
+    "Host adapter BSSID redacted.",
+    "Interface name redacted because it is derived from the adapter MAC."
+  ]
+}

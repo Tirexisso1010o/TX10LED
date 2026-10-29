@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ap-mode-ldn-join-observed",
+  "observed_at": "2026-10-29T02:50:00+01:00",
+  "observed_at_precision": "approximate; hostapd and join-harness log mtime",
+  "observation_type": "console-observed-ap-mode-ldn-join-attempt",
+  "operator": "owner at the console; hostapd 2.11, Firmware/ap_ldn_join_run.sh, and Firmware/ap_ldn_join_test.py in an OrbStack Ubuntu VM",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not instrumented for this test. The owner was present, had the console on the Dragon Ball FighterZ local-wireless search screen, selected the room, and observed the error code and game popup.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "adapter-ap-mode-join-test",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; AP mode during the test>"
+  },
+  "commands": [
+    {
+      "command": "sudo bash Firmware/ap_ldn_join_run.sh 90",
+      "exit_code": null,
+      "result": "hostapd 2.11 reached AP-ENABLED with the room's 32-character hexadecimal WLAN SSID and the LDN RSN IE. The wrapper created the mon-ldn monitor vif on the same phy and ran the advertisement and 0x88B7 responder for 90 seconds. The harness sent 54 advertisements, received 0 0x88B7 authentication frames, and ended with joined=False. The wrapper's final exit status was not preserved in the sanitized record."
+    }
+  ],
+  "hostapd_log": {
+    "path": "/tmp/hostapd-ldn-join.log in the OrbStack VM (local-only; not committed)",
+    "summary": "The console completed open-system authentication, associated with AID 1, and reached AP-STA-CONNECTED with authorized=1. About one second later hostapd received a disassociation from the console with reason_code=8, logged AP-STA-DISCONNECTED, and later deauthenticated the station due to inactivity.",
+    "authentication_events": 1,
+    "association_events": 1,
+    "station_connected_events": 1,
+    "station_disconnected_events": 1,
+    "disassociation_reason": 8,
+    "disassociation_reason_text": "sending STA is leaving BSS",
+    "deauthentication_after_inactivity": true,
+    "note": "The log contains the console's authentication request (len=41), association request (len=127), association response TX status with ack=1, and disassociation (len=26). It does not contain an EAPOL or 0x88B7 exchange."
+  },
+  "join_harness": {
+    "advertisements_sent": 54,
+    "auth_requests_received": 0,
+    "joined": false,
+    "monitor_interface": "mon-ldn on the same phy, channel 1",
+    "monitor_frames_matching_console": 1,
+    "monitor_frame": {
+      "radiotap_len": 28,
+      "radiotap_flags": 16,
+      "fcs_included": true,
+      "inferred_80211_len": 24,
+      "inferred_subtype": 4,
+      "inferred_subtype_text": "null data",
+      "payload_len": 0,
+      "note": "A 24-byte 802.11 header with no payload is a null-data frame. It is not the 946-byte LDN authentication request."
+    },
+    "ap_socket_frame": {
+      "ethernet_len": 20,
+      "ethertype": "0x0006",
+      "payload_len": 6,
+      "note": "Unidentified. Raw payload hex was not preserved in this run; the next run logs it."
+    },
+    "other_console_frames": {
+      "0x0006": 1
+    },
+    "pairwise_key_installed": true,
+    "key_reinstalled_after_station_readd": true,
+    "note": "The harness installed the pairwise CCMP key and reinstalled it after hostapd's authentication-time station reset. It never reached the auth-response path because no 0x88B7 request was observed."
+  },
+  "console_observation": {
+    "room_name": "TX10LED",
+    "room_appeared": true,
+    "action": "selected the room",
+    "error_code": "2203-0066",
+    "error_timing": "after a few seconds",
+    "game_popup": "unable to join the room",
+    "search_screen_after_error": "closed",
+    "console_state_after_error": "returned to the game normally; the console remained responsive",
+    "observer": "owner"
+  },
+  "test_configuration": {
+    "hostapd_ssid": "<redacted; the room's 32-character hexadecimal WLAN SSID>",
+    "room_ssid_used_as_wlan_ssid": true,
+    "hostapd_security": "wpa=0 with a throwaway WEP key only to set the privacy bit",
+    "rsn_ie_sent_in_beacon": true,
+    "rsn_ie_sent_in_association_response": true,
+    "rsn_ie": "30140100000fac040100000fac040100000fac020c00",
+    "advertisement": "the real captured AES-CTR LDN advertisement from the room, sent as a unicast vendor action with the AP BSSID",
+    "beacon": "null-SSID LDN beacon with the AP BSSID",
+    "channel": 1,
+    "frequency_mhz": 2412,
+    "ldn_password": "empty (assumed; not independently verified)"
+  },
+  "interpretation": "The WLAN layer succeeded: the console authenticated, associated with AID 1, and hostapd marked the station authorized. The console then disassociated itself with reason 8 after about one second, before any 0x88B7 authentication request was observed. The monitor's 28-byte frame is a null-data frame, not the LDN request. The 20-byte AP-socket frame with ethertype 0x0006 is unidentified. The failure therefore moved past the scan and association layers but stopped before the custom LDN authentication exchange. The association response included an RSN IE that the ldn package's MonitorAP does not send; that mismatch is the leading candidate for the console's decision to leave, but it is not proven. The console stayed responsive, so there is no evidence of a memory-safety fault.",
+  "limitations": [
+    "No pcap or raw hex was preserved from this run; the 28-byte frame's null-data identity is inferred from its length and the monitor's 802.11 type check, not from a full decode.",
+    "The 20-byte AP-socket frame with ethertype 0x0006 is unidentified.",
+    "No 0x88B7 authentication request was observed; the run cannot distinguish a console abort before the request from a receive-path miss.",
+    "The console reaction is owner-reported and was not instrumented.",
+    "The association response's RSN IE is a candidate explanation, not a proven cause.",
+    "One adapter, driver, kernel, and channel.",
+    "The host adapter BSSID, interface name, console station MAC, room SSID, application data, and keys are redacted."
+  ],
+  "redactions": [
+    "Host adapter BSSID redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "Console station MAC redacted; it is stored only in the local ignored file Firmware/console-mac.local.txt.",
+    "Room SSID and application data redacted; the room parameters are stored locally in Firmware/ldn-room.json.",
+    "Keys and the local hostapd configuration are not included."
+  ]
+}

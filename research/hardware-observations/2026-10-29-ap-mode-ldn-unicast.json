@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ap-mode-ldn-unicast",
+  "observed_at": "2026-10-29T01:45:00+01:00",
+  "observed_at_precision": "approximate",
+  "observation_type": "adapter-ap-mode-real-ldn-unicast",
+  "operator": "hostapd 2.11 and Firmware/ap_ldn_unicast_test.py in an OrbStack Ubuntu VM",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not instrumented for this test, and the owner reports it was off/away during the run.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "adapter-tx-test",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; AP mode during the test>"
+  },
+  "commands": [
+    {
+      "command": "sudo bash Firmware/ap_ldn_run.sh 60",
+      "exit_code": null,
+      "result": "First attempt: hostapd reached AP-ENABLED, the temporary station entry was added, and the script failed on the first action frame with [Errno 22] Invalid argument. 0 advertisements were sent; the station entry was removed and monitor mode was restored."
+    },
+    {
+      "command": "sudo env PYTHONUNBUFFERED=1 python Firmware/ap_action_variants.py <interface> Firmware/ldn-room.json Firmware/prod.keys.txt <console-mac>",
+      "exit_code": 0,
+      "result": "Diagnostic: the LDN advertisement and a short control were each sent with a broadcast BSSID and with the AP BSSID. Broadcast BSSID failed with EINVAL for both frames; AP BSSID succeeded for both. The station entry was removed."
+    },
+    {
+      "command": "sudo bash Firmware/ap_ldn_run.sh 60",
+      "exit_code": 0,
+      "result": "Second attempt with --variant ap: hostapd reached AP-ENABLED, the temporary station entry was added, 568 real LDN advertisements and 568 null-SSID LDN beacons were submitted without a netlink error, the station entry was removed, and hostapd reached AP-DISABLED."
+    },
+    {
+      "command": "sudo iw dev <interface> set type monitor; sudo ip link set <interface> up; sudo iw dev <interface> set channel 1",
+      "exit_code": null,
+      "result": "Monitor mode was restored after the run, but the interface was left DOWN and could not be brought up. dmesg reported 'error beacon valid', 'failed to download rsvd page', 'failed to download firmware', and probe error -16."
+    },
+    {
+      "command": "echo 0 > /sys/bus/usb/devices/2-1/authorized; echo 1 > /sys/bus/usb/devices/2-1/authorized; sudo modprobe rtw88_8822bu",
+      "exit_code": 0,
+      "result": "USB deauthorize/reauthorize recovered the adapter. The driver probed cleanly, monitor mode on channel 1 was restored, and a passive check received traffic on channels 6 and 11 (61 and 120 packets in 5 seconds respectively); channel 1 was quiet."
+    }
+  ],
+  "ldn_unicast_test": {
+    "room": {
+      "title_id": "0100a250097f0000",
+      "scene_id": 0,
+      "channel": 1,
+      "freq_mhz": 2412,
+      "ldn_version": 4,
+      "security_mode": 1,
+      "max_participants": 2,
+      "app_version": 26,
+      "ssid": "<redacted; 16 bytes>",
+      "application_data": "<redacted; 4 bytes>"
+    },
+    "frame_type": "LDN vendor action (category 0x7f, OUI 00:22:aa, type 0x04)",
+    "advertisement_length_bytes": 1364,
+    "action_frame_length_bytes": 1388,
+    "beacon": "null-SSID LDN beacon, 89 bytes",
+    "destination": "<redacted; console station MAC recovered from the local Phase 1 pcap>",
+    "bssid": "<redacted; the AP interface address>",
+    "bssid_variant": "AP BSSID; the driver rejects a broadcast BSSID with EINVAL",
+    "station_entry": "temporary, added through NL80211_CMD_NEW_STATION and removed through NL80211_CMD_DEL_STATION",
+    "frames_submitted": 568,
+    "frames_accepted_by_kernel": 568,
+    "beacons_submitted": 568,
+    "netlink_errors": 0,
+    "interval_seconds": 0.1,
+    "hostapd_version": "2.11",
+    "hostapd_state": "AP-ENABLED, then AP-DISABLED",
+    "receiver": "none; the console was off/away and the Mac cannot independently capture the AP's transmissions",
+    "console_reaction": "not observed",
+    "adapter_after_test": "monitor mode on channel 1 after a USB deauthorize/reauthorize recovery"
+  },
+  "broadcast_bssid_diagnostic": {
+    "ldn_broadcast_bssid": "FAIL, [Errno 22] Invalid argument, 1388 bytes",
+    "ldn_ap_bssid": "OK, 1388 bytes",
+    "short_broadcast_bssid": "FAIL, [Errno 22] Invalid argument, 42 bytes",
+    "short_ap_bssid": "OK, 42 bytes",
+    "beacon_variants": "All accepted, including the 89-byte null-SSID LDN beacon; the beacon was not the cause of the earlier failure.",
+    "station_entry": "temporary, added before the variants and removed afterward"
+  },
+  "interpretation": "The running mac80211/rtw88_8822bu stack accepted 568 real LDN unicast vendor action frames and 568 null-SSID LDN beacons through NL80211_CMD_FRAME on an AP interface. This confirms that the AP-BSSID unicast path can carry the captured room's valid AES-CTR advertisement at the driver level. It does not show that the console received the frames or that its LDN parser reacted: the console was off/away, no independent receiver captured the frames, and the original LDN advertisement uses a broadcast BSSID while this path requires the AP BSSID. The diagnostic isolated the earlier failure to the broadcast BSSID: the driver rejects any action frame with a broadcast BSSID with EINVAL, and accepts the same frame with the AP BSSID. The run is therefore inconclusive for the LDN hypothesis, not a negative result. The post-run firmware download failure and the required USB deauthorize/reauthorize are host-side reliability issues that must be checked before another run.",
+  "authorization": "The owner approved a 60-second real LDN unicast test on channel 1. The test sent the captured room's valid advertisement and the null-SSID LDN beacon, used a temporary station entry, and did not send malformed data, application data, authentication, or storage writes. The console was off/away, so no console state changed.",
+  "limitations": [
+    "One adapter, one driver, one kernel, and one channel.",
+    "The console was off/away; reception and parser reaction were not observed.",
+    "No independent receiver captured the frames; the AP radio cannot simultaneously monitor its own transmissions on this setup.",
+    "The original LDN advertisement uses a broadcast BSSID; this path can only use the AP BSSID because the driver rejects broadcast-BSSID action frames with EINVAL.",
+    "The station entry was synthetic and unassociated; it was created only to satisfy the mac80211 lookup.",
+    "dmesg reported 'failed to get tx report from firmware' during the run and a firmware download failure after hostapd stopped; the adapter needed a USB deauthorize/reauthorize cycle before it would probe again.",
+    "The 568-frame count is the number of accepted NL80211_CMD_FRAME requests, not a count of frames independently confirmed on air.",
+    "The host adapter BSSID, interface name, console station MAC, SSID, and application data are redacted."
+  ],
+  "redactions": [
+    "Host adapter BSSID redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "Console station MAC redacted; it is stored only in the local ignored file Firmware/console-mac.local.txt.",
+    "Room SSID and application data redacted; the room parameters are stored locally in Firmware/ldn-room.json."
+  ]
+}

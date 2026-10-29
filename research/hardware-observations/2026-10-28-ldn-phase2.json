@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-28-ldn-phase2",
+  "observed_at": "2026-10-28T22:00:09Z",
+  "observed_at_precision": "second",
+  "observation_type": "ldn-plaintext-host-attempt",
+  "operator": "scripts/ldn_host.py in an OrbStack Ubuntu VM",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "Firmware was not re-queried during this run. The 2026-10-26 PTP observation recorded 23.0.1.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this run does not detect modifications"
+  },
+  "connection": {
+    "mode": "local-wireless-host",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; monitor mode>"
+  },
+  "commands": [
+    {
+      "command": "scripts/ldn_host.py --title-id 0100a250097f0000 --scene-id 0 --ssid <redacted> --channel 1 --ifname ldn --phyname phy1 --name TX10LED --dry-run",
+      "exit_code": 0,
+      "result": "Dry run only; security mode 3 (system debug / plaintext), challenge disabled, frame length 1364 bytes."
+    },
+    {
+      "command": "scripts/ldn_host.py --title-id 0100a250097f0000 --scene-id 0 --ssid <redacted> --channel 1 --ifname ldn --phyname phy1 --name TX10LED --duration 30 --host --confirm",
+      "exit_code": 1,
+      "result": "Setup failed before transmission: the package tried to create the second monitor interface with NL80211_MNTR_FLAG_ACTIVE, which rtw88_8822bu rejects with OSError [Errno 95] Operation not supported."
+    },
+    {
+      "command": "scripts/ldn_host.py --title-id 0100a250097f0000 --scene-id 0 --ssid <redacted> --channel 1 --ifname ldn --phyname phy1 --name TX10LED --duration 2 --host --confirm --compat-no-active-ack",
+      "exit_code": 0,
+      "result": "Host started, advertised, and stopped cleanly after 2 seconds. No JOIN."
+    },
+    {
+      "command": "scripts/ldn_host.py --title-id 0100a250097f0000 --scene-id 0 --ssid <redacted> --channel 1 --ifname ldn --phyname phy1 --name TX10LED --duration 30 --host --confirm --compat-no-active-ack",
+      "exit_code": 0,
+      "result": "Host started, advertised, and stopped cleanly after 30 seconds. The log ended with 'Host stopped.' and contained no JOIN, no authentication request, and no error."
+    },
+    {
+      "command": "scripts/ldn_host.py --title-id 0100a250097f0000 --scene-id 0 --ssid <redacted> --channel 1 --ifname ldn --phyname phy1 --name TX10LED --duration 60 --host --confirm --compat-no-active-ack",
+      "exit_code": 0,
+      "result": "Host started, advertised, and stopped cleanly after 60 seconds. No JOIN. Three CoreWLAN scans from the Mac's built-in Wi-Fi did not show the 32-character SSID, but the scan is not a valid transmission check because the LDN beacon uses a null SSID."
+    }
+  ],
+  "ldn": {
+    "game": "Dragon Ball FighterZ",
+    "title_id": "0100a250097f0000",
+    "scene_id": 0,
+    "channel": 1,
+    "security_mode": 3,
+    "security_mode_name": "system debug / plaintext",
+    "challenge_enabled": false,
+    "frame_length": 1364,
+    "host_duration_seconds": 30,
+    "console_state": "Dragon Ball FighterZ Local Wireless join/search screen",
+    "join_observed": false,
+    "authentication_request_observed": false,
+    "room_observed_on_console": false,
+    "console_note": "The owner reports that no room appeared after multiple search attempts.",
+    "host_log": "Creating plaintext LDN network. Press Ctrl-C to stop. Waiting for the console to join. No application data is sent. Host stopped."
+  },
+  "adapter_tx": {
+    "tx_confirmed": false,
+    "independent_receiver": "Mac built-in Wi-Fi CoreWLAN scan (three scans; invalid because a wildcard scan does not see the null-SSID LDN beacon)",
+    "dmesg_messages": [
+      "rtw88_8822bu 2-1:1.0: failed to get tx report from firmware",
+      "rtw88_8822bu 2-1:1.0: failed to get tx report from firmware",
+      "rtw88_8822bu 2-1:1.0: failed to get tx report from firmware"
+    ],
+    "dmesg_count": 3,
+    "note": "The first two messages correspond to the 2-second and 30-second runs; the third corresponds to the 60-second run. The in-kernel rtw88_8822bu driver is reported to fail beacon transmission in AP mode with this firmware error. No valid independent receiver was used, so the host's frames may not have been on air.",
+    "tx_check_valid": false,
+    "tx_check_note": "The 60-second check scanned for the 32-character SSID and did not see it. The check is invalid: the LDN host beacon uses SSIDElement(\"\\x00\" * 32), and the real network ID is carried in vendor action frames, which a wildcard Wi-Fi scan does not report. The scan therefore cannot distinguish a silent host from a transmitting host."
+  },
+  "authorization": "The owner approved the Phase 2 plaintext LDN host test and a 60-second TX check; this record covers those approved runs. Another active run requires new approval.",
+  "interpretation": "Inconclusive. The host process started and stopped cleanly, but the console saw no room and the host logged no JOIN. The rtw88_8822bu driver reported 'failed to get tx report from firmware' after the 2-second, 30-second, and 60-second runs, so the host's transmission is unconfirmed. The 60-second CoreWLAN check was invalid because the LDN beacon uses a null SSID and the network ID is carried in vendor action frames. This result cannot distinguish a console rejection of security mode 3 from a host that never transmitted.",
+  "limitations": [
+    "No valid independent receiver was used to confirm that the host's frames were on air; the 60-second CoreWLAN scan could not see the null-SSID beacon.",
+    "The console screen was observed by the owner, not captured automatically.",
+    "Only one game and one network were tested.",
+    "Firmware was not re-queried during this run.",
+    "The SSID, interface name, and any MAC addresses are redacted."
+  ],
+  "redactions": [
+    "SSID redacted.",
+    "Monitor interface name redacted because it is derived from the adapter MAC.",
+    "Serial number reduced to the three-character prefix XTJ."
+  ],
+  "tx_diagnostic": {
+    "observed_at": "2026-10-28",
+    "observed_at_precision": "day",
+    "host_duration_seconds": 60,
+    "channel": 1,
+    "receiver": "Mac built-in Wi-Fi, CoreWLAN scanForNetworks(withSSID: nil), three scans",
+    "ssid_checked": "<redacted; 32 hexadecimal characters>",
+    "ssid_seen": false,
+    "scans": 3,
+    "result": "The 32-character SSID did not appear in any of the three scans.",
+    "validity": "INVALID as a transmission check. The LDN beacon carries a 32-byte null SSID, and the network ID is inside vendor action frames. A wildcard Wi-Fi scan does not report either. The check neither confirms nor denies that the host transmitted.",
+    "dmesg": "A third 'failed to get tx report from firmware' message appeared after the 60-second run.",
+    "host_log": "Creating plaintext LDN network. Press Ctrl-C to stop. Waiting for the console to join. No application data is sent. Host stopped.",
+    "note": "A directed scan for the known SSID is a better one-sided check: the host answers a matching directed probe request with a probe response that carries the real SSID, so a positive result confirms TX. A negative result is still inconclusive. Use a monitor-mode capture on the host interface, a second monitor-mode receiver, or a second PC/adapter for a definitive check. The Mac's wildcard Wi-Fi scan is not suitable."
+  }
+}

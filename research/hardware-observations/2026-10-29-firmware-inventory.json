@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-firmware-inventory",
+  "observed_at": "2026-10-29T00:00:00Z",
+  "observed_at_precision": "day",
+  "observation_type": "read-only-firmware-inventory",
+  "operator": "Python 3.13 with the cryptography package; NCA headers decrypted locally with the owner's header_key",
+  "console": {
+    "model": "HEG-001",
+    "firmware_reported_by_user": "23.0.1",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this analysis does not detect modifications"
+  },
+  "artifacts": {
+    "firmware_directory": "Firmware/Firmware.23.0.1",
+    "firmware_file_count": 238,
+    "firmware_size_bytes_approx": 340787200,
+    "file_types": {
+      "nca": 238
+    },
+    "content_type_counts": {
+      "program": 76,
+      "meta": 121,
+      "data": 38,
+      "public_data": 3
+    },
+    "keys_file": "Firmware/prod.keys.txt",
+    "keys_file_key_count": 222,
+    "keys_file_max_master_key": "master_key_14",
+    "keys_file_max_key_area_key_application": "key_area_key_application_14",
+    "version_source": "owner-reported and folder-named; not independently verified with a firmware tool",
+    "handling": "Both artifacts are local-only and ignored by git. No key values or decrypted content are recorded here."
+  },
+  "nca_inventory": {
+    "headers_parsed": 238,
+    "valid_nca3_headers": 238,
+    "key_generation_counts": {
+      "0x00": 126,
+      "0x07": 2,
+      "0x0b": 1,
+      "0x10": 1,
+      "0x14": 3,
+      "0x15": 1,
+      "0x16": 8,
+      "0x17": 96
+    },
+    "key_area_encryption_key_index_counts": {
+      "0x00": 238
+    },
+    "highest_key_generation": "0x17",
+    "highest_key_generation_name": "23.0.0",
+    "note": "The key generation is the value at NCA header offset 0x220. The effective master-key revision is the maximum of 0x206 and 0x220, minus one, so 0x17 maps to key_area_key_application_16."
+  },
+  "ldn_identification": {
+    "title_id": "0100000000000018",
+    "title_name": "ldn",
+    "title_name_source": "community system-module title-ID mapping; the title ID is read from the NCA header",
+    "nca_file": "755bcf33085ed666cbbcf34de83d1cb0.nca",
+    "content_type": "program",
+    "content_size": 556544,
+    "key_generation": "0x17",
+    "key_area_encryption_key_index": "0x00",
+    "rights_id_present": false,
+    "section_0": {
+      "media_start_offset": "0xc00",
+      "media_end_offset": "0x87e00",
+      "size": 556032,
+      "fs_type": "partitionfs",
+      "hash_type": "hierarchical_sha256",
+      "encryption_type": "aes_ctr"
+    },
+    "extraction_status": "blocked",
+    "title_version": "0x5c0004b0",
+    "title_version_decimal": 1543505072,
+    "meta_nca": "5bc39286ff59b4bd3abc2bbca467e86c.cnmt.nca",
+    "meta_content_type": "SystemProgram",
+    "nca_sha256": "755bcf33085ed666cbbcf34de83d1cb0f7ceaa0ebf7a106dfa54a2d54b193072",
+    "nca_sha256_matches_cnmt": true
+  },
+  "key_coverage": {
+    "required_for_ldn": "key_area_key_application_16",
+    "present_in_keys_file": false,
+    "present_key_area_key_application_range": "0x00 through 0x14",
+    "consequence": "The ldn NCA header can be parsed and the ldn meta NCA is readable, but the program NCA's key area and section cannot be decrypted with the supplied keys.",
+    "ldn_advertisement_note": "The LDN advertisement decryption used KeyDerivation(protocol=1) with master_key_00, which is why it succeeded even though the file does not cover the 23.0.1 NCA key generation."
+  },
+  "package1": {
+    "present_in_dump": false,
+    "reason": "The dump contains only NCA files. Package1 is stored in the BOOT0 partition, not in the firmware NCA set."
+  },
+  "tooling": {
+    "hactool": "not installed",
+    "nxdump": "not installed",
+    "header_parser": "local Python script using AES-XTS with the owner's header_key",
+    "next_tool_needed": "hactool or equivalent, plus a key set that covers key_area_key_application_15 and key_area_key_application_16"
+  },
+  "interpretation": "All 238 NCA headers are valid and parseable with the owner's header_key. The ldn sysmodule is identified as title 0100000000000018, version 0x5c0004b0, NCA 755bcf33085ed666cbbcf34de83d1cb0.nca, a 556,544-byte program NCA whose section 0 is a 556,032-byte AES-CTR PartitionFS. The ldn meta NCA decrypts with key_area_key_application_00 and its CNMT confirms the title version and the program NCA's SHA-256, which matches the local file. The program NCA uses key generation 0x17 (23.0.0), which requires key_area_key_application_16. The owner's prod.keys file stops at key generation 0x14 (20.0.0), so the program key area and section cannot be decrypted. The dump is NCA-only, so package1 is not present. This is a concrete key-coverage and artifact gap, not a failure of the LDN advertisement decryption.",
+  "limitations": [
+    "The firmware dump's version is owner-reported and folder-named 23.0.1; it was not independently verified with a firmware tool.",
+    "The title-ID mapping comes from a community list; the title ID itself is read from the NCA header.",
+    "Package1 is absent, so the warmboot direction cannot be analyzed from this dump.",
+    "No key values, decrypted NCA content, or proprietary firmware are recorded here.",
+    "No program-NCA content was decrypted; the ldn meta NCA/CNMT was decrypted for title version and hash verification."
+  ],
+  "redactions": [
+    "Key values are not recorded.",
+    "Only one NCA filename is recorded, for the ldn identification.",
+    "The serial number is reduced to the prefix XTJ.",
+    "No decrypted NCAs, KIPs, NSOs, or package1 images are recorded."
+  ],
+  "metadata_analysis": {
+    "method": "The ldn meta NCA was decrypted locally with AES-ECB (key_area_key_application_00) for the key area and AES-CTR for its PFS0 section, then the CNMT was parsed.",
+    "result": "The CNMT reports title 0100000000000018, version 0x5c0004b0 (1543505072), content type SystemProgram, one content entry, and the NCA SHA-256 755bcf33085ed666cbbcf34de83d1cb0f7ceaa0ebf7a106dfa54a2d54b193072. That hash matches the local NCA file exactly.",
+    "consequence": "The metadata path is readable with the supplied keys, but the program NCA content still requires key_area_key_application_16, which is absent. The hash match confirms the local ldn NCA is intact and matches its metadata."
+  }
+}

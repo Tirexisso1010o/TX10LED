@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ldn-prod-host",
+  "observed_at": "2026-10-28T23:38:23Z",
+  "observed_at_precision": "second",
+  "observation_type": "ldn-prod-host-attempt",
+  "operator": "scripts/ldn_host.py and tcpdump in an OrbStack Ubuntu VM; CoreWLAN scans from macOS",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "Firmware was not re-queried during this run. The 2026-10-26 PTP observation recorded 23.0.1.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this run does not detect modifications"
+  },
+  "connection": {
+    "mode": "local-wireless-host",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; monitor mode>"
+  },
+  "commands": [
+    {
+      "command": "scripts/ldn_host.py --room-file Firmware/ldn-room.json --keys-file Firmware/prod.keys.txt --dry-run",
+      "exit_code": 0,
+      "result": "Dry run only. Security mode 1 (prod/encrypted), challenge enabled, max 2 participants, app version 26, LDN version 4, protocol 1, application data 4 bytes, frame format aes-ctr, frame length 1364 bytes, round-trip decode OK (11 fields match). SSID and frame hex were not printed."
+    },
+    {
+      "command": "scripts/ldn_host.py --room-file Firmware/ldn-room.json --keys-file Firmware/prod.keys.txt --host --confirm --compat-no-active-ack --ifname ldn --phyname phy1 --duration 30",
+      "exit_code": 0,
+      "result": "Host started, advertised, and stopped cleanly. The log ended with 'Host stopped. Join events observed: 0.'"
+    },
+    {
+      "command": "tcpdump -i <existing monitor interface> -y IEEE802_11_RADIO -w <local pcap> -U",
+      "exit_code": 0,
+      "result": "Captured 660 beacons, 373 vendor action frames, and 10 data frames from the host adapter. No frames from the console."
+    },
+    {
+      "command": "tcpdump -i ldn -y IEEE802_11_RADIO -w <local pcap> -U",
+      "exit_code": 0,
+      "result": "Captured 1222 beacons, 655 vendor action frames, and 19 data frames from the host adapter. No frames from the console."
+    },
+    {
+      "command": "macOS CoreWLAN scanForNetworks(withSSID: <room SSID>)",
+      "exit_code": 0,
+      "result": "Three attempts returned FOUND with rssi -90 and channel 6; a later attempt returned FOUND with rssi -94 and channel 13. Every result had a nil BSSID. A control scan for a random non-existent 16-byte SSID also returned FOUND (rssi -81, channel 1, nil BSSID)."
+    },
+    {
+      "command": "macOS CoreWLAN scanForNetworks(withSSID: nil), compare CWNetwork.bssid to the host adapter",
+      "exit_code": 0,
+      "result": "With the host stopped, the host BSSID was not present in 6 scan results. This validates the baseline for the next independent check."
+    }
+  ],
+  "ldn": {
+    "game": "Dragon Ball FighterZ",
+    "title_id": "0100a250097f0000",
+    "scene_id": 0,
+    "channel": 1,
+    "security_mode": 1,
+    "security_mode_name": "prod / encrypted",
+    "challenge_enabled": true,
+    "max_participants": 2,
+    "app_version": 26,
+    "application_data_len": 4,
+    "ldn_version": 4,
+    "protocol": 1,
+    "frame_length": 1364,
+    "payload_size": 1280,
+    "ciphertext_len": 1312,
+    "frame_format": "aes-ctr",
+    "host_duration_seconds": 30,
+    "capture_window_seconds": 36.5,
+    "console_state": "Dragon Ball FighterZ Local Communication Battle search",
+    "console_note": "The owner reports that the game searches for about one second and then says it did not find any rooms.",
+    "join_observed": false,
+    "authentication_request_observed": false,
+    "room_observed_on_console": false,
+    "host_log": "Creating LDN network. Press Ctrl-C to stop. title ID 0100a250097f0000, scene 0, channel 1. security mode 1 (prod / encrypted), challenge enabled. SSID: <redacted; 16 bytes>. Waiting for the console to join. No application data is sent. Advertising now. Host stopped. Join events observed: 0."
+  },
+  "frame_validation": {
+    "method": "Decoded the first captured host advertisement with the owner's local keys and KeyDerivation(protocol=1).",
+    "result": "The advertisement decrypted and its SHA-256 validated.",
+    "fields": {
+      "title_id": "0100a250097f0000",
+      "scene_id": 0,
+      "ldn_version": 4,
+      "security_mode": 1,
+      "challenge_present": true,
+      "max_participants": 2,
+      "num_participants": 1,
+      "app_version": 26,
+      "application_data_len": 4,
+      "participant_slots": 8
+    },
+    "ssid_matches_room": true,
+    "participant_name_length": 7,
+    "phase1_participant_name_length": 21,
+    "note": "The host frame matches the Phase 1 room's decrypted fields. The participant name length differs because the host uses the local name TX10LED."
+  },
+  "adapter_tx": {
+    "same_phy_capture": true,
+    "tx_confirmed_on_air": false,
+    "frames_captured": 373,
+    "beacons_captured": 660,
+    "console_frames_captured": 0,
+    "dmesg_tx_report_failures_before": 3,
+    "dmesg_tx_report_failures_after": 4,
+    "note": "The capture on the host's own phy proves that the frames reached the monitor interfaces, but it does not prove RF transmission. The rtw88_8822bu driver may loop back injected frames, and it logged one new 'failed to get tx report from firmware' message. An independent receiver is still required."
+  },
+  "directed_scan": {
+    "method": "macOS CoreWLAN scanForNetworks(withSSID:) for the 16-byte room SSID",
+    "attempts": 3,
+    "results": [
+      "FOUND rssi=-90 channel=6 bssid=<nil>",
+      "FOUND rssi=-90 channel=6 bssid=<nil>",
+      "FOUND rssi=-90 channel=6 bssid=<nil>"
+    ],
+    "follow_up": "FOUND rssi=-94 channel=13 bssid=<nil>",
+    "control": "A scan for a random non-existent 16-byte SSID also returned FOUND (rssi=-81, channel=1, bssid=<nil>).",
+    "validity": "INVALID as a transmission check. The API returns a false positive for a non-existent 16-byte SSID with a nil BSSID and an inconsistent channel, so a FOUND result cannot be attributed to the host.",
+    "conclusion": "Do not use the directed CoreWLAN scan as a TX check. Use a wildcard scan for the host BSSID or a second receiver instead."
+  },
+  "wildcard_bssid_check": {
+    "method": "macOS CoreWLAN scanForNetworks(withSSID: nil) and compare CWNetwork.bssid to the host adapter BSSID",
+    "host_running": false,
+    "result": "The host BSSID was not present in 6 scan results with the host stopped.",
+    "validity": "This is the independent check to run during the next approved host run. It does not rely on the broken directed-SSID matching."
+  },
+  "authorization": "The owner approved one short prod-mode host run with the existing local keys, a directed SSID scan, and a capture. This record covers that run. Another active run requires new explicit approval.",
+  "interpretation": "The prod-mode host built and transmitted 373 AES-CTR advertisements whose decrypted fields match the target's Phase 1 room, including the SSID, application data, challenge, max participants, and app version. The host logged no JOIN, the console reported no rooms after a roughly one-second search, and the capture saw no frames from the console. The same-phy capture and the invalid directed scan do not independently prove that the frames were on air; the rtw88_8822bu driver may loop back injected frames, and it logged one new TX-report failure. The result is therefore inconclusive about RF transmission and does not show that the console rejected the prod-mode room.",
+  "limitations": [
+    "The same-phy capture is not an independent receiver; it may see injected frames that never reached the air.",
+    "The macOS directed-SSID scan is invalid because it returns false positives for non-existent 16-byte SSIDs.",
+    "The console screen was observed by the owner, not captured automatically.",
+    "The console's roughly one-second search duration is an owner report, not a measurement.",
+    "Only one game and one prod-mode room were tested.",
+    "Firmware was not re-queried during this run.",
+    "The SSID, interface name, and MAC addresses are redacted."
+  ],
+  "redactions": [
+    "SSID redacted.",
+    "Host adapter BSSID redacted.",
+    "Monitor interface name redacted because it is derived from the adapter MAC.",
+    "Serial number reduced to the three-character prefix XTJ."
+  ]
+}

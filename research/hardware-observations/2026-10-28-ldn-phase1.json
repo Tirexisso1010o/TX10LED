@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-28-ldn-phase1",
+  "observed_at": "2026-10-28T21:46:16Z",
+  "observed_at_precision": "second",
+  "observation_type": "ldn-passive-advertisement-capture",
+  "operator": "tcpdump and scripts/ldn_probe.py in an OrbStack Ubuntu VM",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "Firmware was not re-queried during this capture. The 2026-10-26 PTP observation recorded 23.0.1.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this capture does not detect modifications"
+  },
+  "connection": {
+    "mode": "local-wireless-monitor",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "driver_version": "7.2.12-orbstack-00394-gbecdd6130068",
+    "firmware_version": "30.20.0",
+    "interface": "wlx... (redacted; monitor mode)",
+    "monitor_mode_supported": true,
+    "monitor_mode_verified": true,
+    "monitor_mode_note": "The interface was set to type monitor and captured 269 frames during a channel-hopping run. A separate 20-frame capture also succeeded."
+  },
+  "commands": [
+    {
+      "command": "ethtool -i <monitor-interface>",
+      "exit_code": 0,
+      "result": "driver: rtw88_8822bu; firmware-version: 30.20.0; bus-info: 2-1:1.0"
+    },
+    {
+      "command": "iw phy phy1 info | sed -n '/Supported interface modes/,/Band 1/p'",
+      "exit_code": 0,
+      "result": "IBSS, managed, AP, AP/VLAN, monitor"
+    },
+    {
+      "command": "ip link set <monitor-interface> down; iw dev <monitor-interface> set type monitor; ip link set <monitor-interface> up",
+      "exit_code": 0,
+      "result": "interface type: monitor; channel 1 (2412 MHz)"
+    },
+    {
+      "command": "tcpdump -i <monitor-interface> -y IEEE802_11_RADIO -w ldn-phase1.pcap -U",
+      "exit_code": 0,
+      "result": "269 packets captured; 0 packets dropped by kernel; capture hopped channels 1, 6, and 11 for about 22 seconds"
+    },
+    {
+      "command": "scripts/ldn_probe.py --pcap ldn-phase1.pcap --json --redact",
+      "exit_code": 0,
+      "result": "64 advertisement frames; 1 unique network; plaintext NetworkId header parsed"
+    }
+  ],
+  "ldn": {
+    "game": "Dragon Ball FighterZ",
+    "title_id": "0100a250097f0000",
+    "scene_id": 0,
+    "ldn_version": 4,
+    "format": "aes-ctr",
+    "size": 1280,
+    "nonce": "39030b16",
+    "ciphertext_len": 1312,
+    "payload_len_ok": true,
+    "advertisement_frames": 64,
+    "unique_networks": 1,
+    "capture_packets": 269,
+    "channel_observations": {
+      "channel_1_2412_mhz": 61,
+      "channel_6_2437_mhz": 1,
+      "channel_11_2462_mhz": 2
+    },
+    "dominant_channel": 1,
+    "source_mac": "xx:xx:xx:xx:xx:xx",
+    "ssid": "<redacted>"
+  },
+  "interpretation": "The retail console advertises a Dragon Ball FighterZ LDN network whose plaintext NetworkId header is readable without keys. The owner-provided prod.keys decrypt the full advertisement and validate its SHA-256, confirming that the room uses security mode 1 (prod/encrypted) with the challenge enabled, channel 1, max 2 participants, and app version 26. This confirms the passive half of the LDN path and the key compatibility with the target firmware. It does not show that the console will accept a PC-hosted network, and it is not evidence of a parser vulnerability.",
+  "limitations": [
+    "Passive capture only. No LDN frames were transmitted to the console.",
+    "The keys are from the owner's other modded Switch, not from the target. The target remains unmodified.",
+    "The firmware dump's version is owner-reported and folder-named 23.0.1; it was not independently verified with a firmware tool.",
+    "Only one game and one network were captured.",
+    "Firmware was not re-queried during this run.",
+    "The capture hopped channels, so the per-channel frame counts are not a complete channel survey.",
+    "The unredacted pcap and JSON are local-only because they contain the console MAC and SSID.",
+    "The key file matches the LDN key derivation but stops at key generation 0x14; it does not cover the 23.0.1 NCA key generation (E-083)."
+  ],
+  "redactions": [
+    "Source MAC redacted to xx:xx:xx:xx:xx:xx.",
+    "SSID redacted.",
+    "Monitor interface name redacted because it is derived from the adapter MAC.",
+    "Serial number reduced to the three-character prefix XTJ.",
+    "Key material, server random, and application data are not recorded."
+  ],
+  "key_check": {
+    "performed_at": "2026-10-28",
+    "method": "kinnay/LDN AdvertisementFrame.decode with KeyDerivation(protocol=1) over the local pcap",
+    "key_source": "owner-provided prod.keys dump from the owner's other modded Switch; local-only and excluded from version control",
+    "decryption": "successful; the advertisement SHA-256 validated",
+    "security_mode": 1,
+    "security_mode_name": "prod / encrypted",
+    "challenge_present": true,
+    "channel": 1,
+    "band": "2.4 GHz",
+    "max_participants": 2,
+    "num_participants": 1,
+    "app_version": 26,
+    "application_data_len": 4,
+    "participant_slots": 8,
+    "note": "The keys match the target firmware's LDN key derivation. The decrypted fields confirm the retail room is encrypted, not a development mode. SSID, MAC addresses, server random, and application data are not recorded."
+  }
+}

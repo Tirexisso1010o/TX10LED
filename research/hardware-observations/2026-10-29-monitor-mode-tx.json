@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-monitor-mode-tx",
+  "observed_at": "2026-10-29T01:16:00Z",
+  "observed_at_precision": "approximate",
+  "observation_type": "adapter-monitor-mode-tx-test",
+  "operator": "Firmware/monitor_beacon_test.py with the ldn package MonitorAP in an OrbStack Ubuntu VM; Location Services-enabled CoreWLAN scan from macOS",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not involved in this control test.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "adapter-tx-control",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; monitor mode during the test>"
+  },
+  "commands": [
+    {
+      "command": "python Firmware/monitor_beacon_test.py (without sudo)",
+      "exit_code": 1,
+      "result": "Failed at NL80211_CMD_NEW_INTERFACE with PermissionError: [Errno 1] Operation not permitted. No frame was transmitted."
+    },
+    {
+      "command": "sudo -E env PYTHONUNBUFFERED=1 python Firmware/monitor_beacon_test.py",
+      "exit_code": 0,
+      "result": "Created two monitor interfaces, logged 'Creating monitor AP TX10LED-MON on channel 1', 'beaconing as <redacted>', and 'done'. The interfaces existed on channel 1 and were removed at exit."
+    },
+    {
+      "command": "LocationScan.app: CoreWLAN scanForNetworks(withSSID: nil), twice during the 12-second window",
+      "exit_code": 0,
+      "result": "TX10LED-MON was not visible in either scan. The host adapter BSSID was also not visible. Ambient networks on channels 1, 6, 11, and 100 were visible."
+    }
+  ],
+  "monitor_test": {
+    "ssid": "TX10LED-MON",
+    "channel": 1,
+    "duration_seconds": 12,
+    "interfaces": "two monitor interfaces on the same phy",
+    "monitor_ap": "ldn package MonitorAP",
+    "beaconing_logged": true,
+    "receiver": "macOS CoreWLAN wildcard scan with Location Services authorization",
+    "ssid_visible": false,
+    "bssid_visible": false,
+    "ambient_networks_visible": true
+  },
+  "control": {
+    "ap_mode_test": "research/hardware-observations/2026-10-29-ap-mode-tx.json",
+    "result": "The same adapter, driver, channel, and Mac saw a normal AP beacon at -32 dBm (E-090)."
+  },
+  "interpretation": "Monitor-mode injection on rtw88_8822bu does not put frames on the air. The ldn package created the monitor interfaces and logged that it was beaconing, but the Mac did not see the test SSID or the adapter BSSID, while it did see ambient networks. The AP-mode control proves the adapter can transmit, so the failure is specific to monitor-mode TX on this driver. The LDN host uses monitor mode, so the current host path is blocked. This does not test the console's response to an LDN room.",
+  "authorization": "The owner approved a 12-second monitor-mode test beacon on channel 1 with a test SSID. The test did not touch the console and did not send LDN frames.",
+  "limitations": [
+    "One adapter, one driver, one kernel, and one channel.",
+    "The test used the ldn package's MonitorAP and a normal test SSID, not the LDN room parameters.",
+    "The Mac scan is a reception check, not a frame capture; a null-SSID LDN beacon could be filtered even if a normal test SSID is not.",
+    "The monitor test used the same phy as the host path; it does not rule out a firmware or driver quirk that affects only certain frame types.",
+    "The host adapter BSSID and interface names are redacted."
+  ],
+  "redactions": [
+    "Host adapter BSSID redacted.",
+    "Monitor interface names redacted because they are derived from the adapter MAC."
+  ]
+}

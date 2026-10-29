@@ -2,7 +2,7 @@
 
 ## Scope
 
-This project performs **read-only inspection** of USB devices on macOS and **passive LDN capture** on a Linux host. The only active wireless action in scope is a single, explicitly approved plaintext LDN host test described in [`docs/LDN-TEST-PLAN.md`](LDN-TEST-PLAN.md). The project does not modify the console, its storage, its boot configuration, or its firmware.
+This project performs **read-only inspection** of USB devices on macOS, **passive LDN capture** on a Linux host or a Linux VM running on macOS, and **local read-only analysis** of the owner's own firmware dump and keys. The only active wireless actions in scope are explicitly approved LDN host tests and adapter diagnostics described in [`docs/LDN-TEST-PLAN.md`](LDN-TEST-PLAN.md). The plaintext host test, the 60-second TX check, and three prod-mode host runs were executed. The plaintext host is recorded as inconclusive and the 60-second check as invalid because a wildcard Wi-Fi scan cannot see the null-SSID LDN beacon. The prod-mode hosts emitted valid AES-CTR advertisements but produced no join; the second run's pcap capture failed on a wrapper permission error, and the third run's independent scan did not see the host BSSID. An AP-mode control proved the adapter can transmit at -32 dBm, and a follow-up AP-mode `NL80211_CMD_FRAME` control put a 20-frame test beacon on the air at -28 dBm in all 12 scans. A monitor-mode control showed that monitor-mode injection does not transmit; the current host path is blocked by the driver's monitor-mode TX, not by a console rejection. A unicast control with a temporary station entry and a non-LDN test OUI was accepted by the kernel without a netlink error (`E-095`). A real LDN unicast run then sent 568 valid advertisements and 568 null-SSID beacons with the AP BSSID; all requests were accepted, but the console was off/away, so reception was not observed (`E-096`). The driver rejects a broadcast-BSSID action frame with `EINVAL`, so the AP path can only send the AP-BSSID variant (`E-097`). A supervised rerun made the room `TX10LED` appear on the console, but selecting it produced `2203-0065` immediately; the search screen closed, the console returned to the game normally, and hostapd logged no authentication, association, or station event (`E-098`). The room appearance confirms the advertisement reached the scan path; that join failure is consistent with the hostapd WLAN SSID/security not matching the room's 32-character hexadecimal SSID and LDN RSN IE. A second supervised run used the corrected WLAN parameters: the console authenticated, associated with AID 1, and was marked authorized, then disassociated with `reason_code=8` about one second later and sent no observed `0x88B7` request (`E-099`). The owner saw `2203-0066` after a few seconds and a game popup `unable to join the room`; the console returned to the game normally. A local control showed that the AP control port rejects `0x88B7` with `EINVAL`, while the raw authorized-station path transmits it protected with KeyID 0 (`E-100`). The post-run firmware download failure required a USB deauthorize/reauthorize cycle; after that, monitor mode and RX worked again. Location Services restored real BSSIDs for the independent scan. Another active run requires new approval and the console present. The project does not modify the console, its storage, its boot configuration, or its firmware.
 
 The research conclusion is that an unmodified Switch OLED has no publicly documented, reproducible software-only path to Atmosphère. The safe response is not to try increasingly invasive workarounds. It is to stop, document the state, and use a documented route only if you deliberately choose to accept its risks.
 
@@ -20,7 +20,10 @@ Do not use this repository to:
 - kill `ptpcamerad` or another system daemon automatically;
 - transmit LDN frames without explicit approval for the specific run;
 - use the LDN host to play or share a game, bypass the ticket challenge, or impersonate a GameShare or Virtual Game Card host;
-- collect or publish full serial numbers, keys, certificates, tokens, or NAND dumps.
+- commit, publish, share, or paste keys, certificates, decrypted system modules, NAND dumps, or proprietary firmware;
+- download firmware or keys from a third party;
+- use the owner's keys against any console other than the owner's own;
+- collect or publish full serial numbers or tokens.
 
 If a procedure requires any of these, it is outside the project's authorization boundary.
 
@@ -37,7 +40,9 @@ If a procedure requires any of these, it is outside the project's authorization 
 | Modchip installation | High; microsoldering, warranty, and bricking risk | Out of scope |
 | NAND/eMMC operations | High; data loss and bricking risk | Prohibited |
 | Passive LDN capture (monitor mode) | Low; captures frames on the host adapter, transmits nothing | Allowed; keep the pcap and unredacted output local |
-| Transmit LDN frames / host a plaintext LDN network | Medium; can hang or crash the `ldn` sysmodule or Wi-Fi firmware; active frame injection | Explicit approval for the specific run; follow `docs/LDN-TEST-PLAN.md` |
+| Read-only analysis of the owner's firmware dump and keys | Low; local file parsing, no console interaction | Allowed; artifacts stay local and out of git |
+| Transmit LDN frames / host a plaintext or prod-mode LDN network | Medium; can hang or crash the `ldn` sysmodule or Wi-Fi firmware; active frame injection | Explicit approval for the specific run; follow `docs/LDN-TEST-PLAN.md` |
+| Install a pairwise CCMP key and answer the LDN `0x88B7` authentication challenge | Medium; the console may reject, hang, or crash the `ldn` sysmodule; the host may transmit malformed authentication data | Separate explicit approval; use the room's real parameters and a bounded challenge response; no application data |
 
 ## Before any device interaction
 
@@ -70,10 +75,20 @@ The tool never requires RCM for identity inspection.
 ### The console is unresponsive after an LDN frame test
 
 - Stop the LDN host and the channel-hop loop first.
-- Restore the Linux adapter to managed mode and restart NetworkManager.
+- Restore the Linux adapter to managed mode and restart NetworkManager if it is installed.
 - Hold the console's power button until it powers off, then boot normally.
 - Do not factory-reset or initialize the console as a first response. A wireless hang is not a storage problem.
 - Record the exact frame parameters, the host output, and the console's behavior. If the console produced a crash report or error code, preserve it and do not repeat the frame until the report is copied.
+- If the console shows `2203-0065` or `2203-0066` and returns to the game normally, do not power-cycle it. Record the error, the room name, whether the search screen closed, and whether hostapd logged authentication or association. That combination is a join failure, not evidence of a parser fault (`E-098`, `E-099`). For `2203-0066`, also record whether the console associated and how long it stayed connected before disassociating; the second run associated with AID 1 and left with reason 8 about one second later.
+
+### The Wi-Fi adapter fails to probe after an LDN host run
+
+- Stop `hostapd` and any `tcpdump` process first.
+- Check `dmesg` for `error beacon valid`, `failed to download rsvd page`, `failed to download firmware`, or `probe with driver rtw88_8822bu failed with error -16`.
+- If those appear, the driver is wedged; a module reload alone may not recover it.
+- Detach and reattach the adapter with OrbStack, then deauthorize/reauthorize the USB device (`echo 0 > /sys/bus/usb/devices/<bus-port>/authorized`, then `echo 1 > ...`) and reload `rtw88_8822bu`.
+- Verify with a passive 5-second `tcpdump` on a channel known to have ambient traffic (for example channel 6 or 11). Zero packets on every channel means the radio is not receiving.
+- Do not run another LDN test until the adapter receives again.
 
 ### The Mac reports the device as busy
 
@@ -102,6 +117,14 @@ The tool never requires RCM for identity inspection.
 - Use the installer's or maintained guide's recovery procedure.
 - Do not mix instructions from unrelated tools.
 - Record the modification in the hardware observation, because it changes the meaning of "unmodified console".
+
+## Local keys and firmware
+
+- The owner's `Firmware/prod.keys.txt` and `Firmware/Firmware.23.0.1` are local-only artifacts from the owner's own modded Switch.
+- `.gitignore` excludes `Firmware/`, `Firmware.*/`, and `prod.keys*`. Run `git check-ignore -v Firmware/prod.keys.txt Firmware/Firmware.23.0.1` before any commit that touches the tree.
+- Do not copy them into `research/`, `docs/`, `scripts/`, or any path that is not ignored.
+- Do not paste key names with values, key material, decrypted NCAs, or decrypted KIPs into chat, issues, commits, or logs. Record only derived, non-secret fields such as the security mode, channel, and participant limits.
+- Extracted firmware artifacts inherit the same rule: local only, never committed.
 
 ## Privacy
 

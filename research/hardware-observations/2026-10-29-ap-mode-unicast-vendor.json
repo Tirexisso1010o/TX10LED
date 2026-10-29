@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-29-ap-mode-unicast-vendor",
+  "observed_at": "2026-10-29T01:55:00Z",
+  "observed_at_precision": "approximate",
+  "observation_type": "adapter-ap-mode-unicast-vendor-action",
+  "operator": "hostapd 2.11 and Firmware/ap_unicast_test.py in an OrbStack Ubuntu VM",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not instrumented for this test; its reaction was not observed.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "adapter-tx-control",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "virtualization": "OrbStack 2.2.5",
+    "guest_os": "Ubuntu 26.04.1 LTS",
+    "guest_kernel": "7.2.12-orbstack-00394-gbecdd6130068",
+    "adapter": "TP-Link Archer T3U Plus",
+    "usb_id": "2357:0138",
+    "driver": "rtw88_8822bu",
+    "firmware_version": "30.20.0",
+    "interface": "<redacted; AP mode during the test>"
+  },
+  "commands": [
+    {
+      "command": "sudo ip link set <interface> down; sudo iw dev <interface> set type managed; sudo ip link set <interface> up",
+      "exit_code": 0,
+      "result": "The adapter was switched from monitor mode to managed mode."
+    },
+    {
+      "command": "sudo timeout 30 hostapd Firmware/hostapd-test.conf",
+      "exit_code": null,
+      "result": "hostapd reached 'AP-ENABLED' on channel 1 with SSID TX10LED-TEST. It was stopped by the wrapper after the test."
+    },
+    {
+      "command": "sudo python Firmware/ap_unicast_test.py --ifname <interface> --console-mac <redacted> --channel 1 --freq 2412 --count 5 --interval 0.25 --confirm",
+      "exit_code": 0,
+      "result": "The script added a temporary station entry for the console's MAC, sent 5 unicast vendor action frames, removed the station entry, and printed 'done'."
+    },
+    {
+      "command": "sudo pkill -x hostapd; restore monitor mode on channel 1",
+      "exit_code": 0,
+      "result": "hostapd stopped and the adapter was restored to monitor mode on channel 1. The wrapper's cleanup trap completed."
+    }
+  ],
+  "unicast_test": {
+    "ap_ssid": "TX10LED-TEST",
+    "channel": 1,
+    "freq_mhz": 2412,
+    "frame_type": "vendor action (category 0x7f)",
+    "test_oui": "00:11:22",
+    "test_type": "0x01",
+    "test_payload": "TX10LED-UNICAST",
+    "frame_length_bytes": 45,
+    "destination": "<redacted; console station MAC recovered from the local Phase 1 pcap>",
+    "station_entry": "temporary, added through NL80211_CMD_NEW_STATION and removed through NL80211_CMD_DEL_STATION",
+    "frames_submitted": 5,
+    "frames_accepted_by_kernel": 5,
+    "netlink_errors": 0,
+    "hostapd_version": "2.11",
+    "hostapd_state": "AP-ENABLED",
+    "receiver": "none; no independent capture of the unicast frame",
+    "console_reaction": "not observed",
+    "adapter_after_test": "monitor mode on channel 1"
+  },
+  "interpretation": "The kernel accepted the unicast vendor-action path that E-093 identified: a temporary station entry for the console's MAC was created, five NL80211_CMD_FRAME requests returned without a netlink error, and the station entry was removed. This confirms the station-lookup half of the AP path on the running kernel and adapter. It does not show that the console received the frame or that its LDN parser reacted; the test used a non-LDN OUI, no independent capture was made, and the console was not instrumented. The dmesg log again reported 'failed to get tx report from firmware' after the test, so the RF result is not independently confirmed.",
+  "authorization": "The owner approved a 5-frame unicast vendor-action test on channel 1 with a non-LDN test OUI. The test did not send LDN room data or application data and did not touch console storage.",
+  "limitations": [
+    "One adapter, one driver, one kernel, and one channel.",
+    "The station entry was synthetic and unassociated; it was created only to satisfy the mac80211 lookup.",
+    "The frame used a non-LDN test OUI, so it does not test the console's LDN parser.",
+    "No independent receiver captured the unicast frame, and the console's reaction was not observed.",
+    "dmesg reported 'failed to get tx report from firmware' after the test, a known message on this driver that does not by itself prove failure.",
+    "The host adapter BSSID, interface name, and console station MAC are redacted."
+  ],
+  "redactions": [
+    "Host adapter BSSID redacted.",
+    "Interface name redacted because it is derived from the adapter MAC.",
+    "Console station MAC redacted; it is stored only in the local ignored file Firmware/console-mac.local.txt."
+  ]
+}
