@@ -168,6 +168,10 @@ Switchbrew's 23.0.0 page documents fixes for:
 
 These are public fixes, not a public exploit chain. They show that system-service surfaces are actively maintained and patched.
 
+### Planned `D10` network-service test
+
+`D10` targets the same class of service surfaces from the network side: the `wlan` supplicant (802.11 management/EAPOL) and the `bsdsocket`/`sfdnsres`/`nifm`/`ssl` stack (DHCP/DNS/IPv6/TLS), through a dedicated test AP and the console's built-in **Test Connection**. The plan is gated and not executed; see [`docs/WIFI-NETWORK-TEST-PLAN.md`](WIFI-NETWORK-TEST-PLAN.md). A fault there would be stage 1–2 at best and would not reach Atmosphère without boot-stage execution.
+
 ## EP-009 — Kernel / TrustZone
 
 Kernel code execution is typically needed for full system control. A bootROM or secure-monitor compromise is needed for pre-boot CFW that survives reboot. The reviewed public flaw list contains no unpatched Mariko software-only boot chain and no public 23.0.1 kernel/TrustZone chain.

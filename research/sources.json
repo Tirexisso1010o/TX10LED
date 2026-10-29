@@ -705,6 +705,39 @@
       "snapshot": "Reviewed ieee80211_mgmt_tx, ieee80211_mgmt_tx_skb, cfg80211_mgmt_tx_check, and the nl80211 FRAME_NO_STA attribute on 2026-10-29.",
       "license": "GPL-2.0; cited as implementation documentation.",
       "notes": "AP interfaces can send beacon frames through NL80211_CMD_FRAME. Non-public action frames require a station entry; FRAME_NO_STA does not bypass that check."
+    },
+    {
+      "id": "switchbrew-wlan",
+      "title": "Nintendo Switch Brew: WLAN services",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/WLAN_services",
+      "retrieved_at": "2026-10-29",
+      "snapshot": "Documents the wlan:inf, wlan:lcl, wlan:lg, wlan:lga, wlan:sg, wlan:soc, wlan:dtc, wlan, and wlan:p services, including Scan, Connect, CreateBss, PutActionFrame, GetActionFrame, and the 23.0.0 Scan struct size change.",
+      "license": "Community wiki; cited as service documentation.",
+      "notes": "Used to scope the general Wi-Fi management-frame surface. It describes the service API, not a vulnerability or a parser implementation."
+    },
+    {
+      "id": "switchbrew-sockets",
+      "title": "Nintendo Switch Brew: Sockets services",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/Sockets_services",
+      "retrieved_at": "2026-10-29",
+      "snapshot": "Documents bsd:u/bsd:s/bsd:a, bsdcfg/ifcfg, sfdnsres, nsd:u/nsd:a, and bsd:nu. It describes the FreeBSD-derived socket stack, the AddrInfo serialization format, and the 23.0.0 command additions.",
+      "license": "Community wiki; cited as service documentation.",
+      "notes": "Used to scope DHCP, DNS, and socket-service parsing. The 23.0.0 changelog separately records an AddrInfo deserialization fix."
+    },
+    {
+      "id": "switchbrew-ssl",
+      "title": "Nintendo Switch Brew: SSL services",
+      "publisher": "Nintendo Switch Brew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/SSL_services",
+      "retrieved_at": "2026-10-29",
+      "snapshot": "Documents ssl and ssl:s, the NSS-backed client TLS implementation, ISslContext/ISslConnection commands, certificate import and verification options, and the 23.0.0 certificate-store update.",
+      "license": "Community wiki; cited as service documentation.",
+      "notes": "Used to scope the TLS handshake and certificate surface. It does not document a vulnerability."
     }
   ],
   "last_reviewed": "2026-10-29"
