@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-29",
+  "last_reviewed": "2026-10-30",
   "entries": [
     {
       "id": "E-001",
@@ -1512,6 +1512,27 @@
       "evidence": "The local AF_PACKET responder bound UDP 53/67 to suppress ICMP port-unreachable and sent DHCP/DNS frames with Scapy. Control C: DHCPOFFER/DHCPACK for 192.168.77.94, DNS A 2.19.126.212 for ctest.cdn.nintendo.net, TCP SYN from 192.168.77.94 to 2.19.126.212:80, final console error 2110-3129. D-01: DHCPOFFER option 1 length 0 (276-byte frame); the console sent repeated DHCPREQUEST frames and the responder intentionally withheld a valid ACK; final console error 2110-2963; association lifetime 30.1 s; no crash or new error. A first D-01 attempt was inconclusive: no DHCP frame reached the responder or pcap, the console showed 2110-1100, and the AP data path had wedged. A driver reload produced the valid retry. The D-02 runner could not bring the AP/hostapd path up reliably; the ldn2 interface/hostapd cleanup later hung.",
       "limitations": "One console, one adapter, one driver, and channel 1 only. The rtw88_8822bu AP data path is intermittent and required a driver reload between control and D-01; D-02 could not be started reliably. The local responder is not a production DHCP/DNS server. D-01 was observed once after a reload; the first attempt was inconclusive because no DHCP frame reached the host. No malformed DNS case was sent. The two test networks remain saved on the console. No crash, hang, or reboot occurred; this is not an exploit or a memory-safety proof.",
       "last_reviewed": "2026-10-29"
+    },
+    {
+      "id": "E-111",
+      "claim": "A read-only desk review on 2026-10-30 identified CVE-2023-28205 as the only candidate in the reviewed set that combines a public WebKit proof of concept, no JavaScript JIT requirement, and a reachable structured-clone path. The public MIT-licensed PoC targets WebKit-613.1.17.1 and triggers a use-after-free by sending a Map/Date object graph through postMessage. The Switch applet executes local JavaScript and is feature-bracketed to Safari 15.4-15.6, but the PoC has not been run on the console and the exact patch level is unknown.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "low",
+      "scope": "Read-only source review on 2026-10-30. No console interaction, no PoC execution, and no exploit attempt. The review covers public advisories, the WebKit fix commit, and the public PoC.",
+      "sources": [
+        "nvd-cve-2023-28205",
+        "apple-security-ios-16.4.1",
+        "webkit-commit-c9880de",
+        "github-uaf-2023-28205",
+        "switchbrew-internet-browser",
+        "nvd-cve-2022-32893",
+        "webkit-bugzilla-243557",
+        "webkitgtk-wsa-2022-0009",
+        "nvd-cve-2025-31200"
+      ],
+      "evidence": "The review compared the applet's fingerprint (E-058, E-061, E-063) with public WebKit advisories and PoCs. CVE-2023-28205 is a JavaScriptCore SerializedScriptValue/CloneDeserializer use-after-free fixed by WebKit commit c9880de (MarkedVector); the public PoC uses postMessage with Map/Date objects and targets WebKit-613.1.17.1. JIT-dependent candidates (CVE-2022-42856, CVE-2023-37450, CVE-2023-41993, CVE-2024-23222, CVE-2024-44308) were excluded because the applet shows no JIT warm-up. CVE-2022-32912 was excluded because the applet has no WebGL. CVE-2023-32409 and CVE-2025-24201 were excluded as sandbox escapes that are not first-stage primitives. CVE-2024-44309 is an XSS/cookie issue. CVE-2024-27834 and CVE-2025-31201 are PAC bypasses and Switch 1 has no PAC. CVE-2025-31200 is a CoreAudio APAC decoder bug, not WebKit, and the codec is not expected on the Switch. CVE-2022-32893 remains a secondary candidate but has no public PoC in the reviewed sources. CVE-2023-4863 was already tested inconclusively in D7.",
+      "limitations": "The review is a desk exercise. The public PoC's crash analysis is from a PlayStation WebKit process, not the Switch. The Switch build may include a Nintendo backport of the MarkedVector fix. A browser crash would be applet-level only and would not reach Atmosph\u00e8re without a separate kernel/boot-stage chain. No console page was loaded and no exploit content was served.",
+      "last_reviewed": "2026-10-30"
     }
   ]
 }

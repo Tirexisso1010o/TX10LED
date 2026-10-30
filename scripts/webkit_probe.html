@@ -1,0 +1,777 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Network check</title></head>
+<body>
+<h1>Network check</h1>
+<p id="status">collecting…</p>
+<script>
+(function () {
+  "use strict";
+
+  function safe(fn) {
+    try { return fn(); } catch (e) { return "error:" + (e && e.name); }
+  }
+
+  function has(path) {
+    try {
+      var parts = path.split(".");
+      var cur = window;
+      for (var i = 0; i < parts.length; i++) {
+        if (cur === null || typeof cur === "undefined") { return false; }
+        cur = cur[parts[i]];
+      }
+      return typeof cur !== "undefined";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function typeOf(path) {
+    try {
+      var parts = path.split(".");
+      var cur = window;
+      for (var i = 0; i < parts.length; i++) {
+        if (cur === null || typeof cur === "undefined") { return "undefined"; }
+        cur = cur[parts[i]];
+      }
+      return typeof cur;
+    } catch (e) {
+      return "error:" + (e && e.name);
+    }
+  }
+
+  function syntax(source) {
+    return safe(function () { return eval(source); });
+  }
+
+  function cssSupports(property, value) {
+    try {
+      return !!(window.CSS && CSS.supports && CSS.supports(property, value));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function cssSelector(selector) {
+    try {
+      return !!(window.CSS && CSS.supports && CSS.supports("selector(" + selector + ")"));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function mediaQuery(query) {
+    try {
+      return !!(window.matchMedia && window.matchMedia(query).matches);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function canPlay(type) {
+    try {
+      var element = type.indexOf("audio/") === 0
+        ? document.createElement("audio")
+        : document.createElement("video");
+      return element.canPlayType(type) || "";
+    } catch (e) {
+      return "error:" + (e && e.name);
+    }
+  }
+
+  function mseSupports(type) {
+    try {
+      return !!(window.MediaSource && MediaSource.isTypeSupported &&
+        MediaSource.isTypeSupported(type));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function canvasInfo() {
+    var out = {};
+    try {
+      var canvas = document.createElement("canvas");
+      canvas.width = 2;
+      canvas.height = 2;
+      var context = canvas.getContext("2d");
+      out.context2d = !!context;
+      if (context) {
+        context.fillStyle = "#f00";
+        context.fillRect(0, 0, 2, 2);
+        out.dataUrl = canvas.toDataURL("image/png").slice(0, 24);
+        out.toBlob = typeof canvas.toBlob === "function";
+      }
+    } catch (e) {
+      out.error = "error:" + (e && e.name);
+    }
+    try {
+      var webglCanvas = document.createElement("canvas");
+      out.webgl = !!(webglCanvas.getContext("webgl") ||
+        webglCanvas.getContext("experimental-webgl"));
+      out.webgl2 = !!webglCanvas.getContext("webgl2");
+    } catch (e) {
+      out.webglError = "error:" + (e && e.name);
+    }
+    return out;
+  }
+
+  function storageInfo() {
+    var out = {};
+    try {
+      localStorage.setItem("__tx10_probe__", "1");
+      out.localStorage = localStorage.getItem("__tx10_probe__") === "1";
+      localStorage.removeItem("__tx10_probe__");
+    } catch (e) {
+      out.localStorage = "error:" + (e && e.name);
+    }
+    try {
+      sessionStorage.setItem("__tx10_probe__", "1");
+      out.sessionStorage = sessionStorage.getItem("__tx10_probe__") === "1";
+      sessionStorage.removeItem("__tx10_probe__");
+    } catch (e) {
+      out.sessionStorage = "error:" + (e && e.name);
+    }
+    try {
+      out.indexedDB = !!window.indexedDB;
+      out.openDatabase = typeof window.openDatabase === "function";
+    } catch (e) {
+      out.indexedDB = "error:" + (e && e.name);
+    }
+    return out;
+  }
+
+  function cookieInfo() {
+    var out = {};
+    try {
+      document.cookie = "__tx10_probe__=1; path=/";
+      out.writable = document.cookie.indexOf("__tx10_probe__=1") !== -1;
+      document.cookie = "__tx10_probe__=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    } catch (e) {
+      out.writable = "error:" + (e && e.name);
+    }
+    out.cookieEnabled = navigator.cookieEnabled;
+    out.length = (document.cookie || "").length;
+    return out;
+  }
+
+  function cryptoInfo() {
+    var out = {};
+    try {
+      out.crypto = !!window.crypto;
+      out.getRandomValues = !!(window.crypto && window.crypto.getRandomValues);
+      out.subtle = !!(window.crypto && window.crypto.subtle);
+      if (out.getRandomValues) {
+        var bytes = new Uint8Array(8);
+        window.crypto.getRandomValues(bytes);
+        out.sample = Array.prototype.slice.call(bytes).join(",");
+      }
+    } catch (e) {
+      out.error = "error:" + (e && e.name);
+    }
+    return out;
+  }
+
+  function perfInfo() {
+    var out = {};
+    try {
+      out.now = typeof performance !== "undefined" &&
+        typeof performance.now === "function";
+      if (out.now) {
+        var minimum = 1e9;
+        var last = performance.now();
+        for (var i = 0; i < 1000; i++) {
+          var now = performance.now();
+          if (now > last && now - last < minimum) { minimum = now - last; }
+          last = now;
+        }
+        out.minDeltaMs = minimum;
+      }
+      out.timing = !!(performance && performance.timing);
+      out.memory = !!(performance && performance.memory);
+      out.navigation = !!(performance && performance.navigation);
+    } catch (e) {
+      out.error = "error:" + (e && e.name);
+    }
+    return out;
+  }
+
+  function stackInfo() {
+    var out = {};
+    try {
+      var error = new Error("probe");
+      out.stack = error.stack ? String(error.stack).slice(0, 500) : null;
+      out.stackTraceLimit = Error.stackTraceLimit;
+      out.prepareStackTrace = typeof Error.prepareStackTrace;
+    } catch (e) {
+      out.error = "error:" + (e && e.name);
+    }
+    return out;
+  }
+
+  function pluginsInfo() {
+    var out = { plugins: [], mimeTypes: [] };
+    try {
+      var i;
+      for (i = 0; i < navigator.plugins.length; i++) {
+        out.plugins.push(navigator.plugins[i].name);
+      }
+      for (i = 0; i < navigator.mimeTypes.length; i++) {
+        out.mimeTypes.push(navigator.mimeTypes[i].type);
+      }
+    } catch (e) {
+      out.error = "error:" + (e && e.name);
+    }
+    return out;
+  }
+
+  function fontsInfo() {
+    var out = {};
+    try {
+      out.fonts = !!document.fonts;
+      out.check = document.fonts && document.fonts.check
+        ? document.fonts.check("12px sans-serif")
+        : null;
+      out.size = document.fonts ? document.fonts.size : null;
+    } catch (e) {
+      out.error = "error:" + (e && e.name);
+    }
+    return out;
+  }
+
+  function collect() {
+    var featurePaths = [
+      "Promise", "Symbol", "Proxy", "Reflect", "Map", "Set", "WeakMap",
+      "WeakSet", "WeakRef", "FinalizationRegistry", "structuredClone",
+      "queueMicrotask", "reportError", "SharedArrayBuffer", "Atomics",
+      "Date", "ArrayBuffer", "Uint8Array", "URLSearchParams", "origin",
+      "postMessage", "addEventListener", "MessageChannel", "MessagePort",
+      "BroadcastChannel", "alert",
+      "WebAssembly", "fetch", "Request", "Response", "Headers",
+      "AbortController", "ReadableStream", "WritableStream",
+      "TransformStream", "CompressionStream", "DecompressionStream",
+      "WebSocket", "EventSource", "Worker", "SharedWorker", "ServiceWorker",
+      "Cache", "indexedDB", "localStorage", "sessionStorage", "FileReader",
+      "Blob", "FormData", "URL", "URLSearchParams", "TextEncoder",
+      "TextDecoder", "crypto", "crypto.subtle", "crypto.getRandomValues",
+      "WebGLRenderingContext", "WebGL2RenderingContext", "OffscreenCanvas",
+      "createImageBitmap", "ImageDecoder", "VideoDecoder", "AudioDecoder",
+      "RTCPeerConnection", "webkitRTCPeerConnection", "MediaSource",
+      "MediaStream", "navigator.mediaDevices", "navigator.getUserMedia",
+      "navigator.webkitGetUserMedia", "AudioContext", "webkitAudioContext",
+      "OfflineAudioContext", "SpeechSynthesis", "SpeechSynthesisUtterance",
+      "webkitSpeechRecognition", "Notification", "PushManager", "Permissions",
+      "Geolocation", "DeviceOrientationEvent", "DeviceMotionEvent", "Gamepad",
+      "Vibration", "Battery", "NetworkInformation", "ScreenOrientation",
+      "VisualViewport", "ResizeObserver", "IntersectionObserver",
+      "MutationObserver", "PerformanceObserver", "ReportingObserver",
+      "performance", "performance.now", "performance.memory",
+      "performance.timing", "Intl", "Intl.Segmenter", "Intl.ListFormat",
+      "Intl.DisplayNames", "Intl.RelativeTimeFormat", "Intl.PluralRules",
+      "Intl.Locale", "Intl.NumberFormat", "Intl.DateTimeFormat",
+      "Intl.Collator", "Temporal", "Intl.DurationFormat", "document.fonts",
+      "FontFace", "HTMLMediaElement", "HTMLVideoElement", "HTMLAudioElement",
+      "MediaSource.isTypeSupported", "HTMLCanvasElement",
+      "CanvasRenderingContext2D", "SVGElement", "SVGSVGElement",
+      "XMLHttpRequest", "DOMParser", "XMLSerializer", "Node", "Range",
+      "TreeWalker", "NodeIterator", "Selection", "getSelection", "CSS",
+      "CSS.supports", "CSSStyleSheet", "CSS.registerProperty",
+      "document.adoptedStyleSheets", "HTMLDialogElement",
+      "HTMLTemplateElement", "HTMLSlotElement", "ShadowRoot",
+      "customElements", "PaymentRequest", "PublicKeyCredential",
+      "navigator.bluetooth", "navigator.usb", "navigator.hid",
+      "navigator.serial", "navigator.clipboard", "navigator.credentials",
+      "navigator.cookieStore", "showOpenFilePicker", "showSaveFilePicker",
+      "showDirectoryPicker", "scheduler", "IdleDetector", "WakeLock",
+      "BackgroundFetchManager", "SyncManager", "PeriodicSyncManager", "Share",
+      "PresentationRequest", "RemotePlayback", "PictureInPictureWindow",
+      "document.fullscreenEnabled", "document.pictureInPictureEnabled",
+      "webkitRequestFileSystem", "webkitResolveLocalFileSystemURL",
+      "webkitStorageInfo", "webkitNotifications", "webkitURL",
+      "webkitMediaStream", "webkitSpeechGrammarList",
+      "webkitSpeechRecognitionEvent", "webkitIDBCursor", "webkitIndexedDB",
+      "webkitBlobBuilder", "webkitCancelAnimationFrame",
+      "webkitRequestAnimationFrame", "webkitCancelIdleCallback",
+      "webkitRequestIdleCallback", "webkitConvertPointFromNodeToPage",
+      "webkitConvertPointFromPageToNode", "webkitGetFlowControl",
+      "webkitGetNamedFlows", "webkitLineBreak", "webkitTextAutosizing"
+    ];
+    var features = {};
+    for (var i = 0; i < featurePaths.length; i++) {
+      features[featurePaths[i]] = has(featurePaths[i]);
+    }
+
+    var syntaxFeatures = {
+      asyncFunction: syntax("(async function(){}).constructor.name"),
+      generator: syntax("(function*(){}).constructor.name"),
+      asyncGenerator: syntax("(async function*(){}).constructor.name"),
+      optionalChaining: syntax("({})?.a"),
+      nullish: syntax("null ?? 1"),
+      objectSpread: syntax("({...{a:1}}).a"),
+      exponent: syntax("2**3"),
+      numericSeparator: syntax("1_000===1000"),
+      bigint: syntax("typeof 1n"),
+      regexpDotAll: syntax("/./s.test('\\n')"),
+      regexpNamedGroups: syntax("/(?<a>x)/.exec('x').groups.a==='x'"),
+      regexpLookbehind: syntax("/(?<=x)y/.test('xy')"),
+      regexpUnicodeProps: syntax("/\\p{Letter}/u.test('a')"),
+      regexpMatchIndices: syntax("/(?<a>x)/d.exec('x').indices!==undefined"),
+      regexpEscape: syntax("typeof RegExp.escape === 'function'"),
+      arrayAt: syntax("typeof [].at === 'function'"),
+      arrayFindLast: syntax("typeof [].findLast === 'function'"),
+      arrayToSorted: syntax("typeof [].toSorted === 'function'"),
+      arrayToReversed: syntax("typeof [].toReversed === 'function'"),
+      arrayToSpliced: syntax("typeof [].toSpliced === 'function'"),
+      arrayWith: syntax("typeof [].with === 'function'"),
+      objectHasOwn: syntax("typeof Object.hasOwn === 'function'"),
+      objectGroupBy: syntax("typeof Object.groupBy === 'function'"),
+      mapGroupBy: syntax("typeof Map.groupBy === 'function'"),
+      promiseWithResolvers: syntax("typeof Promise.withResolvers === 'function'"),
+      stringIsWellFormed: syntax("typeof ''.isWellFormed === 'function'"),
+      stringToWellFormed: syntax("typeof ''.toWellFormed === 'function'"),
+      arrayBufferTransfer: syntax("typeof ArrayBuffer.prototype.transfer === 'function'"),
+      arrayFromAsync: syntax("typeof Array.fromAsync === 'function'"),
+      setUnion: syntax("typeof Set.prototype.union === 'function'"),
+      iteratorHelpers: syntax("typeof Iterator === 'function'"),
+      urlCanParse: syntax("typeof URL.canParse === 'function'"),
+      urlParse: syntax("typeof URL.parse === 'function'")
+    };
+
+    var cssChecks = {
+      "display:grid": ["display", "grid"],
+      "display:flex": ["display", "flex"],
+      "display:contents": ["display", "contents"],
+      "aspect-ratio": ["aspect-ratio", "1"],
+      "gap": ["gap", "1px"],
+      "container-type": ["container-type", "inline-size"],
+      "container-name": ["container-name", "x"],
+      "color-mix": ["color", "color-mix(in srgb, red, blue)"],
+      "lab": ["color", "lab(50% 0 0)"],
+      "lch": ["color", "lch(50% 0 0)"],
+      "oklab": ["color", "oklab(50% 0 0)"],
+      "oklch": ["color", "oklch(50% 0 0)"],
+      "color-p3": ["color", "color(display-p3 1 0 0)"],
+      "hwb": ["color", "hwb(0 0% 0%)"],
+      "subgrid": ["grid-template-columns", "subgrid"],
+      "backdrop-filter": ["backdrop-filter", "blur(1px)"],
+      "webkit-backdrop-filter": ["-webkit-backdrop-filter", "blur(1px)"],
+      "text-wrap-balance": ["text-wrap", "balance"],
+      "text-wrap-pretty": ["text-wrap", "pretty"],
+      "text-box-trim": ["text-box-trim", "trim-start"],
+      "text-box-edge": ["text-box-edge", "cap alphabetic"],
+      "font-variant-emoji": ["font-variant-emoji", "emoji"],
+      "font-palette": ["font-palette", "dark"],
+      "font-variation-settings": ["font-variation-settings", "\"wght\" 400"],
+      "font-optical-sizing": ["font-optical-sizing", "auto"],
+      "font-size-adjust": ["font-size-adjust", "0.5"],
+      "line-clamp": ["line-clamp", "2"],
+      "webkit-line-clamp": ["-webkit-line-clamp", "2"],
+      "overflow-clip": ["overflow", "clip"],
+      "overscroll-behavior": ["overscroll-behavior", "contain"],
+      "scrollbar-gutter": ["scrollbar-gutter", "stable"],
+      "scroll-behavior": ["scroll-behavior", "smooth"],
+      "accent-color": ["accent-color", "red"],
+      "masonry": ["grid-template-rows", "masonry"],
+      "anchor-name": ["anchor-name", "--x"],
+      "position-anchor": ["position-anchor", "--x"],
+      "anchor-function": ["top", "anchor(--x top)"],
+      "view-transition-name": ["view-transition-name", "x"],
+      "user-select": ["user-select", "none"],
+      "webkit-user-select": ["-webkit-user-select", "none"],
+      "touch-action": ["touch-action", "none"],
+      "appearance": ["appearance", "none"],
+      "webkit-appearance": ["-webkit-appearance", "none"],
+      "transform": ["transform", "rotate(1deg)"],
+      "filter": ["filter", "blur(1px)"],
+      "clip-path": ["clip-path", "circle(50%)"],
+      "mask": ["mask", "url(#x)"],
+      "shape-outside": ["shape-outside", "circle(50%)"],
+      "writing-mode": ["writing-mode", "vertical-rl"],
+      "text-orientation": ["text-orientation", "upright"],
+      "ruby-position": ["ruby-position", "over"],
+      "font-feature-settings": ["font-feature-settings", "\"kern\""],
+      "font-kerning": ["font-kerning", "normal"],
+      "font-synthesis": ["font-synthesis", "none"],
+      "text-rendering": ["text-rendering", "optimizeLegibility"],
+      "image-rendering": ["image-rendering", "pixelated"],
+      "object-fit": ["object-fit", "cover"],
+      "object-position": ["object-position", "center"],
+      "isolation": ["isolation", "isolate"],
+      "mix-blend-mode": ["mix-blend-mode", "multiply"],
+      "backface-visibility": ["backface-visibility", "hidden"],
+      "perspective": ["perspective", "100px"],
+      "transform-style": ["transform-style", "preserve-3d"],
+      "will-change": ["will-change", "transform"],
+      "contain": ["contain", "layout"],
+      "content-visibility": ["content-visibility", "auto"],
+      "scroll-snap-type": ["scroll-snap-type", "x mandatory"],
+      "scroll-snap-align": ["scroll-snap-align", "start"],
+      "position-sticky": ["position", "sticky"],
+      "position-fixed": ["position", "fixed"],
+      "inset": ["inset", "0"],
+      "logical-properties": ["margin-inline-start", "0"],
+      "columns": ["columns", "2"],
+      "hyphens": ["hyphens", "auto"],
+      "webkit-hyphens": ["-webkit-hyphens", "auto"],
+      "text-size-adjust": ["text-size-adjust", "100%"],
+      "webkit-text-size-adjust": ["-webkit-text-size-adjust", "100%"],
+      "touch-callout": ["-webkit-touch-callout", "none"],
+      "overflow-scrolling": ["-webkit-overflow-scrolling", "touch"],
+      "tap-highlight-color": ["-webkit-tap-highlight-color", "transparent"]
+    };
+    var css = {};
+    for (var property in cssChecks) {
+      if (Object.prototype.hasOwnProperty.call(cssChecks, property)) {
+        css[property] = cssSupports(cssChecks[property][0], cssChecks[property][1]);
+      }
+    }
+
+    var selectorChecks = {
+      "has": ":has(*)",
+      "is": ":is(*)",
+      "where": ":where(*)",
+      "not": ":not(*)",
+      "nth-child-of": ":nth-child(1 of .x)",
+      "focus-visible": ":focus-visible",
+      "focus-within": ":focus-within",
+      "placeholder-shown": ":placeholder-shown",
+      "dir": ":dir(rtl)",
+      "lang": ":lang(en)",
+      "any-link": ":any-link",
+      "defined": ":defined",
+      "host": ":host",
+      "host-context": ":host-context(*)",
+      "slotted": "::slotted(*)",
+      "part": "::part(x)",
+      "file-selector-button": "::file-selector-button",
+      "marker": "::marker",
+      "selection": "::selection",
+      "backdrop": "::backdrop",
+      "first-line": "::first-line",
+      "first-letter": "::first-letter",
+      "before": "::before",
+      "after": "::after"
+    };
+    var selectors = {};
+    for (var selector in selectorChecks) {
+      if (Object.prototype.hasOwnProperty.call(selectorChecks, selector)) {
+        selectors[selector] = cssSelector(selectorChecks[selector]);
+      }
+    }
+
+    var mediaChecks = {
+      "prefers-reduced-motion": "(prefers-reduced-motion: reduce)",
+      "prefers-color-scheme": "(prefers-color-scheme: dark)",
+      "prefers-contrast": "(prefers-contrast: more)",
+      "hover": "(hover: hover)",
+      "pointer": "(pointer: fine)",
+      "any-hover": "(any-hover: hover)",
+      "any-pointer": "(any-pointer: fine)",
+      "display-mode": "(display-mode: standalone)",
+      "dynamic-range": "(dynamic-range: high)",
+      "video-dynamic-range": "(video-dynamic-range: high)",
+      "color-gamut": "(color-gamut: p3)",
+      "inverted-colors": "(inverted-colors: inverted)",
+      "scripting": "(scripting: enabled)",
+      "update": "(update: fast)",
+      "overflow-block": "(overflow-block: scroll)",
+      "overflow-inline": "(overflow-inline: scroll)",
+      "forced-colors": "(forced-colors: active)"
+    };
+    var mediaQueries = {};
+    for (var query in mediaChecks) {
+      if (Object.prototype.hasOwnProperty.call(mediaChecks, query)) {
+        mediaQueries[query] = mediaQuery(mediaChecks[query]);
+      }
+    }
+
+    var mediaTypes = [
+      "video/mp4; codecs=\"avc1.42E01E\"",
+      "video/mp4; codecs=\"avc1.4D401F\"",
+      "video/mp4; codecs=\"avc1.64001F\"",
+      "video/mp4; codecs=\"avc1.640028\"",
+      "video/mp4; codecs=\"hvc1.1.6.L93.B0\"",
+      "video/mp4; codecs=\"hev1.1.6.L93.B0\"",
+      "video/mp4; codecs=\"av01.0.05M.08\"",
+      "video/webm; codecs=\"vp8\"",
+      "video/webm; codecs=\"vp9\"",
+      "video/webm; codecs=\"vp09.00.10.08\"",
+      "video/webm; codecs=\"av01.0.05M.08\"",
+      "audio/mp4; codecs=\"mp4a.40.2\"",
+      "audio/mp4; codecs=\"mp4a.40.5\"",
+      "audio/mp4; codecs=\"mp4a.69\"",
+      "audio/mp4; codecs=\"alac\"",
+      "audio/mp4; codecs=\"ac-3\"",
+      "audio/mp4; codecs=\"ec-3\"",
+      "audio/mp4; codecs=\"Opus\"",
+      "audio/mp4; codecs=\"flac\"",
+      "audio/mpeg",
+      "audio/ogg; codecs=\"vorbis\"",
+      "audio/ogg; codecs=\"opus\"",
+      "audio/wav",
+      "audio/flac",
+      "audio/webm; codecs=\"opus\"",
+      "audio/x-m4a",
+      "video/quicktime",
+      "video/x-m4v",
+      "application/vnd.apple.mpegurl",
+      "application/x-mpegURL",
+      "video/mp2t"
+    ];
+    var media = {};
+    for (var m = 0; m < mediaTypes.length; m++) {
+      media[mediaTypes[m]] = {
+        canPlay: canPlay(mediaTypes[m]),
+        mse: mseSupports(mediaTypes[m])
+      };
+    }
+
+    var data = {
+      event: "probe",
+      t: Date.now(),
+      ua: navigator.userAgent,
+      appVersion: navigator.appVersion,
+      appName: navigator.appName,
+      appCodeName: navigator.appCodeName,
+      product: navigator.product,
+      productSub: navigator.productSub,
+      vendor: navigator.vendor,
+      platform: navigator.platform,
+      language: navigator.language,
+      languages: navigator.languages || null,
+      cookieEnabled: navigator.cookieEnabled,
+      doNotTrack: navigator.doNotTrack,
+      hardwareConcurrency: navigator.hardwareConcurrency || null,
+      deviceMemory: navigator.deviceMemory || null,
+      maxTouchPoints: navigator.maxTouchPoints,
+      pdfViewerEnabled: navigator.pdfViewerEnabled,
+      userAgentData: typeOf("navigator.userAgentData"),
+      screen: [
+        screen.width, screen.height, screen.availWidth, screen.availHeight,
+        screen.colorDepth, screen.pixelDepth, devicePixelRatio
+      ],
+      window: [
+        window.innerWidth, window.innerHeight, window.outerWidth,
+        window.outerHeight, window.screenX, window.screenY,
+        window.scrollX, window.scrollY
+      ],
+      visualViewport: safe(function () {
+        return window.visualViewport
+          ? [visualViewport.width, visualViewport.height, visualViewport.scale]
+          : null;
+      }),
+      orientation: safe(function () {
+        return screen.orientation
+          ? [screen.orientation.type, screen.orientation.angle]
+          : null;
+      }),
+      document: [
+        document.compatMode, document.characterSet, document.contentType,
+        document.readyState, document.visibilityState, document.hidden,
+        document.designMode, document.dir, document.title,
+        document.lastModified
+      ],
+      referrer: document.referrer,
+      url: document.URL,
+      domain: document.domain,
+      timezone: safe(function () {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone;
+      }),
+      locale: safe(function () {
+        return Intl.DateTimeFormat().resolvedOptions().locale;
+      }),
+      dateOffset: new Date().getTimezoneOffset(),
+      features: features,
+      syntax: syntaxFeatures,
+      css: css,
+      selectors: selectors,
+      mediaQueries: mediaQueries,
+      media: media,
+      canvas: canvasInfo(),
+      storage: storageInfo(),
+      cookie: cookieInfo(),
+      crypto: cryptoInfo(),
+      perf: perfInfo(),
+      stack: stackInfo(),
+      plugins: pluginsInfo(),
+      fonts: fontsInfo(),
+      eval: safe(function () { return eval("1+1"); }),
+      functionConstructor: safe(function () {
+        return new Function("return 1+1")();
+      }),
+      errorStack: safe(function () { return typeof new Error().stack; }),
+      cssSupportsGrid: cssSupports("display", "grid"),
+      mediaSource: typeOf("MediaSource"),
+      indexedDBType: typeOf("indexedDB"),
+      webkitPrefixes: {
+        webkitRequestFileSystem: has("webkitRequestFileSystem"),
+        webkitResolveLocalFileSystemURL: has("webkitResolveLocalFileSystemURL"),
+        webkitStorageInfo: has("webkitStorageInfo"),
+        webkitNotifications: has("webkitNotifications"),
+        webkitURL: has("webkitURL"),
+        webkitMediaStream: has("webkitMediaStream"),
+        webkitRTCPeerConnection: has("webkitRTCPeerConnection"),
+        webkitAudioContext: has("webkitAudioContext")
+      }
+    };
+    return data;
+  }
+
+  function reachability() {
+    return {
+      postMessage: typeof window.postMessage === "function",
+      messageChannel: typeof MessageChannel === "function",
+      messagePort: typeof MessagePort === "function",
+      broadcastChannel: typeof BroadcastChannel === "function",
+      worker: typeof Worker === "function",
+      structuredClone: typeof structuredClone === "function",
+      origin: typeof window.origin === "string" ? window.origin : null,
+      moduleScript: window.__tx10Module === true
+    };
+  }
+
+  function postMessageRoundTrip() {
+    return new Promise(function (resolve) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) { return; }
+        done = true;
+        window.removeEventListener("message", onMessage);
+        resolve({ ok: false, reason: "timeout" });
+      }, 1500);
+      function onMessage(event) {
+        if (done) { return; }
+        done = true;
+        clearTimeout(timer);
+        window.removeEventListener("message", onMessage);
+        var data = event.data;
+        resolve({
+          ok: !!(data && data.marker === 0x1234),
+          marker: data && data.marker,
+          mapSize: data && data.map ? data.map.size : null,
+          dateValue: data && data.date
+        });
+      }
+      window.addEventListener("message", onMessage);
+      try {
+        window.postMessage({
+          marker: 0x1234,
+          map: new Map([[new Date(0), "x"]]),
+          date: new Date(0).getTime()
+        }, "*");
+      } catch (e) {
+        done = true;
+        clearTimeout(timer);
+        window.removeEventListener("message", onMessage);
+        resolve({ ok: false, reason: "throw:" + (e && e.name) });
+      }
+    });
+  }
+
+  function post(payload) {
+    var body;
+    try {
+      body = JSON.stringify(payload);
+    } catch (e) {
+      return;
+    }
+    try {
+      if (navigator.sendBeacon) {
+        var blob = new Blob([body], { type: "application/json" });
+        if (navigator.sendBeacon("/fp", blob)) {
+          return;
+        }
+      }
+    } catch (e) {
+      // Fall through to XHR.
+    }
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/fp", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send(body);
+    } catch (e) {
+      // The page is diagnostic only; there is no retry loop.
+    }
+  }
+
+  window.onerror = function (message, source, lineno, colno, error) {
+    post({
+      event: "error",
+      t: Date.now(),
+      message: String(message),
+      source: String(source),
+      lineno: lineno,
+      colno: colno,
+      stack: error && error.stack ? String(error.stack).slice(0, 2000) : null
+    });
+    return false;
+  };
+
+  window.addEventListener("unhandledrejection", function (event) {
+    post({
+      event: "unhandledrejection",
+      t: Date.now(),
+      reason: String(event.reason),
+      stack: event.reason && event.reason.stack
+        ? String(event.reason.stack).slice(0, 2000)
+        : null
+    });
+  });
+
+  window.addEventListener("pagehide", function () {
+    post({ event: "pagehide", t: Date.now() });
+  });
+
+  document.addEventListener("visibilitychange", function () {
+    post({
+      event: "visibility",
+      t: Date.now(),
+      state: document.visibilityState
+    });
+  });
+
+  setTimeout(function () {
+    post(collect());
+    var status = document.getElementById("status");
+    if (status) {
+      status.textContent = "probe sent";
+    }
+    postMessageRoundTrip().then(function (result) {
+      post({
+        event: "reachability",
+        t: Date.now(),
+        result: result,
+        features: reachability()
+      });
+      if (status) {
+        status.textContent = result.ok
+          ? "probe sent (postMessage round-trip ok)"
+          : "probe sent (postMessage round-trip failed)";
+      }
+    });
+  }, 300);
+
+  var beats = 0;
+  var beatTimer = setInterval(function () {
+    beats += 1;
+    post({
+      event: "heartbeat",
+      n: beats,
+      t: Date.now(),
+      visibility: document.visibilityState || null
+    });
+    if (beats >= 20) {
+      clearInterval(beatTimer);
+      post({ event: "done", n: beats, t: Date.now() });
+      var status = document.getElementById("status");
+      if (status) {
+        status.textContent = "done";
+      }
+    }
+  }, 2000);
+})();
+</script>
+<script type="module">window.__tx10Module = true;</script>
+</body>
+</html>

@@ -738,7 +738,84 @@
       "snapshot": "Documents ssl and ssl:s, the NSS-backed client TLS implementation, ISslContext/ISslConnection commands, certificate import and verification options, and the 23.0.0 certificate-store update.",
       "license": "Community wiki; cited as service documentation.",
       "notes": "Used to scope the TLS handshake and certificate surface. It does not document a vulnerability."
+    },
+    {
+      "id": "nvd-cve-2023-28205",
+      "title": "NVD: CVE-2023-28205",
+      "publisher": "NIST",
+      "kind": "advisory",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-28205",
+      "retrieved_at": "2026-10-30",
+      "snapshot": "NVD record published 2023-04-10; CWE-416 use-after-free; CVSS 3.1 base 8.8; CISA KEV entry. Fixed in Safari 16.4.1, iOS 15.7.5 and 16.4.1, iPadOS 15.7.5 and 16.4.1, and macOS Ventura 13.3.1.",
+      "license": "NVD public data; cited, not redistributed.",
+      "notes": "Used to identify the top no-JIT candidate. NVD does not publish the vulnerable function; the public PoC and the WebKit commit provide the structured-clone detail."
+    },
+    {
+      "id": "apple-security-ios-16.4.1",
+      "title": "About the security content of iOS 16.4.1 and iPadOS 16.4.1",
+      "publisher": "Apple",
+      "kind": "advisory",
+      "url": "https://support.apple.com/en-us/102795",
+      "retrieved_at": "2026-10-30",
+      "snapshot": "Apple advisory released 2023-04-07. The WebKit entry describes CVE-2023-28205 as a use-after-free addressed with improved memory management and notes active exploitation.",
+      "license": "Apple advisory; cited, not redistributed.",
+      "notes": "Confirms the fixed versions and the vendor's active-exploitation statement."
+    },
+    {
+      "id": "webkit-commit-c9880de",
+      "title": "WebKit commit c9880de: use MarkedVector in CloneDeserializer",
+      "publisher": "WebKit",
+      "kind": "source",
+      "url": "https://github.com/WebKit/WebKit/commit/c9880de4a28b9a64a5e1d0513dc245d61a2e6ddb",
+      "retrieved_at": "2026-10-30",
+      "snapshot": "Public WebKit commit referenced by the CVE-2023-28205 PoC. Not built or independently verified in this project.",
+      "license": "WebKit source is LGPL/BSD; the commit is cited, not redistributed.",
+      "notes": "The PoC states that the fix replaces non-GC-scanned Vector containers with MarkedVector in SerializedScriptValue/CloneDeserializer."
+    },
+    {
+      "id": "github-uaf-2023-28205",
+      "title": "seregonwar/uaf-2023-28205: CVE-2023-28205 PoC",
+      "publisher": "GitHub / seregonwar, based on ntfargo",
+      "kind": "proof-of-concept",
+      "url": "https://github.com/seregonwar/uaf-2023-28205",
+      "retrieved_at": "2026-10-30",
+      "snapshot": "MIT-licensed PoC. README, index.html, and poc.js retrieved 2026-10-30. Targets WebKit-613.1.17.1; uses postMessage with Map/Date objects; crash analysis is from a PlayStation WebKit process, not the Switch.",
+      "license": "MIT License, Copyright (c) 2024 Nathan Fargo.",
+      "notes": "A public PoC is not evidence that the Switch build is vulnerable. Do not serve it without the W2 approval."
+    },
+    {
+      "id": "webkit-bugzilla-243557",
+      "title": "WebKit Bugzilla 243557 (CVE-2022-32893)",
+      "publisher": "WebKit",
+      "kind": "bug",
+      "url": "https://bugs.webkit.org/show_bug.cgi?id=243557",
+      "retrieved_at": "2026-10-30",
+      "snapshot": "Bug referenced by Apple's Safari 15.6.1 advisory and the oss-security discussion. The reviewed text does not identify the vulnerable component or a public PoC.",
+      "license": "WebKit Bugzilla; cited, not redistributed.",
+      "notes": "CVE-2022-32893 is an out-of-bounds write fixed in Safari 15.6.1. It remains a secondary candidate only because the target build predates the fix."
+    },
+    {
+      "id": "webkitgtk-wsa-2022-0009",
+      "title": "WebKitGTK and WPE WebKit Security Advisory WSA-2022-0009",
+      "publisher": "WebKitGTK",
+      "kind": "advisory",
+      "url": "https://webkitgtk.org/security/WSA-2022-0009.html",
+      "retrieved_at": "2026-10-30",
+      "snapshot": "Advisory dated 2022-09-19 covering CVE-2022-32912. Notes that the issue only affects macOS builds and credits the WebGL2 drawRangeElements analysis.",
+      "license": "Advisory; cited, not redistributed.",
+      "notes": "CVE-2022-32912 is a WebGL2 bug; the console reports no WebGL, so it is excluded."
+    },
+    {
+      "id": "nvd-cve-2025-31200",
+      "title": "NVD: CVE-2025-31200",
+      "publisher": "NIST",
+      "kind": "advisory",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-31200",
+      "retrieved_at": "2026-10-30",
+      "snapshot": "CoreAudio APAC decoder memory corruption fixed in iOS 18.4.1, iPadOS 18.4.1, macOS Sequoia 15.4.1, tvOS 18.4.1, visionOS 2.4.1, and watchOS 11.5. CISA KEV.",
+      "license": "NVD public data; cited, not redistributed.",
+      "notes": "Not a WebKit bug. The APAC codec is not expected on the Switch, so it is excluded from the browser candidate set."
     }
   ],
-  "last_reviewed": "2026-10-29"
+  "last_reviewed": "2026-10-30"
 }
