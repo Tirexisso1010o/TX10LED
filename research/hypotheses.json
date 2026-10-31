@@ -599,6 +599,44 @@
       "results": "The benign sibling-directory image displayed the real Exif control with no error and no AA\\<CJK> folder (E-119). The browser download probe showed no download attribute, no save/open/directory picker, and no storage/caches API (E-120). The file-picker probe then displayed 'ready; choose a file', but pressing Browse produced 'The file selection is not supported' (E-121). The browser download and file-selection routes are closed negative. The day-directory SD-card filename variant remains untested; the fs binary is still required for code execution.",
       "uncertainties": "Whether any free applet calls GetEntryType on a user-controlled path; whether the 23.0.1 Switch 1 fs contains the same 0x301-byte Path::Normalize overflow; whether a confirmed crash can be developed into code execution without the fs binary.",
       "resolution": "blocked"
+    },
+    {
+      "id": "H-014",
+      "title": "Seedsow Lullaby Artemis save Lua on Switch 1 23.0.1",
+      "stage": "1",
+      "surface": "EP-007",
+      "component": "Seedsow Lullaby demo/full (Artemis engine), modified save, Lua 5.1 VFS",
+      "hypothesis": "A modified Seedsow Lullaby save can run arbitrary Lua inside the game on Switch 1 23.0.1, providing a free game-level primitive without SmileBASIC; a future Artemis/FS bootstrap could use it for fs-level code execution.",
+      "status": "UNVERIFIED",
+      "confidence": "medium",
+      "applies_to_target": true,
+      "prerequisites": [
+        "The free Seedsow Lullaby demo installed on the OLED",
+        "A hacked Switch 1 seed console that can run JKSV and install the editor save",
+        "Nintendo's official save transfer with both consoles on current firmware",
+        "A compatible game/demo version and save format"
+      ],
+      "expected_capability": "Game-level Lua 5.1 with save and game: VFS access; no shell, no sd:, no arbitrary traversal. It is stage 1, not fs-level.",
+      "test_procedure": "Install the free demo on both consoles; install the editor save with JKSV on the hacked seed; use the official save transfer; load editor slot 1 on the OLED; observe Lua execution and save read/write. Do not attempt an fs exploit.",
+      "expected_signal": "The editor/Lua runs on the OLED and can read/write the game save; no fs or sd access.",
+      "kill_criteria": "The demo is unavailable, the transfer is refused, the save is incompatible, or the editor fails to run.",
+      "risks": "Console software install and state change; official save transfer and account use; seed console update; no fs exploit; the game may be updated or delisted.",
+      "blocked_by": "No hacked 23.0.1 seed; the only modded Switch 1 is 22.0.0 and the 23.0.1 source console is gone; the modded 22.0.0 console is off-limits by prior decision; the Artemis/FS bootstrap is not public.",
+      "evidence": [
+        "E-122",
+        "E-123"
+      ],
+      "sources": [
+        "seedsow-lua-editor-repo",
+        "ns2-savekit-results",
+        "onejailbreak-seedsow"
+      ],
+      "last_reviewed": "2026-10-31",
+      "hardware": "HEG-001 (Mariko) target; modded 22.0.0 seed",
+      "firmware": "23.0.1 target; 22.0.0 seed",
+      "results": "Not tested on the OLED. Public repos report game-level Lua on Switch 1/2; no OLED 23.0.1 test. The seed console/current-firmware transfer is blocked and the Artemis/FS bootstrap is not public.",
+      "uncertainties": "Whether the official save transfer works across 22.0.0 and 23.0.1; whether the demo remains available in the owner's region; whether the save format matches the OLED's demo version; whether a future Artemis/FS bootstrap will be released.",
+      "resolution": "blocked"
     }
   ]
 }

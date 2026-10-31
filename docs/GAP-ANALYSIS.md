@@ -34,6 +34,8 @@ Atmosphère is a **boot-time** CFW. A runtime kernel exploit can patch a running
 
 Stage 4 is the only stage with maintained software behind it — Atmosphère and hekate exist and support 23.0.1 — but it has nothing to hand off to without stage 3. Stage 3 is empty.
 
+> **Seedsow Lullaby update (2026-10-31):** a free-demo game-level Lua primitive exists and bypasses SmileBASIC, but it is stage 1, not fs-level. The save transfer needs a hacked 23.0.1 seed; the owner's seed is 22.0.0. See `L-007`/`H-014`.
+
 ## Stage 3 is the one people forget
 
 It is tempting to think that a kernel exploit would be enough. It is not. Atmosphère has to run **before or during boot**, because its job is to replace verified system modules with patched ones. A kernel exploit that arrives after Horizon has booted cannot retroactively convince the boot chain to load unsigned modules.

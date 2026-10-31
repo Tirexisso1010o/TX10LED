@@ -892,6 +892,39 @@
       "snapshot": "README retrieved 2026-10-31. Adds SmileBASIC 4.4.6 demo support and macOS, Linux, and Windows hosts.",
       "license": "No license stated in the retrieved README; cited, not redistributed.",
       "notes": "Still a Switch 2 FS demo. Requires Ethernet and warns that the exploit is very timing-sensitive."
+    },
+    {
+      "id": "seedsow-lua-editor-repo",
+      "title": "DialingSpoon527/seedsow-lua-editor: Seedsow Lua Editor",
+      "publisher": "GitHub / DialingSpoon527",
+      "kind": "source-code",
+      "url": "https://github.com/DialingSpoon527/seedsow-lua-editor",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "README and installation guide retrieved 2026-10-31. 0BSD. Tested with US Seedsow Lullaby demo 1.0.0 on Switch 1 and Switch 2; the editor save is installed with JKSV on a hacked Switch 1 and transferred with Nintendo's official save transfer.",
+      "license": "0BSD for project-owned code and documentation; game content retains its own rights.",
+      "notes": "The README calls the editor a foothold, not a full exploit. It requires a hacked Switch 1 seed and current firmware on both consoles for the official transfer. It does not provide fs-level code execution."
+    },
+    {
+      "id": "ns2-savekit-results",
+      "title": "ns2-savekit: Results",
+      "publisher": "GitHub / dougchansan",
+      "kind": "write-up",
+      "url": "https://github.com/dougchansan/ns2-savekit/blob/main/docs/RESULTS.md",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Hardware results on a retail Switch 2 with the Seedsow Lullaby demo/full. Reports full unsandboxed Lua 5.1 with io, os, debug, package, loadstring, and dofile; os.execute returns 0, io.popen is unsupported, sd: is absent, and save:/../ traversal is normalized away.",
+      "license": "Project documentation; cited, not redistributed.",
+      "notes": "The Lua primitive is game-level save/VFS access, not fs-level. The fs sysmodule exploit is untested through this path."
+    },
+    {
+      "id": "onejailbreak-seedsow",
+      "title": "Seedsow Lullaby Opens New Switch 2 Homebrew Entry Point",
+      "publisher": "ONE Jailbreak",
+      "kind": "news",
+      "url": "https://onejailbreak.com/blog/seedsow-lullaby-opens-new-switch-2-homebrew-entry-point/",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Article updated 2026-10-30. Reports a save vulnerability in Seedsow Lullaby (Artemis engine), a free demo, a hacked Switch 1 seed, official save transfer, and an FS bootstrap still being written.",
+      "license": "News article; cited, not redistributed.",
+      "notes": "States that the FS sysmodule exploit is still untested through this path and the bootstrap is not public. Both consoles need current firmware for the official transfer."
     }
   ],
   "last_reviewed": "2026-10-31"

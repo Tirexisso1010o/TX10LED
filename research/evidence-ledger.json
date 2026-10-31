@@ -1665,6 +1665,35 @@
       "evidence": "The file-picker page displayed 'ready; choose a file'. Pressing Browse produced the applet message 'The file selection is not supported'. No file_picker event was logged. The H-013 real-control SD card was inserted.",
       "limitations": "One applet and one page. The message is an applet-level restriction; it does not prove that another applet or a full browser lacks file selection.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-122",
+      "claim": "Seedsow Lullaby (Artemis engine) has a save-based Lua 5.1 primitive: a modified save runs arbitrary Lua inside the game on Switch 1 and Switch 2. The free demo works. The Lua environment has save and game: VFS access, but no shell, no sd:, and /../ traversal is normalized away.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "high",
+      "scope": "Public repository and hardware results, 2026-10-31; no OLED 23.0.1 test.",
+      "sources": [
+        "seedsow-lua-editor-repo",
+        "ns2-savekit-results",
+        "onejailbreak-seedsow"
+      ],
+      "evidence": "The Seedsow Lua Editor runs Lua inside Seedsow Lullaby on Switch 1 and Switch 2; the tested reference is US demo 1.0.0. ns2-savekit reports Lua 5.1 with io, os, debug, package, loadstring, and dofile; os.execute returns 0, io.popen is unsupported, sd: is absent, and save:/../saveg.dat is normalized away. The editor save is installed with JKSV on a hacked Switch 1 and moved with Nintendo's official save transfer.",
+      "limitations": "This is game-level Lua, not fs-level. The fs sysmodule exploit is untested through this path and the Artemis/FS bootstrap is not public. The save is version-specific; the OLED 23.0.1 route has not been tested. The seed console and current-firmware transfer are required.",
+      "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-123",
+      "claim": "The Seedsow installation route requires a hacked Switch 1 seed console that can run homebrew and complete Nintendo's official save transfer, with both consoles on current firmware. The owner's only hacked Switch 1 is on 22.0.0, the 23.0.1 source console is gone, and the modded 22.0.0 console is off-limits by prior decision.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Installation requirements plus owner hardware inventory, 2026-10-31.",
+      "sources": [
+        "seedsow-lua-editor-repo",
+        "onejailbreak-seedsow"
+      ],
+      "evidence": "The editor README says to start with a modded/hacked Switch 1 that can run homebrew and can complete Nintendo's online save transfer; both consoles need to be current for the official transfer. The owner has the unmodded 23.0.1 OLED and a modded 22.0.0 Switch 1; the 23.0.1 source console is no longer available. The 22.0.0 console has been left untouched by prior decision.",
+      "limitations": "The transfer might work across 22.0.0 and 23.0.1 in some configuration, but the guide says both current and this has not been tested. Updating the 22.0.0 console to 23.0.1 could remove the blocker but is not authorized.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }

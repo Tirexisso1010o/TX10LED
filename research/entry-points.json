@@ -33,7 +33,8 @@
       "The only documented route for patched/Mariko consoles is a hardware modchip, which is outside this project's scope.",
       "The surface matrix records what is publicly documented; it does not claim that any surface is unexploitable.",
       "GameShare is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. It is recorded as EP-011 / L-006; no public vulnerability exists for it.",
-      "Success criterion narrowed on 2026-10-31: native code execution as fs (tethered) is sufficient; boot-stage CFW is not required."
+      "Success criterion narrowed on 2026-10-31: native code execution as fs (tethered) is sufficient; boot-stage CFW is not required.",
+      "Seedsow Lullaby (Artemis engine) is recorded as L-007/H-014: a free-demo save Lua primitive that runs game-level code on Switch 1/2 without SmileBASIC. It is not fs-level, the Artemis/FS bootstrap is not public, and the OLED route is blocked by the seed console/current-firmware transfer."
     ]
   },
   "field_notes": {
@@ -298,9 +299,9 @@
       "physical_access": "optional",
       "target_reachable": true,
       "public_chain_on_target": false,
-      "status": "UNKNOWN",
-      "status_basis": "The reviewed flaw list's Games section documents game-level infoleaks and anti-cheat issues, not a public save-data or cartridge code-execution chain on 23.0.1. Save editing is not code execution.",
-      "capability_if_successful": "Potentially game-context code execution; a kernel or bootROM stage would still be required for Atmosph\u00e8re.",
+      "status": "PARTIALLY VERIFIED",
+      "status_basis": "A game-level save Lua primitive exists on Switch 1/2 via Seedsow Lullaby (Artemis engine); the free demo works, and the editor save runs arbitrary Lua inside the game. It is not fs-level: no shell, no sd:, and traversal is normalized away. The Artemis/FS bootstrap is not public, and no OLED 23.0.1 test is documented.",
+      "capability_if_successful": "Game-level Lua 5.1 with save and game: VFS access; not fs, kernel, bootROM, CFW, or persistence.",
       "leads_to_atmosphere": false,
       "in_scope": true,
       "requires": [
@@ -308,12 +309,17 @@
         "A kernel/bootROM stage for CFW"
       ],
       "evidence": [
-        "E-036"
+        "E-036",
+        "E-122",
+        "E-123"
       ],
       "sources": [
-        "switchbrew-system-flaws"
+        "switchbrew-system-flaws",
+        "seedsow-lua-editor-repo",
+        "ns2-savekit-results",
+        "onejailbreak-seedsow"
       ],
-      "notes": "No public chain found. This surface is game-dependent and is not a generic console entry point."
+      "notes": "A free-demo game-level lead. It requires a hacked Switch 1 seed and official save transfer with current firmware; the fs bootstrap is not public. It does not change the fs-level conclusion."
     },
     {
       "id": "EP-008",
@@ -601,6 +607,27 @@
         "switchbrew-system-flaws"
       ],
       "next_step": "The 2026-10-29 read-only review found no public splay/GameShare vulnerability and no post-20.0.0 splay security fix. The next useful inputs are a Switch 2 host for a supervised receiver test or a key set that covers key generation 0x17 for static analysis; neither is available. Do not spoof a GameShare host or send crafted data to the console."
+    },
+    {
+      "id": "L-007",
+      "name": "Seedsow Lullaby / Artemis save Lua",
+      "surface": "EP-007",
+      "status": "PARTIALLY VERIFIED",
+      "target_applicability": "UNVERIFIED",
+      "leads_to_atmosphere": false,
+      "what_it_is": "A free-demo Switch 1 Artemis-engine visual novel with a modified-save Lua 5.1 primitive. The editor save is installed with JKSV on a hacked Switch 1 and transferred to another console; the game runs arbitrary Lua from the save.",
+      "what_it_proves": "A free, game-level Lua code-execution entry point exists on Switch 1/2 without SmileBASIC. The Lua environment has save and game: VFS access.",
+      "what_it_does_not_prove": "It is not fs-level: no shell, no sd:, and /../ traversal is normalized away. The Artemis/FS bootstrap is not public. No OLED 23.0.1 test; it requires a hacked Switch 1 seed and current firmware for the official save transfer. It does not provide kernel, bootROM, CFW, or persistence.",
+      "evidence": [
+        "E-122",
+        "E-123"
+      ],
+      "sources": [
+        "seedsow-lua-editor-repo",
+        "ns2-savekit-results",
+        "onejailbreak-seedsow"
+      ],
+      "next_step": "Decide whether to install the free demo on the OLED as future-proofing and whether to authorize updating the 22.0.0 seed console to 23.0.1. Do not transfer a modified save or touch the seed console without explicit approval. Monitor the Artemis FS bootstrap and Gezine."
     }
   ],
   "fixed_public_flaws": [
@@ -680,10 +707,10 @@
     ],
     "status_counts": {
       "VERIFIED": 1,
-      "PARTIALLY VERIFIED": 1,
+      "PARTIALLY VERIFIED": 2,
       "UNVERIFIED": 0,
       "DISPROVEN": 3,
-      "UNKNOWN": 6
+      "UNKNOWN": 5
     }
   }
 }
