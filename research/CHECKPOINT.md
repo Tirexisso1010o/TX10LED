@@ -19,6 +19,7 @@ Last updated: 2026-10-31
 - H-013 file-picker probe prepared (2026-10-31): `scripts/webkit_file_picker_probe.html` reports only name/size/type for a selected benign SD-card file; it does not read or upload contents. The portal local self-test passes. The protocol is in `docs/H-013-FILE-PICKER-PLAN.md`. It has not been run; it needs explicit approval for the page load.
 - H-013 file-picker result (2026-10-31): the page displayed “ready; choose a file”, but pressing Browse returned “The file selection is not supported” (`E-121`). No file was selected and no contents were read. The browser file-selection surface is closed negative.
 - Seedsow Lullaby lead (2026-10-31): a free-demo Switch 1 Artemis-engine save Lua 5.1 primitive, game-level only. The editor save runs arbitrary Lua inside the game on Switch 1/2; `io`, `os`, `debug`, `package`, `loadstring`, and `dofile` are present, but `os.execute` returns 0, `io.popen` is unsupported, `sd:` is absent, and `/../` traversal is normalized away (`E-122`). It does not require SmileBASIC. The install needs a hacked Switch 1 seed with JKSV and Nintendo’s official save transfer with both consoles on current firmware (`E-124`); the owner’s only hacked Switch 1 is on 22.0.0, the 23.0.1 source console is gone, and the modded 22.0.0 console is off-limits by prior decision (`E-123`). The Artemis/FS bootstrap is not public; `H-014` is blocked and `L-007` is partially verified. Installing the free demo on the OLED is future-proofing, not an exploit.
+- SD card inspection (2026-10-31): a 31.9 GB FAT32 card with an empty `Nintendo/Album`, four NCA containers (largest 1,748,484,096 bytes), and two system saves. The NCA containers are NAX0-encrypted; the global header key does not decrypt them. `Nintendo/Contents/private` is a 16-byte SD-seed identifier, not the seed; the actual seed is in the system save `8000000000000043`, which is absent from the card. Only the FAT tree is readable (`E-125`). If the card is from the lost source console, its `sd_seed` in the local keys might decode it; not tested.
 - New context (2026-10-28): the owner asked to keep the workflow on macOS. Native macOS cannot inject 802.11 frames, so the radio runs in an OrbStack Ubuntu 26.04 VM with a TP-Link Archer T3U Plus passed through. This makes the LDN pre-auth direction (`D9`, `H-010`) testable without rebooting the Mac.
 - Local artifacts (2026-10-28): the owner supplied `Firmware/prod.keys.txt` and `Firmware/Firmware.23.0.1` from a modded 23.0.1 Switch that the owner no longer has. Both are excluded from version control. The keys decrypt the Phase 1 advertisement and confirm the retail room is security mode 1 (prod).
 - Hardware availability (2026-10-29): the owner no longer has the modded 23.0.1 source console. The remaining hardware is a modded 22.0.0 Switch and the unmodded 23.0.1 target. A 23.0.1 BOOT0/package1 dump and 23.0.1 key generation `0x17` keys are therefore not currently obtainable; the 22.0.0 console's keys cover at most generation `0x16` and do not decrypt the 23.0.1 `ldn`/`splay` NCAs.
@@ -103,7 +104,7 @@ Last updated: 2026-10-31
 
 ## Completed work
 
-- Source register (85 sources), evidence ledger (E-001–E-124), hypothesis register (H-001–H-014), and compatibility matrix (37 rows).
+- Source register (87 sources), evidence ledger (E-001–E-125), hypothesis register (H-001–H-014), and compatibility matrix (37 rows).
 - Detailed entry-point matrix (`research/entry-points.json`) covering 11 surfaces and 6 public leads, including `EP-011` GameShare/`splay` and `L-006`.
 - Readable entry-point analysis (`docs/ENTRY-POINTS.md`) with a stage model, a GameShare section, bounds, and capability ceiling.
 - Stage-by-stage gap analysis (`docs/GAP-ANALYSIS.md`) identifying boot-stage execution as the decisive missing link, plus a section on why applet-level userland cannot launch NRO homebrew.
@@ -164,7 +165,7 @@ python3 scripts/validate_research.py
 Current result:
 
 ```text
-Research data OK: 85 sources, 124 evidence entries, 11 entry-point surfaces, 7 leads, 14 hypotheses, 37 matrix rows, 5 USB modes.
+Research data OK: 87 sources, 125 evidence entries, 11 entry-point surfaces, 7 leads, 14 hypotheses, 37 matrix rows, 5 USB modes.
 ```
 
 Full suite: `93 tests, OK`.

@@ -621,11 +621,12 @@
       "expected_signal": "The editor/Lua runs on the OLED and can read/write the game save; no fs or sd access.",
       "kill_criteria": "The demo is unavailable, the transfer is refused, the save is incompatible, or the editor fails to run.",
       "risks": "Console software install and state change; official save transfer and account use; seed console update; no fs exploit; the game may be updated or delisted.",
-      "blocked_by": "No hacked 23.0.1 seed; the only modded Switch 1 is 22.0.0 and the 23.0.1 source console is gone. Nintendo's official save transfer requires the latest system version (E-124), so the 22.0.0 seed cannot transfer to the 23.0.1 OLED as-is. The modded 22.0.0 console is off-limits by prior decision, and the Artemis/FS bootstrap is not public.",
+      "blocked_by": "No hacked 23.0.1 seed; the only modded Switch 1 is 22.0.0 and the 23.0.1 source console is gone. Nintendo's official save transfer requires the latest system version (E-124), so the 22.0.0 seed cannot transfer to the 23.0.1 OLED as-is. The modded 22.0.0 console is off-limits by prior decision, and the Artemis/FS bootstrap is not public. The SD card is not a direct save-delivery path: its NCA/save content is NAX0/console-encrypted and the seed is internal (E-125).",
       "evidence": [
         "E-122",
         "E-123",
-        "E-124"
+        "E-124",
+        "E-125"
       ],
       "sources": [
         "seedsow-lua-editor-repo",

@@ -1708,6 +1708,20 @@
       "evidence": "Nintendo's support page says: 'You must update to the latest system version before carrying out a transfer.' The Seedsow Lua Editor guide also says both consoles need to be current for the official transfer. The owner's only hacked Switch 1 is on 22.0.0; the OLED is on 23.0.1; the 23.0.1 source console is gone.",
       "limitations": "The support page is generic and the transfer tool might behave differently for a specific game/version. A harmless normal-save transfer test could confirm it, but that requires using the modded seed console and the OLED.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-125",
+      "claim": "The console SD card's NCA containers are NAX0-encrypted; the global NCA header key does not decrypt them. Nintendo/Contents/private is a 16-byte SD-seed identifier, not the seed; the actual seed is in the console's internal system save 8000000000000043, which is not on the card. Only the FAT tree is readable.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only inventory of the SD card inserted 2026-10-31. No content extraction and no key output.",
+      "sources": [
+        "switchbrew-nax0",
+        "gbatemp-sd-seed"
+      ],
+      "evidence": "The card is a 31.9 GB FAT32 volume with Nintendo/Album (empty), Nintendo/Contents/registered (four NCA containers: 19,968; 389,632; 165,376; 1,748,484,096 bytes), and Nintendo/save (8000000000000000, 1,916,928 bytes; 8000000000000124, 21,413,888 bytes). The NCA data files are <hash>.nca/00 and do not decrypt to NCA3 with the global header key; their first bytes are high-entropy. Nintendo/Contents/private is 16 bytes; the SD-seed system save 8000000000000043 is absent. The save files are high-entropy.",
+      "limitations": "If the card came from the lost 23.0.1 source console, its sd_seed in the local prod.keys might decrypt the NAX0 headers; this was not tested. If the card is the OLED's, the seed is internal and unavailable without CFW. No title IDs or key generations are claimed.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }

@@ -936,6 +936,28 @@
       "snapshot": "Official support page: you must update to the latest system version before carrying out a transfer; Data Management > Transfer Your Save Data.",
       "license": "Nintendo support; cited, not redistributed.",
       "notes": "Used to assess the 22.0.0 seed versus the 23.0.1 OLED. It does not provide a save-signature bypass."
+    },
+    {
+      "id": "switchbrew-nax0",
+      "title": "NAX0 - Nintendo Switch Brew",
+      "publisher": "Switchbrew",
+      "kind": "wiki",
+      "url": "https://switchbrew.org/wiki/NAX0",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Documents the AES-XTS NAX0 format used for SD-card files, the console-unique SD seed from ns_appman:/private, the sd_card_nca_key_source derivation, and the path-specific HMAC.",
+      "license": "Wiki; cited, not redistributed.",
+      "notes": "Used to interpret the SD-card NCA containers read-only. It does not provide keys."
+    },
+    {
+      "id": "gbatemp-sd-seed",
+      "title": "How do you get your sd card encryption seed?",
+      "publisher": "GBAtemp",
+      "kind": "guide",
+      "url": "https://gbatemp.net/threads/how-do-you-get-your-sd-card-encryption-seed.507542/",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Forum guide: match the 16-byte Nintendo/Contents/private value in system save 8000000000000043 and take the next 16 bytes as the SD seed.",
+      "license": "Forum guide; cited, not redistributed.",
+      "notes": "Community guide, not authoritative. Used only to explain why the card's private file is not the seed."
     }
   ],
   "last_reviewed": "2026-10-31"
