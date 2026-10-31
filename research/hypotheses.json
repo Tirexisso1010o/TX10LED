@@ -577,14 +577,15 @@
       "expected_signal": "The console crashes, hangs, or reboots while the applet enumerates or opens the crafted path, or fs returns an unexpected error. Clean enumeration and normal behavior are a negative.",
       "kill_criteria": "The applet rejects or sanitizes the path, does not call GetEntryType on it, or the console remains normal through the bounded test.",
       "risks": "The console may hang or crash in an applet or in fs. Recovery is a reboot; the SD card is sacrificial and no console data is written. Do not run without approval.",
-      "blocked_by": "No approved browser capability page load or day-directory test; the sibling-directory route is closed negative. A confirmed trigger would still need the Switch 1 fs binary and heap-grooming exploit to reach code execution.",
+      "blocked_by": "No approved file-picker page load or day-directory card test; the download and sibling-directory routes are closed negative. A confirmed trigger would still need the Switch 1 fs binary and heap-grooming exploit to reach code execution.",
       "evidence": [
         "E-045",
         "E-075",
         "E-076",
         "E-114",
         "E-118",
-        "E-119"
+        "E-119",
+        "E-120"
       ],
       "sources": [
         "pepsipu-ns2jb-blog",
@@ -594,7 +595,7 @@
       "last_reviewed": "2026-10-31",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "The benign sibling-directory image displayed the real Exif control with no error and no AA\\<CJK> folder (E-119). The Album does not traverse non-date directories, so the crafted sibling-directory image was not written. The browser/download capability probe is prepared (scripts/webkit_download_probe.html, docs/H-013-BROWSER-PROBE-PLAN.md) but not run; it only detects download/file APIs. The day-directory filename variant remains untested.",
+      "results": "The benign sibling-directory image displayed the real Exif control with no error and no AA\\<CJK> folder (E-119). The browser capability probe then showed no download attribute, no save/open/directory picker, and no storage/caches API (E-120), so the download route is closed negative. The applet does expose <input type=file>, indexedDB, and localStorage; a file-picker probe is the only remaining browser file surface. The day-directory SD-card filename variant also remains untested.",
       "uncertainties": "Whether any free applet calls GetEntryType on a user-controlled path; whether the 23.0.1 Switch 1 fs contains the same 0x301-byte Path::Normalize overflow; whether a confirmed crash can be developed into code execution without the fs binary.",
       "resolution": "blocked"
     }

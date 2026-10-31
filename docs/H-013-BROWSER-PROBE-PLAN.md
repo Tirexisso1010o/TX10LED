@@ -1,6 +1,21 @@
 # H-013 — Browser/download capability probe
 
-> **Status: prepared, not run.** The probe is a single page load that only detects download/file APIs. It does not click a download, send a crafted filename, or write to the SD card. It needs explicit approval for the page load.
+> **Status: run 2026-10-31; download route closed negative.** The applet has no HTML download attribute, no save/open/directory picker, and no `navigator.storage`/`caches` API. It does expose `<input type=file>`, `indexedDB`, and `localStorage`. No download was clicked.
+
+## Result (2026-10-31)
+
+The `download_probe` event reported:
+
+- `anchorDownload: false`, `anchorDownloadType: undefined`
+- `showSaveFilePicker`, `showOpenFilePicker`, `showDirectoryPicker`: `undefined`
+- `navigator.storage`: `undefined`; no `estimate`, `getDirectory`, or `persist`
+- `caches`: `undefined`; `serviceWorker: false`
+- `<input type=file>` and `.files`: present; `webkitdirectory` and `directory`: absent
+- `Blob`, `URL.createObjectURL`, `FileReader`, `fetch`, `XMLHttpRequest`: present
+- `indexedDB`, `localStorage`, `sessionStorage`: present
+- UA: `Mozilla/5.0 (Nintendo Switch; WifiWebAuthApplet) AppleWebKit/613.0 (KHTML, like Gecko) NF/6.0.3.31.11 NintendoBrowser/5.1.0.55481`
+
+No `benign_download_clicked` event was recorded (`E-120`). The download/file-save route is closed. The remaining browser file surface is the file input: it may open a picker, but the page JS would receive a `File` object, not the full path, and the picker may not pass a path to `fs`.
 
 ## Purpose
 

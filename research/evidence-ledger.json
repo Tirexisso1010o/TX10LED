@@ -1643,6 +1643,17 @@
       "evidence": "The corrected benign image contained the real Exif screenshot at NINTENDO/ALBUM/2026/10/27/2026102700452400-57B4628D2267231D57E0FC1078C0596D.jpg and a long AA\\<CJK> sibling directory under NINTENDO/ALBUM. The Album displayed the control image with no error or crash and did not display the AA\\<CJK> directory. The control confirms the card path, filename, and Exif requirements.",
       "limitations": "One console, one observation. It does not prove the crafted sibling directory would be ignored in every applet, but it shows the Album does not traverse it. It does not test a crafted filename inside the traversed day directory.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-120",
+      "claim": "The captive-portal applet exposes no HTML download attribute, no save/open/directory picker, and no navigator.storage or caches API. It does expose <input type=file>, indexedDB, and localStorage.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "One capability page load on 2026-10-31 through the local captive portal; no download click, no crafted filename, no SD-card write.",
+      "sources": [],
+      "evidence": "The download_probe event reported anchorDownload=false, anchorDownloadType=undefined, showSaveFilePicker/showOpenFilePicker/showDirectoryPicker=undefined, storage=undefined, storageEstimate=false, storageGetDirectory=false, caches=undefined, serviceWorker=false. It reported inputFile=true, inputFiles=true, inputWebkitDirectory=false, inputDirectory=false, blob/createObjectURL/FileReader/fetch/xhr present, indexedDB/localStorage/sessionStorage present. UA: Mozilla/5.0 (Nintendo Switch; WifiWebAuthApplet) AppleWebKit/613.0 (KHTML, like Gecko) NF/6.0.3.31.11 NintendoBrowser/5.1.0.55481. No benign_download_clicked event was logged.",
+      "limitations": "Feature presence is not proof that the file picker opens or that the applet passes a selected file's full path to fs. The page JS would see a File object, not the full path. This does not test a crafted path or the fs bug.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }
