@@ -91,7 +91,7 @@ It is **not fs-level**:
 - `sd:` is absent; `save:/../` traversal is normalized away.
 - The Artemis/FS bootstrap is being written but is not public; the fs sysmodule exploit is untested through this path.
 
-The install route is the blocker: a hacked Switch 1 seed must install the editor save with JKSV, then use Nintendo's official save transfer with both consoles on current firmware. The owner's only hacked Switch 1 is on 22.0.0, the 23.0.1 source console is gone, and the modded 22.0.0 console is off-limits by prior decision. The OLED is 23.0.1 and can install the free demo, but cannot receive the editor save without the seed/transfer.
+The install route is the blocker: a hacked Switch 1 seed must install the editor save with JKSV, then use Nintendo's official save transfer with both consoles on current firmware. Nintendo requires the latest system version (`E-124`), so the 22.0.0 seed is blocked as-is. The owner's only hacked Switch 1 is on 22.0.0, the 23.0.1 source console is gone, and the modded 22.0.0 console is off-limits by prior decision. The OLED is 23.0.1 and can install the free demo, but cannot receive the editor save without the seed/transfer.
 
 **Future-proofing:** installing the free demo on the OLED is harmless and keeps the option open; it is not an exploit. Do not transfer a modified save or update the seed console without explicit approval. See `L-007`, `H-014`, `E-122`, and `E-123`.
 

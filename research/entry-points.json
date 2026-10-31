@@ -617,17 +617,18 @@
       "leads_to_atmosphere": false,
       "what_it_is": "A free-demo Switch 1 Artemis-engine visual novel with a modified-save Lua 5.1 primitive. The editor save is installed with JKSV on a hacked Switch 1 and transferred to another console; the game runs arbitrary Lua from the save.",
       "what_it_proves": "A free, game-level Lua code-execution entry point exists on Switch 1/2 without SmileBASIC. The Lua environment has save and game: VFS access.",
-      "what_it_does_not_prove": "It is not fs-level: no shell, no sd:, and /../ traversal is normalized away. The Artemis/FS bootstrap is not public. No OLED 23.0.1 test; it requires a hacked Switch 1 seed and current firmware for the official save transfer. It does not provide kernel, bootROM, CFW, or persistence.",
+      "what_it_does_not_prove": "It is not fs-level: no shell, no sd:, and /../ traversal is normalized away. The Artemis/FS bootstrap is not public. No OLED 23.0.1 test; it requires a hacked Switch 1 seed and current firmware for the official save transfer (E-124). It does not provide kernel, bootROM, CFW, or persistence.",
       "evidence": [
         "E-122",
-        "E-123"
+        "E-123",
+        "E-124"
       ],
       "sources": [
         "seedsow-lua-editor-repo",
         "ns2-savekit-results",
         "onejailbreak-seedsow"
       ],
-      "next_step": "Decide whether to install the free demo on the OLED as future-proofing and whether to authorize updating the 22.0.0 seed console to 23.0.1. Do not transfer a modified save or touch the seed console without explicit approval. Monitor the Artemis FS bootstrap and Gezine."
+      "next_step": "Decide whether to install the free demo on the OLED as future-proofing and whether to authorize a harmless normal-save transfer test across 22.0.0/23.0.1 or an update of the 22.0.0 seed console to 23.0.1. Do not transfer a modified save or touch the seed console without explicit approval. Monitor the Artemis FS bootstrap and Gezine."
     }
   ],
   "fixed_public_flaws": [

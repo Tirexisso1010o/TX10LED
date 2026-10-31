@@ -1694,6 +1694,20 @@
       "evidence": "The editor README says to start with a modded/hacked Switch 1 that can run homebrew and can complete Nintendo's online save transfer; both consoles need to be current for the official transfer. The owner has the unmodded 23.0.1 OLED and a modded 22.0.0 Switch 1; the 23.0.1 source console is no longer available. The 22.0.0 console has been left untouched by prior decision.",
       "limitations": "The transfer might work across 22.0.0 and 23.0.1 in some configuration, but the guide says both current and this has not been tested. Updating the 22.0.0 console to 23.0.1 could remove the blocker but is not authorized.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-124",
+      "claim": "Nintendo's official save transfer requires the latest system version on the consoles. The owner's seed console is on 22.0.0 and the OLED is on 23.0.1, so the transfer is blocked as-is without updating the seed.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Official Nintendo support plus owner hardware inventory, 2026-10-31.",
+      "sources": [
+        "nintendo-save-transfer",
+        "seedsow-lua-editor-repo"
+      ],
+      "evidence": "Nintendo's support page says: 'You must update to the latest system version before carrying out a transfer.' The Seedsow Lua Editor guide also says both consoles need to be current for the official transfer. The owner's only hacked Switch 1 is on 22.0.0; the OLED is on 23.0.1; the 23.0.1 source console is gone.",
+      "limitations": "The support page is generic and the transfer tool might behave differently for a specific game/version. A harmless normal-save transfer test could confirm it, but that requires using the modded seed console and the OLED.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }

@@ -925,6 +925,17 @@
       "snapshot": "Article updated 2026-10-30. Reports a save vulnerability in Seedsow Lullaby (Artemis engine), a free demo, a hacked Switch 1 seed, official save transfer, and an FS bootstrap still being written.",
       "license": "News article; cited, not redistributed.",
       "notes": "States that the FS sysmodule exploit is still untested through this path and the bootstrap is not public. Both consoles need current firmware for the official transfer."
+    },
+    {
+      "id": "nintendo-save-transfer",
+      "title": "Transferring users and save data",
+      "publisher": "Nintendo",
+      "kind": "vendor-documentation",
+      "url": "https://www.nintendo.com/sg/support/switch/secondary/transfer.html",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Official support page: you must update to the latest system version before carrying out a transfer; Data Management > Transfer Your Save Data.",
+      "license": "Nintendo support; cited, not redistributed.",
+      "notes": "Used to assess the 22.0.0 seed versus the 23.0.1 OLED. It does not provide a save-signature bypass."
     }
   ],
   "last_reviewed": "2026-10-31"

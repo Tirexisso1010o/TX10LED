@@ -274,7 +274,7 @@ The full matrix, controls, approval record, stop conditions, and recovery steps 
 
 **Hypothesis:** `H-014`, lead `L-007`.
 
-**What is known.** Seedsow Lullaby is a Switch 1 visual novel on the Artemis engine. A modified save (`Seedsow-Lua-Editor-Save.zip`) runs Lua 5.1 inside the game on Switch 1 and Switch 2. The free demo 1.0.0 works; the full game works. The editor save is installed with JKSV on a hacked Switch 1 and moved with Nintendo's official save transfer; both consoles need current firmware. The Lua environment has `io`, `os`, `debug`, `package`, `loadstring`, and `dofile`, but `os.execute` returns 0, `io.popen` is unsupported, `sd:` is absent, and `/../` traversal is normalized away (`E-122`).
+**What is known.** Seedsow Lullaby is a Switch 1 visual novel on the Artemis engine. A modified save (`Seedsow-Lua-Editor-Save.zip`) runs Lua 5.1 inside the game on Switch 1 and Switch 2. The free demo 1.0.0 works; the full game works. The editor save is installed with JKSV on a hacked Switch 1 and moved with Nintendo's official save transfer; both consoles need current firmware (`E-124`). The Lua environment has `io`, `os`, `debug`, `package`, `loadstring`, and `dofile`, but `os.execute` returns 0, `io.popen` is unsupported, `sd:` is absent, and `/../` traversal is normalized away (`E-122`).
 
 **Why it matters.** It is a free, game-level code-execution entry point that does not require SmileBASIC. The SmileBASIC ownership blocker disappears. It is **not fs-level**: it runs inside the game and its VFS, not the `fs` sysmodule. The Artemis/FS bootstrap is being written but is not public, and the fs sysmodule exploit is untested through this path.
 
