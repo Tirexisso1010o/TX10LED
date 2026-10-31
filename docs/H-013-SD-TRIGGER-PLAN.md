@@ -47,11 +47,15 @@ python3 scripts/sdcard_lab.py --describe h013-crafted.img
 
 ## Card write
 
-The write is destructive and must be run by the owner, against the sacrificial card only:
+The write is destructive and must be run by the owner, against the sacrificial card only. Run the **benign** image first; only after a clean benign run should you write the crafted image:
 
 ```sh
-python3 scripts/sdcard_write.py --device /dev/diskN --image h013-crafted.img
+python3 scripts/sdcard_write.py --device /dev/diskN --image h013-benign.img
 # inspect the printed plan, then re-run with --write
+python3 scripts/sdcard_write.py --device /dev/diskN --image h013-benign.img --write
+
+# only after the benign run is clean:
+python3 scripts/sdcard_write.py --device /dev/diskN --image h013-crafted.img
 python3 scripts/sdcard_write.py --device /dev/diskN --image h013-crafted.img --write
 ```
 
@@ -59,15 +63,25 @@ The writer refuses `disk0`, internal disks, partitions, and cards smaller than t
 
 ## Console run
 
-1. Insert the sacrificial card and open **Album**.
-2. Confirm the control image under `2026/10/27` appears. If it does not, the card or album setup failed; abort and do not interpret the result.
-3. Wait 60 seconds without touching the console. If the album displays the crafted `..\<CJK>` folder, open it once; otherwise leave the album on the control image.
-4. Record:
-   - whether the control image appeared;
-   - any error code, black screen, hang, reboot, or crash report;
-   - whether the console returned to the album or HOME normally.
+### 1. Benign control first
+
+1. Write `h013-benign.img` to the sacrificial card and insert it.
+2. Open **Album** and confirm the control image under `2026/10/27` appears. If it does not, the card or album setup failed; abort.
+3. Wait 60 seconds without touching the console. If the album displays the long `AA\<CJK>` folder, open it once; otherwise leave the album on the control image.
+4. Record any error code, black screen, hang, reboot, or crash report.
 5. Reboot, remove the card, and restore the original card.
-6. Repeat the run with `h013-benign.img`. The benign image is the attribution control.
+
+If the benign image crashes or hangs, **stop**. The long Unicode path itself is implicated; do not run the crafted image, and record the result as a long-path/parser issue rather than a `..\` trigger.
+
+### 2. Crafted image
+
+Only if the benign run is clean:
+
+1. Write `h013-crafted.img` to the sacrificial card and insert it.
+2. Open **Album** and confirm the same control image appears.
+3. Wait 60 seconds without touching the console. If the album displays the crafted `..\<CJK>` folder, open it once; otherwise leave the album on the control image.
+4. Record any error code, black screen, hang, reboot, or crash report.
+5. Reboot, remove the card, and restore the original card.
 
 ## Abort and recovery
 
