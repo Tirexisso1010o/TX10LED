@@ -1605,6 +1605,33 @@
       "evidence": "ONE Jailbreak reports a Discord claim that the fs payload works through Switch 2 WebKit on the author's console and that testers were wanted for firmware before 23.0.1. The article states that no public download or full write-up had been posted. The original write-up lists the WebKit port as future work.",
       "limitations": "The port's existence and capability are author-reported and not independently reproduced. It is described only for Switch 2; the Switch 1 browser is a different, older NetFront/WebKit build, so the claim does not transfer.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-117",
+      "claim": "The ns2jb author says the SmileBASIC trigger and ROP stage were developed on a Switch 1, and that the exploit was tested on Switch 1, but no Switch 1 package, offsets, payload, or firmware are published.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Author-reported development and test history in the public write-up; not independently reproduced.",
+      "sources": [
+        "pepsipu-ns2jb-blog"
+      ],
+      "evidence": "The write-up says: 'This was a Switch 1 game, so the SmileBASIC agent could work on the exploit on my Switch 1, while the WebKit agent worked on the Switch 2. After some time, it got ROP.' It later says: 'The exploit has also been tested on the Switch 1, but I haven't gotten around to packaging it yet. It wouldn't provide the capabilities of a modchip, but it wouldn't require any external hardware.' The first statement confirms SmileBASIC-triggered ROP on a Switch 1. The second claims the exploit was tested there but does not state the model, firmware, or how far the chain went.",
+      "limitations": "Author-reported only. No Switch 1 bootstrap, fs offsets, hashes, payload, or package is public. The Switch 1 model and firmware are unstated, so applicability to 23.0.1 is unknown. A Switch 1 test does not show the fs bug is present in the 23.0.1 build.",
+      "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-118",
+      "claim": "The owner's local Switch 1 23.0.1 NCA dump does not contain an NCA with title ID 0100000000000000 (fs), and every system program NCA in the 01000000000000xx range is key generation 0x17, which the supplied keys cannot decrypt.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only parse of all 238 NCA headers in Firmware/Firmware.23.0.1 on 2026-10-31. No console interaction and no key material recorded.",
+      "sources": [
+        "switchbrew-nca",
+        "switchbrew-23.0.1"
+      ],
+      "evidence": "All 238 files parse as NCA3 after AES-XTS header decryption with the local header key. Title IDs were read at 0x210 and key generation at 0x220. No row has title ID 0100000000000000. The system program rows present in the 01000000000000xx range, including ldn at 0100000000000018, are all key generation 0x17. The key file stops at key_area_key_application_14 (20.0.0), so generation 0x17 content cannot be decrypted.",
+      "limitations": "This shows the fs NCA is absent from this dump and that generation 0x17 content is not decryptable with the supplied keys. It does not show that fs is absent from the console or that the Switch 1 fs lacks the path-normalization bug. The dump is owner-supplied and folder-named 23.0.1; its version was not independently verified.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }

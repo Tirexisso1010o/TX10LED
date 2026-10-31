@@ -25,8 +25,8 @@ Atmosphère is a **boot-time** CFW. A runtime kernel exploit can patch a running
 | Stage | Public status on Mariko 23.0.1 | Closest public artifact |
 |---|---|---|
 | 0. Trigger | **Unavailable to this owner** | `ns2jb` needs SmileBASIC 4.4.9 (or the 4.4.6 demo), which was delisted and is not owned; the public package is Switch 2-only (`E-114`, `E-115`) |
-| 1. Initial execution | **Not publicly demonstrated on Switch 1 23.0.1** | `ns2jb`'s SmileBASIC integer overflow, packaged for Switch 2 |
-| 2. Privilege escalation | **Not publicly demonstrated on Switch 1 23.0.1** | `ns2jb`'s `fs` `Path::Normalize` overflow, packaged for Switch 2 |
+| 1. Initial execution | **Not publicly demonstrated on Switch 1 23.0.1** | `ns2jb`'s SmileBASIC integer overflow; the author got ROP on a Switch 1, but no package or firmware is public (`E-117`) |
+| 2. Privilege escalation | **Not publicly demonstrated on Switch 1 23.0.1** | `ns2jb`'s `fs` `Path::Normalize` overflow, packaged for Switch 2; no Switch 1 `fs` binary in the dump (`E-118`) |
 | 3. Boot stage | **Nothing public** | Caffeine, a warmboot exploit for **Erista 4.0.0–4.1.0 only** |
 | 4. Launch | Packages exist, launch path missing | Atmosphère 1.12.1 and hekate v6.5.4 support 23.0.1 |
 

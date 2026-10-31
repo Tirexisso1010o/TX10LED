@@ -161,23 +161,26 @@
       "prerequisites": [
         "A stage-1 userland primitive on Switch 1 23.0.1",
         "A stage-1 trigger; the only public ns2jb trigger is SmileBASIC 4.4.9, which the owner does not own",
-        "Either a Switch 1 fs binary to inspect or a way to observe the behavior"
+        "A Switch 1 fs binary for 23.0.1 to locate the normalize-and-copy sequence and derive anchors; it is not present in the owner's dump"
       ],
       "expected_capability": "Privilege escalation from a userland process to the fs sysmodule, which is stage 2. It is not an entry point and does not reach boot stage.",
       "test_procedure": "Compare the documented GetEntryType path handling across generations and inspect a Switch 1 fs binary for the 0x301-byte temporary buffer and the backslash parent-directory path. Confirm only with a stage-1 primitive in a controlled environment.",
       "expected_signal": "Presence of the same normalize-and-copy sequence with a fixed 0x301-byte allocation and no length check.",
       "kill_criteria": "The Switch 1 implementation uses a different normalization path, bounds the copy, or is absent.",
       "risks": "Testing on hardware requires a stage-1 primitive that does not exist publicly. Static inspection is passive.",
-      "blocked_by": "No stage-1 primitive on Switch 1 23.0.1, no Switch 1 fs binary, and no Switch 1 package. The public ns2jb package is Switch 2-only (E-114), and the macOS wrapper and forks add no Switch 1 path (E-115).",
+      "blocked_by": "Stage 0 is blocked because the only public trigger is SmileBASIC 4.4.9, which is paid, delisted, and not owned. Stage 2 is blocked because the public ns2jb package is Switch 2-only (E-114), the owner's 23.0.1 dump has no fs NCA and every system program in scope is key generation 0x17 (E-118), and the supplied keys stop at 0x14. The author's Switch 1 test does not publish the bootstrap, offsets, hashes, or payload (E-117).",
       "evidence": [
         "E-045",
         "E-052",
         "E-114",
-        "E-115"
+        "E-115",
+        "E-117",
+        "E-118"
       ],
       "sources": [
         "pepsipu-ns2jb-blog",
         "switchbrew-filesystem",
+        "switchbrew-nca",
         "ns2jb-run-cjs",
         "ns2jb-bootstrap-bas",
         "ns2jb-repository",
@@ -186,8 +189,8 @@
       "last_reviewed": "2026-10-31",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "Not tested. Read-only inspection on 2026-10-31 confirmed the public package is Switch 2-only: only engine/switch2 is present, run.cjs sets platform 2 and spawns switch2/pipeline.cjs, and bootstrap.bas validates Switch 2 offsets. The macOS wrapper and the two maintained forks are also Switch 2-only. A Switch 1 port would be original work and is blocked on a stage-1 primitive, a Switch 1 fs binary, and SmileBASIC ownership.",
-      "uncertainties": "Whether Switch 1 fs shares the normalize-and-copy implementation; whether the 0x301-byte buffer is the same size; whether a Switch 1 port is planned or public.",
+      "results": "A port is technically credible: the author says the SmileBASIC trigger and ROP stage were developed on a Switch 1, and that the exploit was tested there (E-117). It is not reproducible from public materials. The public package has only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets and 11 Switch 2 fs content hashes (E-114). The owner's local 23.0.1 dump contains no fs NCA, and every system program NCA in the 01000000000000xx range is key generation 0x17, which the supplied keys cannot decrypt (E-118). A Switch 1 port would require original reverse engineering and a SmileBASIC copy the owner does not have, so no port work is actionable now.",
+      "uncertainties": "The author's Switch 1 model and firmware are unstated, so applicability to 23.0.1 is unknown. Whether the 23.0.1 Switch 1 fs still contains the 0x301-byte Path::Normalize buffer and missing length check is unverified. Whether the loader/ExeFS behavior and payload would transfer to Switch 1 is also unverified.",
       "resolution": "blocked"
     },
     {

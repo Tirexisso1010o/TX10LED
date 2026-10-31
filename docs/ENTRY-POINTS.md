@@ -145,6 +145,8 @@ The author's write-up says the exploit chain was **also tested on Switch 1**, bu
 
 The newer tooling does not change this. `mac2jb` is a macOS wrapper that automates the SmileBASIC typing and launches MintBrew; the `kurumuz` and `BermTheSequel` forks add demo support, layout handling, and extra hosts. All are Switch 2-only and still require SmileBASIC, and `mac2jb` requires an unsigned kernel extension with SIP disabled (`E-115`). A reported WebKit port is Switch 2-specific and has no public download (`E-116`).
 
+A Switch 1 port is technically credible: the author says the SmileBASIC trigger and ROP stage were developed on a Switch 1 (`E-117`). It is not actionable from public materials. The public bootstrap is Switch 2-specific, and the owner’s 23.0.1 dump has no `fs` NCA; every system program NCA in scope is key generation `0x17`, which the supplied keys cannot decrypt (`E-118`). See [`PORTABILITY.md`](PORTABILITY.md).
+
 ### What it proves — and what it does not
 
 | Question | Answer |

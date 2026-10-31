@@ -69,12 +69,13 @@ The detailed matrix is in [`docs/ENTRY-POINTS.md`](docs/ENTRY-POINTS.md) and [`r
 - It runs native code as ordinary sysmodules and as the built-in `fs` sysmodule.
 - It does **not** provide kernel access, bootROM access, CFW, or persistence.
 - The author says the chain was **also tested on Switch 1**, but it is not packaged for Switch 1, the model and firmware are not stated, and the author says it would not provide modchip-level capability.
+- The author’s write-up also says the **SmileBASIC trigger and ROP stage were developed on a Switch 1**. That makes a port technically credible, but no Switch 1 package, bootstrap, offsets, payload, model, or firmware is public.
 - Read-only inspection on 2026-10-31 confirms there is no Switch 1 code path: the repository contains only `engine/switch2`, `run.cjs` hardcodes `platform: 2` and spawns `switch2/pipeline.cjs`, `bootstrap.bas` validates Switch 2 offsets, and the README says “Switch 2 only.”
 - The newer tools are also Switch 2-only: `mac2jb` is a macOS wrapper that automates the SmileBASIC typing and launches MintBrew, and the `kurumuz` and `BermTheSequel` forks add demo support and layout handling. All still require SmileBASIC, and `mac2jb` requires an unsigned kernel extension with SIP disabled.
 - SmileBASIC 4 is paid and was delisted; the owner does not own it, so the only public trigger is unavailable.
 - No OLED/Mariko 23.0.1 test is documented.
 
-It is a lead worth following, not a method to run. See E-021, E-022, E-032, E-034, E-114, and E-115 in [`research/evidence-ledger.json`](research/evidence-ledger.json).
+It is a lead worth following, not a method to run. A Switch 1 port is the only credible modification path, but it is blocked at SmileBASIC ownership and at the missing Switch 1 `fs` binary; see [`docs/PORTABILITY.md`](docs/PORTABILITY.md). See E-021, E-022, E-032, E-034, E-114, E-115, E-117, and E-118 in [`research/evidence-ledger.json`](research/evidence-ledger.json).
 
 ## WebKit n-day assessment (2026-10-31)
 

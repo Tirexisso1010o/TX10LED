@@ -346,9 +346,11 @@
         "E-046",
         "E-034",
         "E-114",
-        "E-115"
+        "E-115",
+        "E-117",
+        "E-118"
       ],
-      "notes": "The author says the chain was tested on Switch 1 but not packaged. Model and firmware are unstated, so this does not establish OLED/Mariko 23.0.1 applicability. Read-only inspection confirms no Switch 1 code path; a port would need different offsets, heap grooming, and a payload. The macOS wrapper still requires SmileBASIC, and its unsigned driver needs SIP disabled."
+      "notes": "The author says the chain was tested on Switch 1 but not packaged. Model and firmware are unstated, so this does not establish OLED/Mariko 23.0.1 applicability. Read-only inspection confirms no Switch 1 code path; a port would need different offsets, heap grooming, and a payload. The macOS wrapper still requires SmileBASIC, and its unsigned driver needs SIP disabled. The author's Switch 1 ROP development makes a port technically credible, but the public package has no Switch 1 bootstrap/offsets/payload, and the owner's 23.0.1 dump has no fs NCA and cannot decrypt its key generation 0x17 system programs."
     },
     {
       "id": "C-022",

@@ -474,14 +474,16 @@
       "leads_to_atmosphere": false,
       "what_it_is": "A software-only, tethered userland/sysmodule jailbreak for the Nintendo Switch 2 on system software 23.0.1. It runs native code as ordinary sysmodules and as the built-in fs sysmodule. The public package, the macOS wrapper, and the maintained forks are Switch 2-only.",
       "what_it_proves": "A software-only userland/sysmodule chain can exist on recent firmware and can run native code without a modchip.",
-      "what_it_does_not_prove": "It does not provide kernel, bootROM, CFW, or persistence. It is packaged for Switch 2, not Switch 1. The author says the chain was also tested on Switch 1, but the model and firmware are not stated and the Switch 1 version is not packaged. Repository inspection shows no Switch 1 code path, and the only public trigger is SmileBASIC 4.4.9, which the owner does not own.",
+      "what_it_does_not_prove": "It does not provide kernel, bootROM, CFW, or persistence. It is packaged for Switch 2, not Switch 1. The author says the chain was also tested on Switch 1, but the model and firmware are not stated and the Switch 1 version is not packaged. Repository inspection shows no Switch 1 code path, and the only public trigger is SmileBASIC 4.4.9, which the owner does not own. A Switch 1 port is technically credible because the author says the SmileBASIC trigger and ROP stage were developed on a Switch 1, but no Switch 1 package, bootstrap, offsets, hashes, payload, model, or firmware is public.",
       "evidence": [
         "E-021",
         "E-022",
         "E-032",
         "E-034",
         "E-114",
-        "E-115"
+        "E-115",
+        "E-117",
+        "E-118"
       ],
       "sources": [
         "pepsipu-ns2jb-blog",
@@ -491,7 +493,7 @@
         "mac2jb-repository",
         "kurumuz-ns2jb-fork"
       ],
-      "next_step": "Monitor for an independently tested or packaged Switch 1 chain with the model and firmware stated. Do not run the Switch 2 package, mac2jb, or a fork against the OLED; mac2jb additionally requires disabling SIP and loading an unsigned kernel extension."
+      "next_step": "Monitor for an independently tested or packaged Switch 1 chain with the model and firmware stated. A port would require the unpublished Switch 1 bootstrap/offsets/payload and a Switch 1 fs binary; the owner's dump has no fs NCA and cannot decrypt key generation 0x17. Do not run the Switch 2 package, mac2jb, or a fork against the OLED; mac2jb additionally requires disabling SIP and loading an unsigned kernel extension."
     },
     {
       "id": "L-002",

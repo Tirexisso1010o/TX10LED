@@ -31,7 +31,7 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | **D1** | capmtp PTP boundary validation (`H-001`, `H-002`) | 1 | **Yes** — console + USB host | 5 | 2 | 3 | **30** | **Closed — negative** |
 | **D2** | Browser/WebKit n-day assessment (`H-005`) | 1 | **Yes**, with the local captive-portal harness; W2 exploratory run complete | 4 | 4 | 3 | **36** | **W1 passed 2026-10-31 (`E-112`); W2 exploratory run no Stage 1 trigger (`E-113`); candidate deprioritized** |
 | **D3** | Mariko warmboot / package1 diff (`H-003`) | 3 | **No** — the 23.0.1 source console is gone; the only modded console is a 22.0.0 unit the owner has chosen to leave untouched | 2 | 5 | 5 | **30** | **Blocked — no 23.0.1 BOOT0/package1 or `0x17` keys; the 22.0.0 console is not being used** |
-| **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary; the public package is Switch 2-only | 2 | 3 | 2 | **12** | **Blocked — public tree has only `engine/switch2` (`E-114`); SmileBASIC not owned** |
+| **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary; the public package is Switch 2-only | 2 | 3 | 2 | **12** | **Blocked — SmileBASIC not owned; no `fs` NCA in the dump; port would be original work (`E-114`, `E-117`, `E-118`)** |
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host; read-only review complete | 1 | 3 | 2 | **6** | **Blocked — no public vulnerability; `splay` program NCA is key generation `0x17`** |
 | **D6** | Artemis save chain-load (`H-007`) | 1 | No — no Switch reproduction or save delivery | 2 | 2 | 1 | **4** | Blocked |
 | **D7** | Browser non-JS parsers: image decoding (`H-008`) | 1 | **Yes** — the portal serves the assets | 4 | 4 | 3 | **48** | **Closed — inconclusive** |
@@ -133,6 +133,14 @@ The harness discovers the first storage and object handle, then sends boundary o
 The newer tooling does not change this. `mac2jb` is a macOS wrapper for `ns2jb` that automates typing the bootstrap and launches MintBrew; the `kurumuz` fork adds demo support, microSD Express layout handling, held RPC, and a system-code dump; the `BermTheSequel` fork adds demo support and Windows/Linux hosts. All three are Switch 2-only and still require SmileBASIC. `mac2jb` additionally requires Switch Ethernet, an unsigned kernel extension, and `csrutil disable`, which this project does not authorize (`E-115`).
 
 So a Switch 1 port would be original work, not a configuration change. It is blocked on a stage-1 primitive, a Switch 1 `fs` binary, and a SmileBASIC copy the owner does not have.
+
+**Portability (2026-10-31).** The author’s write-up strengthens the case that a port is technically possible: “the SmileBASIC agent could work on the exploit on my Switch 1 … After some time, it got ROP,” and “the exploit has also been tested on the Switch 1, but I haven’t gotten around to packaging it yet” (`E-117`). That confirms the SmileBASIC trigger and ROP stage on some Switch 1, but it does not state the model or firmware, and no Switch 1 bootstrap, offsets, hashes, payload, or package is public.
+
+The `fs` stage is not a constant swap. The public `bootstrap.bas` uses 13 distinct `CALL#` targets, 20 `PUT` writes, and 11 content-hash gates over Switch 2 `fs` code and data, plus 62 `FAIL` gates. A Switch 1 port needs the Switch 1 `fs` binary to find the equivalent anchors and recompute the hashes.
+
+That binary is not available locally. A read-only parse of all 238 NCA headers in the owner’s 23.0.1 dump found no NCA with title ID `0100000000000000` (`fs`), and every system program NCA in the `01000000000000xx` range is key generation `0x17`; the supplied keys stop at `0x14` (`E-118`). The 22.0.0 console could supply an older binary, but the owner has chosen to leave it untouched and 22.0.0 is not 23.0.1.
+
+A port is therefore credible in principle and blocked in practice at stage 0 (SmileBASIC ownership) before the `fs` work even starts. Even a complete port would stop at `fs`-level native code, not CFW. See [`docs/PORTABILITY.md`](PORTABILITY.md).
 
 ## D5 and D6 — blocked directions
 
