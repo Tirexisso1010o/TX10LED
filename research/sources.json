@@ -815,7 +815,84 @@
       "snapshot": "CoreAudio APAC decoder memory corruption fixed in iOS 18.4.1, iPadOS 18.4.1, macOS Sequoia 15.4.1, tvOS 18.4.1, visionOS 2.4.1, and watchOS 11.5. CISA KEV.",
       "license": "NVD public data; cited, not redistributed.",
       "notes": "Not a WebKit bug. The APAC codec is not expected on the Switch, so it is excluded from the browser candidate set."
+    },
+    {
+      "id": "ns2jb-run-cjs",
+      "title": "ns2jb run.cjs host entrypoint",
+      "publisher": "pepsipu",
+      "kind": "source-code",
+      "url": "https://gitlab.com/pepsipu/ns2jb/-/raw/main/run.cjs",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Host entrypoint retrieved 2026-10-31. It hardcodes the Switch 2 target and spawns engine/switch2/pipeline.cjs.",
+      "license": "No license stated in the retrieved file; cited, not redistributed.",
+      "notes": "Sets platform 2 and target 'switch2', copies engine/shared and engine/switch2 into the run folder, and spawns switch2/pipeline.cjs. There is no Switch 1 branch, so running it against a Switch 1 would not select a Switch 1 code path."
+    },
+    {
+      "id": "ns2jb-bootstrap-bas",
+      "title": "ns2jb bootstrap.bas",
+      "publisher": "pepsipu",
+      "kind": "source-code",
+      "url": "https://gitlab.com/pepsipu/ns2jb/-/raw/main/bootstrap.bas",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "SmileBASIC bootstrap retrieved 2026-10-31. It is labelled 'Switch 2 / SmileBASIC 4.4.9' and validates Switch 2 offsets and hashes.",
+      "license": "No license stated in the retrieved file; cited, not redistributed.",
+      "notes": "Contains Switch 2-specific values such as &H9DB49C, &H5872F0, and &H12F614. A Switch 1 port would need different offsets, heap grooming, and a payload."
+    },
+    {
+      "id": "gbatemp-ns2jb-explainer",
+      "title": "What is ns2jb? The Switch 2 jailbreak situation explained",
+      "publisher": "GBAtemp",
+      "kind": "news",
+      "url": "https://gbatemp.net/news/what-is-ns2jb-the-switch-2-jailbreak-situation-explained.685785/",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Article dated 2026-10-24, retrieved 2026-10-31. Timeline, capability table, eShop delisting, and unconfirmed brick reports.",
+      "license": "News article; cited, not redistributed.",
+      "notes": "Confirms no CFW, no kernel exploit, no persistence, and that SmileBASIC 4.4.9 was required and then pulled from the eShop. Reports of consoles stalling at step 2/4 are unconfirmed. Notes that another entry point reaching fs may work, which is a claim, not a released method."
+    },
+    {
+      "id": "onejailbreak-ns2jb-webkit",
+      "title": "Switch 2 Jailbreak Ported to WebKit by pepsipu",
+      "publisher": "ONE Jailbreak",
+      "kind": "news",
+      "url": "https://onejailbreak.com/blog/switch-2-jailbreak-ported-to-webkit-by-pepsipu/",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "Article updated 2026-10-24, retrieved 2026-10-31. Reports a Discord claim that the port works on the author's Switch 2 and that testers were wanted for firmware before 23.0.1.",
+      "license": "News article; cited, not redistributed.",
+      "notes": "States that no public download or full write-up had been posted. The claim is Switch 2-specific and does not describe a Switch 1 WebKit chain."
+    },
+    {
+      "id": "mac2jb-repository",
+      "title": "cpypwn/mac2jb: an all-in-one ns2 jailbreaking tool for Mac",
+      "publisher": "cpypwn",
+      "kind": "source-code",
+      "url": "https://github.com/cpypwn/mac2jb",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "README retrieved 2026-10-31 (v0.6.0). MIT licensed. Requires an Apple Silicon Mac, a Switch 2 on 23.0.1, SmileBASIC full 4.4.9 or demo 4.4.6, Ethernet on the console, and an unsigned kernel extension with SIP disabled.",
+      "license": "MIT License.",
+      "notes": "Wraps ns2jb with USB keyboard automation and a MintBrew homebrew launcher. Switch 2 only. The unsigned USB gadget driver requires Reduced Security and csrutil disable, a system-wide macOS security change outside this project's authorization."
+    },
+    {
+      "id": "kurumuz-ns2jb-fork",
+      "title": "kurumuz/ns2jb: Switch 2 FS demo fork",
+      "publisher": "kurumuz",
+      "kind": "source-code",
+      "url": "https://gitlab.com/kurumuz/ns2jb",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "README retrieved 2026-10-31. Adds SmileBASIC 4.4.6 demo support, microSD Express layout handling, held RPC, and a system-code dump command.",
+      "license": "No license stated in the retrieved README; cited, not redistributed.",
+      "notes": "Still 'Switch 2 only'. Requires Ethernet on both the PC and the console and warns that the FS exploit is very unstable, with at best about a 20% success rate."
+    },
+    {
+      "id": "bermthesequel-ns2jb2-fork",
+      "title": "BermTheSequel/ns2jb2: Switch 2 FS demo fork",
+      "publisher": "BermTheSequel",
+      "kind": "source-code",
+      "url": "https://gitlab.com/BermTheSequel/ns2jb2",
+      "retrieved_at": "2026-10-31",
+      "snapshot": "README retrieved 2026-10-31. Adds SmileBASIC 4.4.6 demo support and macOS, Linux, and Windows hosts.",
+      "license": "No license stated in the retrieved README; cited, not redistributed.",
+      "notes": "Still a Switch 2 FS demo. Requires Ethernet and warns that the exploit is very timing-sensitive."
     }
   ],
-  "last_reviewed": "2026-10-30"
+  "last_reviewed": "2026-10-31"
 }

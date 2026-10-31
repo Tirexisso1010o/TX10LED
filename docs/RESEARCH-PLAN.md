@@ -31,7 +31,7 @@ The score is a planning aid, not evidence. A blocked direction can still be the 
 | **D1** | capmtp PTP boundary validation (`H-001`, `H-002`) | 1 | **Yes** — console + USB host | 5 | 2 | 3 | **30** | **Closed — negative** |
 | **D2** | Browser/WebKit n-day assessment (`H-005`) | 1 | **Yes**, with the local captive-portal harness; W2 exploratory run complete | 4 | 4 | 3 | **36** | **W1 passed 2026-10-31 (`E-112`); W2 exploratory run no Stage 1 trigger (`E-113`); candidate deprioritized** |
 | **D3** | Mariko warmboot / package1 diff (`H-003`) | 3 | **No** — the 23.0.1 source console is gone; the only modded console is a 22.0.0 unit the owner has chosen to leave untouched | 2 | 5 | 5 | **30** | **Blocked — no 23.0.1 BOOT0/package1 or `0x17` keys; the 22.0.0 console is not being used** |
-| **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary | 2 | 3 | 2 | **12** | Blocked |
+| **D4** | `fs` path-normalization on Switch 1 (`H-004`) | 2 | No — needs a stage-1 primitive and a binary; the public package is Switch 2-only | 2 | 3 | 2 | **12** | **Blocked — public tree has only `engine/switch2` (`E-114`); SmileBASIC not owned** |
 | **D5** | GameShare `splay` parsing (`H-006`) | 1 | No — needs a Switch 2 host; read-only review complete | 1 | 3 | 2 | **6** | **Blocked — no public vulnerability; `splay` program NCA is key generation `0x17`** |
 | **D6** | Artemis save chain-load (`H-007`) | 1 | No — no Switch reproduction or save delivery | 2 | 2 | 1 | **4** | Blocked |
 | **D7** | Browser non-JS parsers: image decoding (`H-008`) | 1 | **Yes** — the portal serves the assets | 4 | 4 | 3 | **48** | **Closed — inconclusive** |
@@ -95,6 +95,8 @@ The harness discovers the first storage and object handle, then sends boundary o
 
 **Reopened (2026-10-30).** A read-only review identified `CVE-2023-28205` as the only candidate in the reviewed set that combines a public PoC, no JIT requirement, and a reachable structured-clone path. It is a JavaScriptCore `SerializedScriptValue`/`CloneDeserializer` use-after-free: non-GC-scanned `Vector` containers hold `Map`/`Date` objects during deserialization, a GC cycle frees them, and deserialization continues through dangling pointers. The fix commit `c9880de` replaces those containers with `MarkedVector`. The public MIT-licensed PoC targets WebKit-613.1.17.1 and uses `postMessage` with a `Map`/`Date` graph; the applet's UA token is `AppleWebKit/613.0` and its feature set brackets Safari 15.4-15.6, so the lineage is adjacent but not an exact build match. Before the W2 exploratory run on 2026-10-31, the PoC had not been run on the console; Nintendo may have backported the fix. The local runner `scripts/webkit_portal.py`, probe `scripts/webkit_probe.html`, and tests are validated on loopback. **W1 passed on 2026-10-31:** the applet loaded the probe and round-tripped a `Map`/`Date` graph through `postMessage` (`ok=true`, `mapSize=1`, `dateValue=0`), with `postMessage`, `MessageChannel`, `BroadcastChannel`, `Worker`, `structuredClone`, `localStorage`, and ES modules present; no error event occurred and the console behaved normally (`E-112`). The runner now also has a tested `--site` mode and `--entry-query` for the PoC's `?autorun=1`. The W2 exploratory run on 2026-10-31 loaded the pinned PoC in four short modes; the module graph loaded, but the page logged only `Attempt` lines and produced no Stage 1 trigger, alert, crash, reboot, or hang. The run deviated from the single-load protocol, so it is not a clean negative; the candidate is deprioritized and no repeat is planned without a new hypothesis. Even a successful browser compromise is stage 1 only. See [`docs/WEBKIT-NDAY-PLAN.md`](WEBKIT-NDAY-PLAN.md).
 
+**WebKit port check (2026-10-31).** A reported port of the `ns2jb` `fs` payload to Switch 2 WebKit is author-claimed to work on one Switch 2, with testers wanted for older firmware; no public download or write-up exists, and it is not a Switch 1 chain (`E-116`). It does not reopen this direction.
+
 **Why it is still blocked.** Feature detection does not reveal the security patch level. Nintendo updates the NetFront shell between firmware versions (20.1.1 used `NF/6.0.3.27.11`; 23.0.1 uses `NF/6.0.3.31.11`) and can backport fixes without adding features. Determining the patch level needs the browser binary or controlled exploit testing. The arXiv analysis also reports no JIT in the Switch browser, which invalidates many public WebKit techniques. Even a full compromise is stage 1 only.
 
 **Risk.** Captive-portal testing changes temporary network settings, which are reversible. It requires the owner to add a network on the console.
@@ -120,6 +122,17 @@ The harness discovers the first storage and object handle, then sends boundary o
 **Why it is not the priority.** It is stage 2. It requires a stage-1 primitive that does not exist publicly on Switch 1 `23.0.1`. Even a confirmed port would not reach Atmosphère.
 
 **Next task.** Only after a stage-1 primitive exists: inspect a Switch 1 `fs` binary for the same normalize-and-copy sequence.
+
+**Update (2026-10-31).** A read-only inspection of the public package shows there is no Switch 1 code path to try:
+
+- the repository contains `engine/switch2` but no `engine/switch1`;
+- `run.cjs` sets `platform: 2` and `target: 'switch2'` and spawns `switch2/pipeline.cjs`;
+- `bootstrap.bas` is labelled “Switch 2 / SmileBASIC 4.4.9” and validates Switch 2 values such as `&H9DB49C`, `&H5872F0`, and `&H12F614`;
+- the README says “Switch 2 only” (`E-114`).
+
+The newer tooling does not change this. `mac2jb` is a macOS wrapper for `ns2jb` that automates typing the bootstrap and launches MintBrew; the `kurumuz` fork adds demo support, microSD Express layout handling, held RPC, and a system-code dump; the `BermTheSequel` fork adds demo support and Windows/Linux hosts. All three are Switch 2-only and still require SmileBASIC. `mac2jb` additionally requires Switch Ethernet, an unsigned kernel extension, and `csrutil disable`, which this project does not authorize (`E-115`).
+
+So a Switch 1 port would be original work, not a configuration change. It is blocked on a stage-1 primitive, a Switch 1 `fs` binary, and a SmileBASIC copy the owner does not have.
 
 ## D5 and D6 — blocked directions
 

@@ -56,7 +56,7 @@ The detailed matrix is in [`docs/ENTRY-POINTS.md`](docs/ENTRY-POINTS.md) and [`r
 | General Wi-Fi / network | Phase 0, Phase 1, Phase 2 Batch 1/2, and Phase 3 complete (`D10`): both test APs reached AP-ENABLED on channel 1; the console associated, completed the WPA2 handshake, obtained DHCP lease 192.168.77.94, and queried ctest.cdn.nintendo.net. Batch 1 sent W-01–W-08 and Batch 2 sent W-09–W-14; neither produced a crash, reboot, hang, or new error. W-06 (7.3/15.4 s) and W-09 (14.7 s) showed shorter association lifetimes than their 35.4–35.6 s controls and re-associated. Phase 3 control completed the handshake and three group rekeys; E-01–E-08 and E-09–E-14 were sent one per association, all accepted, with 35.0–35.5 s lifetimes. Phase 4 control C passed DHCP/DNS and failed at the internet step with 2110-3129; D-01 caused 2110-2963 with no crash and a 30.1 s lifetime. Remaining Phase 4 cases are blocked by the adapter data path. Behavioral leads, not memory-safety findings; a fault would be stage 1–2 at best. |
 | Bluetooth | Public stack overflows are fixed before 23.0.1; no public current chain found. |
 | Game saves / cartridges | No public code-execution chain on 23.0.1 found; save editing is not code execution. |
-| System services / sysmodules | `ns2jb` is a real userland/sysmodule chain, but not a path to Atmosphère. |
+| System services / sysmodules | `ns2jb` is a real userland/sysmodule chain, but not a path to Atmosphère. The public package, the macOS wrapper, and the maintained forks are Switch 2-only (`E-114`, `E-115`). |
 | GameShare / `splay` applet | A Switch 2 host can stream to the console over local wireless; the receiver parses host-supplied data. The 2026-10-29 read-only review found no public `splay`/GameShare vulnerability and no post-20.0.0 `splay` security fix. The local `splay` program NCA is blocked by key generation `0x17`, while its meta CNMT is readable; a compromise would be applet-level. |
 | Kernel / TrustZone | No public 23.0.1 chain found; a kernel primitive alone is not a boot path. |
 | Hardware modchip | Documented route, but not software-only and out of scope. |
@@ -69,9 +69,12 @@ The detailed matrix is in [`docs/ENTRY-POINTS.md`](docs/ENTRY-POINTS.md) and [`r
 - It runs native code as ordinary sysmodules and as the built-in `fs` sysmodule.
 - It does **not** provide kernel access, bootROM access, CFW, or persistence.
 - The author says the chain was **also tested on Switch 1**, but it is not packaged for Switch 1, the model and firmware are not stated, and the author says it would not provide modchip-level capability.
+- Read-only inspection on 2026-10-31 confirms there is no Switch 1 code path: the repository contains only `engine/switch2`, `run.cjs` hardcodes `platform: 2` and spawns `switch2/pipeline.cjs`, `bootstrap.bas` validates Switch 2 offsets, and the README says “Switch 2 only.”
+- The newer tools are also Switch 2-only: `mac2jb` is a macOS wrapper that automates the SmileBASIC typing and launches MintBrew, and the `kurumuz` and `BermTheSequel` forks add demo support and layout handling. All still require SmileBASIC, and `mac2jb` requires an unsigned kernel extension with SIP disabled.
+- SmileBASIC 4 is paid and was delisted; the owner does not own it, so the only public trigger is unavailable.
 - No OLED/Mariko 23.0.1 test is documented.
 
-It is a lead worth following, not a method to run. See E-021, E-022, E-032, and E-034 in [`research/evidence-ledger.json`](research/evidence-ledger.json).
+It is a lead worth following, not a method to run. See E-021, E-022, E-032, E-034, E-114, and E-115 in [`research/evidence-ledger.json`](research/evidence-ledger.json).
 
 ## WebKit n-day assessment (2026-10-31)
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-29",
+  "last_reviewed": "2026-10-31",
   "target": {
     "model": "HEG-001",
     "family": "Nintendo Switch OLED",
@@ -23,8 +23,8 @@
     "claim": "A publicly documented, reproducible software-only path to Atmosph\u00e8re exists for an unmodified Switch OLED on firmware 23.0.1.",
     "claim_status": "DISPROVEN",
     "software_only_path_documented": false,
-    "scope": "Reviewed public documentation as of 2026-10-26.",
-    "summary": "No publicly documented, reproducible software-only path to Atmosph\u00e8re was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosph\u00e8re 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. GameShare (the splay applet) is recorded as a newly reviewed receiver-side surface: a documented remote-input path with no public vulnerability and an applet-level capability ceiling.",
+    "scope": "Reviewed public documentation as of 2026-10-31.",
+    "summary": "No publicly documented, reproducible software-only path to Atmosph\u00e8re was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosph\u00e8re 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. Read-only inspection on 2026-10-31 confirmed the public repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets; the macOS wrapper and maintained forks are also Switch 2-only. GameShare (the splay applet) is recorded as a newly reviewed receiver-side surface: a documented remote-input path with no public vulnerability and an applet-level capability ceiling.",
     "undisclosed_exploit_status": "UNKNOWN",
     "evidence": [
       "E-007",
@@ -35,12 +35,14 @@
       "E-032",
       "E-033",
       "E-043",
-      "E-048"
+      "E-048",
+      "E-114",
+      "E-115"
     ]
   },
   "entry_point_analysis": {
     "file": "research/entry-points.json",
-    "last_reviewed": "2026-10-26",
+    "last_reviewed": "2026-10-31",
     "surfaces_reviewed": 11,
     "software_only_surfaces": 10,
     "public_software_only_chain_on_target": false,
@@ -214,7 +216,7 @@
     {
       "id": "C-013",
       "component": "ns2jb userland/sysmodule chain",
-      "version": "Switch 2 package; Switch 1 test unpackaged",
+      "version": "Switch 2 package; Switch 1 test unpackaged; public tree has only engine/switch2",
       "dimension": "entry_point",
       "status": "PARTIALLY VERIFIED",
       "applies_to_target": false,
@@ -223,9 +225,11 @@
         "E-021",
         "E-022",
         "E-032",
-        "E-034"
+        "E-034",
+        "E-114",
+        "E-115"
       ],
-      "notes": "A real software-only userland/sysmodule chain on Switch 2 23.0.1. It does not provide kernel, bootROM, CFW, or persistence, and no OLED/23.0.1 test is documented. The Switch 1 test is a lead, not a packaged method."
+      "notes": "A real software-only userland/sysmodule chain on Switch 2 23.0.1. It does not provide kernel, bootROM, CFW, or persistence, and no OLED/23.0.1 test is documented. run.cjs hardcodes platform 2 and spawns switch2/pipeline.cjs, and the repository has no Switch 1 engine. The Switch 1 test is a lead, not a packaged method."
     },
     {
       "id": "C-014",
@@ -332,7 +336,7 @@
     {
       "id": "C-021",
       "component": "ns2jb Switch 1 packaging",
-      "version": "Chain tested on Switch 1; package is Switch 2 only",
+      "version": "Chain tested on Switch 1; public package and macOS tooling are Switch 2 only",
       "dimension": "Entry point",
       "status": "UNVERIFIED",
       "applies_to_target": true,
@@ -340,9 +344,11 @@
       "evidence": [
         "E-045",
         "E-046",
-        "E-034"
+        "E-034",
+        "E-114",
+        "E-115"
       ],
-      "notes": "The author says the chain was tested on Switch 1 but not packaged. Model and firmware are unstated, so this does not establish OLED/Mariko 23.0.1 applicability."
+      "notes": "The author says the chain was tested on Switch 1 but not packaged. Model and firmware are unstated, so this does not establish OLED/Mariko 23.0.1 applicability. Read-only inspection confirms no Switch 1 code path; a port would need different offsets, heap grooming, and a payload. The macOS wrapper still requires SmileBASIC, and its unsigned driver needs SIP disabled."
     },
     {
       "id": "C-022",

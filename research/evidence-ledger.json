@@ -1561,6 +1561,50 @@
       "evidence": "The console at 192.168.178.136 made 79 DNS queries for ctest.cdn.nintendo.net and 45 HTTP GET requests in a 227 s session (16:35:49Z-16:39:36Z). The log records four page loads: /portal?autorun=1 at 17:36:02 local (crash default, 16 s), /portal?autorun=1&mode=crash at 17:36:18 (43 s), /portal?autorun=1&mode=probe&probe=1 at 17:37:01 (44 s), and /portal?autorun=1&mode=probe&probe=2 at 17:37:45 (58 s). Each load fetched /poc.js and /module/{utils,constants,int64,mem,rw,offset}.mjs with HTTP 200 and text/javascript. There were no POST requests. The owner reports that the page stayed, no alert or crash occurred, the Load logs view showed only Attempt lines, and the console returned to normal. The owner reverted DNS to Automatic.",
       "limitations": "Protocol deviation: four page loads in four modes instead of one bounded page load, with each mode reloaded after 16-58 s. The highest Attempt count was not recorded, and the localStorage log was not exported, so the PoC may not have run long enough to reach Stage 1. No crash dump or fault address was produced. This is not a clean negative for CVE-2023-28205 and does not show the build is patched. A browser compromise would be applet-level only.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-114",
+      "claim": "The public ns2jb package contains only a Switch 2 code path: the repository has only engine/switch2, run.cjs hardcodes platform 2 and target switch2, and bootstrap.bas validates Switch 2 offsets.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only inspection of the public ns2jb repository on 2026-10-31. No code was executed and no console was touched.",
+      "sources": [
+        "ns2jb-run-cjs",
+        "ns2jb-bootstrap-bas",
+        "ns2jb-repository"
+      ],
+      "evidence": "run.cjs builds its result object with platform: 2 and target: 'switch2', copies engine/shared and engine/switch2 into the run folder, and spawns switch2/pipeline.cjs. The repository tree has engine/switch2 but no engine/switch1. bootstrap.bas is labelled 'Switch 2 / SmileBASIC 4.4.9' and checks Switch 2-specific values such as &H9DB49C, &H5872F0, and &H12F614. The README states 'Switch 2 only'.",
+      "limitations": "This shows the package is not a Switch 1 port; it does not show whether the underlying fs bug exists on Switch 1. A port would need different offsets, heap grooming, and a payload, and none has been published.",
+      "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-115",
+      "claim": "The macOS wrapper and the maintained ns2jb forks add convenience and demo support but remain Switch 2-only and still require SmileBASIC; none adds a Switch 1 path or a free entry point.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only review of mac2jb and the kurumuz and BermTheSequel forks on 2026-10-31.",
+      "sources": [
+        "mac2jb-repository",
+        "kurumuz-ns2jb-fork",
+        "bermthesequel-ns2jb2-fork"
+      ],
+      "evidence": "mac2jb describes itself as 'an all-in-one ns2 jailbreaking tool for Mac' and requires a Switch 2 on 23.0.1 with SmileBASIC full 4.4.9 or demo 4.4.6, Ethernet on the console, and an unsigned kernel extension with SIP disabled. The kurumuz fork says it is 'Switch 2 only', requires Ethernet on both devices, and estimates at best a 20% success rate; it adds demo support and a system-code dump. The BermTheSequel fork adds demo 4.4.6 support and Windows/Linux hosts and is still a Switch 2 FS demo.",
+      "limitations": "README claims were not reproduced on hardware. Demo support does not help this owner because the Japanese demo was removed from the eShop and no copy is owned. The macOS wrapper requires an Apple Silicon Mac, Switch Ethernet, and disabling SIP to load an unsigned kernel extension, which this project does not authorize; this MacBook also has no Ethernet port or USB-C Ethernet adapter.",
+      "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-116",
+      "claim": "A WebKit-based ns2jb port is claimed for the Switch 2, but no public release, write-up, or Switch 1 WebKit chain was found as of 2026-10-31.",
+      "status": "UNVERIFIED",
+      "confidence": "medium",
+      "scope": "Public-source review on 2026-10-31.",
+      "sources": [
+        "onejailbreak-ns2jb-webkit",
+        "pepsipu-ns2jb-blog"
+      ],
+      "evidence": "ONE Jailbreak reports a Discord claim that the fs payload works through Switch 2 WebKit on the author's console and that testers were wanted for firmware before 23.0.1. The article states that no public download or full write-up had been posted. The original write-up lists the WebKit port as future work.",
+      "limitations": "The port's existence and capability are author-reported and not independently reproduced. It is described only for Switch 2; the Switch 1 browser is a different, older NetFront/WebKit build, so the claim does not transfer.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }

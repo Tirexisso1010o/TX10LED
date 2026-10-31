@@ -67,11 +67,11 @@ The full ledger, including scope and limitations, is in [`research/evidence-ledg
 | Does it provide kernel access? | **No.** |
 | Does it provide bootROM access? | **No.** |
 | Does it install CFW or persistence? | **No.** |
-| Is it packaged for Switch 1? | **No.** |
+| Is it packaged for Switch 1? | **No.** The repository contains only `engine/switch2`; `run.cjs` hardcodes `platform: 2` and `bootstrap.bas` validates Switch 2 offsets (`E-114`). |
 | Is it confirmed on OLED/Mariko 23.0.1? | **No.** The author does not state the Switch 1 model or firmware. |
 | Does it change the conclusion for the OLED? | **No.** It is a userland/sysmodule primitive, not a boot chain. |
 
-The author's write-up says the exploit chain was also tested on Switch 1, but it has not been packaged for Switch 1, and the author says it would not provide the capabilities of a modchip. The published repository is Switch 2 only. This is recorded in E-021, E-022, E-032, E-034, E-045, and E-046. It is a lead worth following, not a method to run on the target.
+The author's write-up says the exploit chain was also tested on Switch 1, but it has not been packaged for Switch 1, and the author says it would not provide the capabilities of a modchip. The published repository is Switch 2 only. This is recorded in E-021, E-022, E-032, E-034, E-045, E-046, E-114, and E-115. The 2026-10-31 tooling (`mac2jb` and two maintained forks) is also Switch 2-only and still requires SmileBASIC; `mac2jb` additionally requires an unsigned kernel extension with SIP disabled. It is a lead worth following, not a method to run on the target.
 
 ## GameShare as a receiver-side surface
 

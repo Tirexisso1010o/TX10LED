@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-29",
+  "last_reviewed": "2026-10-31",
   "target": {
     "model": "HEG-001",
     "family": "Nintendo Switch OLED",
@@ -19,14 +19,14 @@
   },
   "summary": {
     "question": "Is there a publicly documented, reproducible, software-only entry point to Atmosph\u00e8re on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",
-    "answer": "No publicly documented, reproducible software-only entry point was found in the reviewed public sources as of 2026-10-26.",
+    "answer": "No publicly documented, reproducible software-only entry point was found in the reviewed public sources as of 2026-10-31.",
     "status": "DISPROVEN",
-    "scope": "Public documentation reviewed on 2026-10-26. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
+    "scope": "Public documentation reviewed on 2026-10-31. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
     "software_only_public_chain_on_target": false,
     "documented_route": "Hardware modchip (out of scope for this software-only project)",
     "closest_public_lead": "L-001",
     "closest_public_lead_name": "ns2jb",
-    "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1, does not provide kernel or bootROM access, and is not documented on OLED/Mariko 23.0.1.",
+    "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1: the repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets. The macOS wrapper and maintained forks are also Switch 2-only and still require SmileBASIC. It does not provide kernel or bootROM access and is not documented on OLED/Mariko 23.0.1.",
     "undisclosed_method_status": "UNKNOWN",
     "notes": [
       "Firmware compatibility is a separate axis: Atmosph\u00e8re 1.12.1 and hekate v6.5.4 support 23.0.1, but neither provides an entry point.",
@@ -326,7 +326,7 @@
       "target_reachable": true,
       "public_chain_on_target": false,
       "status": "PARTIALLY VERIFIED",
-      "status_basis": "ns2jb is a real software-only, tethered userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1 but has not been packaged. It runs native code as ordinary sysmodules and fs, without kernel access, CFW, or persistence. No OLED/23.0.1 test is documented.",
+      "status_basis": "ns2jb is a real software-only, tethered userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1 but has not packaged it. Read-only inspection on 2026-10-31 confirmed the public repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets; mac2jb and the two maintained forks are also Switch 2-only. The only public trigger is SmileBASIC 4.4.9 (or the 4.4.6 demo), which the owner does not own and which was delisted. No OLED/23.0.1 test is documented.",
       "capability_if_successful": "Native code as ordinary sysmodules and fs; not kernel, bootROM, or CFW.",
       "leads_to_atmosphere": false,
       "in_scope": true,
@@ -340,14 +340,19 @@
         "E-022",
         "E-024",
         "E-032",
-        "E-034"
+        "E-034",
+        "E-114",
+        "E-115"
       ],
       "sources": [
         "pepsipu-ns2jb-blog",
         "ns2jb-repository",
-        "switchbrew-23.0.0"
+        "switchbrew-23.0.0",
+        "ns2jb-run-cjs",
+        "ns2jb-bootstrap-bas",
+        "mac2jb-repository"
       ],
-      "notes": "Closest public lead. It shows that a software-only userland/sysmodule chain can exist on recent firmware, but it does not provide a path to Atmosph\u00e8re by itself. The Switch 1 test's model and firmware are not stated."
+      "notes": "Closest public lead. It shows that a software-only userland/sysmodule chain can exist on recent firmware, but it does not provide a path to Atmosph\u00e8re by itself. The public package and tooling are Switch 2-only. The Switch 1 test's model and firmware are not stated. The macOS wrapper requires SIP disabled and an unsigned kernel extension, which is out of scope here."
     },
     {
       "id": "EP-009",
@@ -467,20 +472,26 @@
       "status": "PARTIALLY VERIFIED",
       "target_applicability": "UNVERIFIED",
       "leads_to_atmosphere": false,
-      "what_it_is": "A software-only, tethered userland/sysmodule jailbreak for the Nintendo Switch 2 on system software 23.0.1. It runs native code as ordinary sysmodules and as the built-in fs sysmodule.",
+      "what_it_is": "A software-only, tethered userland/sysmodule jailbreak for the Nintendo Switch 2 on system software 23.0.1. It runs native code as ordinary sysmodules and as the built-in fs sysmodule. The public package, the macOS wrapper, and the maintained forks are Switch 2-only.",
       "what_it_proves": "A software-only userland/sysmodule chain can exist on recent firmware and can run native code without a modchip.",
-      "what_it_does_not_prove": "It does not provide kernel, bootROM, CFW, or persistence. It is packaged for Switch 2, not Switch 1. The author says the chain was also tested on Switch 1, but the model and firmware are not stated and the Switch 1 version is not packaged.",
+      "what_it_does_not_prove": "It does not provide kernel, bootROM, CFW, or persistence. It is packaged for Switch 2, not Switch 1. The author says the chain was also tested on Switch 1, but the model and firmware are not stated and the Switch 1 version is not packaged. Repository inspection shows no Switch 1 code path, and the only public trigger is SmileBASIC 4.4.9, which the owner does not own.",
       "evidence": [
         "E-021",
         "E-022",
         "E-032",
-        "E-034"
+        "E-034",
+        "E-114",
+        "E-115"
       ],
       "sources": [
         "pepsipu-ns2jb-blog",
-        "ns2jb-repository"
+        "ns2jb-repository",
+        "ns2jb-run-cjs",
+        "ns2jb-bootstrap-bas",
+        "mac2jb-repository",
+        "kurumuz-ns2jb-fork"
       ],
-      "next_step": "Look for an independent report or author statement identifying the Switch 1 model and firmware. Do not treat the Switch 2 package as an OLED method."
+      "next_step": "Monitor for an independently tested or packaged Switch 1 chain with the model and firmware stated. Do not run the Switch 2 package, mac2jb, or a fork against the OLED; mac2jb additionally requires disabling SIP and loading an unsigned kernel extension."
     },
     {
       "id": "L-002",

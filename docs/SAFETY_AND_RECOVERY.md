@@ -28,7 +28,8 @@ Do not use this repository to:
 - commit, publish, share, or paste keys, certificates, decrypted system modules, NAND dumps, or proprietary firmware;
 - download firmware or keys from a third party;
 - use the owner's keys against any console other than the owner's own;
-- collect or publish full serial numbers or tokens.
+- collect or publish full serial numbers or tokens;
+- run the Switch 2 `ns2jb` package, `mac2jb`, or a fork against the OLED, or disable SIP / load an unsigned kernel extension to do so.
 
 If a procedure requires any of these, it is outside the project's authorization boundary.
 
@@ -64,6 +65,7 @@ It binds the Mac's LAN address on UDP 53 and TCP 80 so the console's **Test Conn
 | Serve crafted TLS records or certificates through a local sinkhole | Medium; can hang or crash the `ssl` sysmodule and risks capturing unintended traffic | Separate explicit approval plus a sinkhole-scope decision; local connectivity-test hostname only; never proxy account/eShop traffic |
 | Run the local captive-portal DNS/HTTP responder on UDP 53 / TCP 80 | Low–medium; binds the Mac LAN address and serves one local page; requires `sudo`; the console's DNS entry is temporary | Explicit approval for the console page load; use the narrow exception above; revert DNS immediately |
 | Serve the public `CVE-2023-28205` PoC to the console | Medium–high; may crash the browser applet or hang/reboot the console; writes a bounded log to applet `localStorage` unless shimmed; this is exploit testing | Executed once on 2026-10-31 as an exploratory four-load run; no crash; DNS reverted; no repeat without a new hypothesis and approval; no payload execution |
+| Run the Switch 2 `ns2jb` package, `mac2jb`, or a fork on the OLED | High; the package is hardcoded for Switch 2 and would fail or crash, and `mac2jb` additionally requires disabling SIP and loading an unsigned kernel extension | Prohibited; the package is not a Switch 1 port. Read-only inspection is allowed (`E-114`, `E-115`) |
 
 ## Before any device interaction
 

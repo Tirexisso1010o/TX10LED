@@ -141,7 +141,9 @@ The author's write-up says the exploit chain was **also tested on Switch 1**, bu
 - it has **not been packaged** for Switch 1;
 - the Switch 1 model and firmware are **not stated**;
 - the author says it **would not provide the capabilities of a modchip**;
-- the published repository is **Switch 2 only**.
+- the published repository is **Switch 2 only**: it contains `engine/switch2` but no `engine/switch1`, `run.cjs` sets `platform: 2` and spawns `switch2/pipeline.cjs`, and `bootstrap.bas` validates Switch 2 offsets (`E-114`).
+
+The newer tooling does not change this. `mac2jb` is a macOS wrapper that automates the SmileBASIC typing and launches MintBrew; the `kurumuz` and `BermTheSequel` forks add demo support, layout handling, and extra hosts. All are Switch 2-only and still require SmileBASIC, and `mac2jb` requires an unsigned kernel extension with SIP disabled (`E-115`). A reported WebKit port is Switch 2-specific and has no public download (`E-116`).
 
 ### What it proves — and what it does not
 
