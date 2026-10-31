@@ -580,6 +580,8 @@
       "blocked_by": "No active test has been approved; the images and plan are prepared only. A confirmed trigger would still need the Switch 1 fs binary and heap-grooming exploit to reach code execution.",
       "evidence": [
         "E-045",
+        "E-075",
+        "E-076",
         "E-114",
         "E-118"
       ],
@@ -591,7 +593,7 @@
       "last_reviewed": "2026-10-31",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "Prepared but not tested. scripts/sdcard_lab.py now builds a crafted FAT32 image (album_unicode_parent_backslash) with a 532-character / 1546-byte UTF-8 path whose first component starts with '..\\', plus a same-length benign control (album_unicode_benign_path). The dry-run images are 71,303,168 bytes; no card was written and the console was not touched. The protocol is in docs/H-013-SD-TRIGGER-PLAN.md.",
+      "results": "Prepared but not tested. scripts/sdcard_lab.py builds a crafted FAT32 image (album_unicode_parent_backslash) with a 532-character / 1546-byte UTF-8 path whose first component starts with '..\\', plus a same-length benign control (album_unicode_benign_path). The album control is the owner's real Exif screenshot (MD5 ffa6936426b64d3c1689a3352915d80d); a synthetic control without Exif was ignored by the Album. No console result yet; the card must be rewritten with the real-control image. The protocol is in docs/H-013-SD-TRIGGER-PLAN.md.",
       "uncertainties": "Whether any free applet calls GetEntryType on a user-controlled path; whether the 23.0.1 Switch 1 fs contains the same 0x301-byte Path::Normalize overflow; whether a confirmed crash can be developed into code execution without the fs binary.",
       "resolution": "blocked"
     }

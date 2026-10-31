@@ -162,7 +162,7 @@ This test would confirm only the **trigger**, not code execution. Turning the ov
 - `album_unicode_parent_backslash` — a 532-character / 1546-byte UTF-8 path whose first component starts with `..\`;
 - `album_unicode_benign_path` — the same tree and path length with a benign `AA\` first component.
 
-Both images include a normal `2026/10/27` control image. The dry-run images are 71,303,168 bytes with MBR wrapping; the SHA-256 values and the card/console protocol are in [`H-013-SD-TRIGGER-PLAN.md`](H-013-SD-TRIGGER-PLAN.md). No card was written and the console was not touched. The test still needs a separate explicit approval for the card write and the console run.
+Both images include the owner's real Exif screenshot as the `2026/10/27` control; a synthetic JPEG without Exif was ignored by the Album. The dry-run images are 71,303,168 bytes with MBR wrapping; the SHA-256 values and the card/console protocol are in [`H-013-SD-TRIGGER-PLAN.md`](H-013-SD-TRIGGER-PLAN.md). No card result yet; the card must be rewritten with the real-control benign image.
 
 ## D5 and D6 — blocked directions
 

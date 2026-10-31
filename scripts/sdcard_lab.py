@@ -200,11 +200,12 @@ def _build_fs(
             chain[cluster] = cluster + 1 if cluster < 8 + count - 1 else EOC
     if anomaly in {"album_unicode_parent_backslash", "album_unicode_benign_path"}:
         count = (len(JPEG) + SECTOR - 1) // SECTOR
+        control = 7 + count
         for cluster in range(7, 7 + count):
             chain[cluster] = cluster + 1 if cluster < 7 + count - 1 else EOC
-        for cluster in range(21, 21 + count):
-            chain[cluster] = cluster + 1 if cluster < 21 + count - 1 else EOC
-        for cluster in (18, 19, 20):
+        for cluster in range(control + 3, control + 3 + count):
+            chain[cluster] = cluster + 1 if cluster < control + 3 + count - 1 else EOC
+        for cluster in (control, control + 1, control + 2):
             chain[cluster] = EOC
     if anomaly == "cluster_oob":
         chain[FILE_CLUSTER] = 0x0FFFFFF0
@@ -409,11 +410,6 @@ def _album_unicode_backslash_tree(
     _dir_entry(album, 0, b"ALBUM      ", 0x10, 4, 0)
     image[at(3) : at(3) + SECTOR] = album
 
-    contents = bytearray(SECTOR)
-    _dir_entry(contents, 0, b"2026       ", 0x10, 18, 0, STAMP)
-    _dir_entry_long(contents, 32, first_name, 1, 0x10, 5, 0, STAMP)
-    image[at(4) : at(4) + SECTOR] = contents
-
     first = bytearray(SECTOR)
     _dir_entry_long(first, 0, UNICODE_DIR_2, 2, 0x10, 6, 0, STAMP)
     image[at(5) : at(5) + SECTOR] = first
@@ -424,10 +420,18 @@ def _album_unicode_backslash_tree(
 
     image[at(7) : at(7) + len(JPEG)] = JPEG
 
-    # Control date tree, so the album can show a known-good image.
+    count = (len(JPEG) + SECTOR - 1) // SECTOR
+    control = 7 + count
+
+    # Control date tree, so the album can show the owner's real Exif screenshot.
+    contents = bytearray(SECTOR)
+    _dir_entry(contents, 0, b"2026       ", 0x10, control, 0, STAMP)
+    _dir_entry_long(contents, 32, first_name, 1, 0x10, 5, 0, STAMP)
+    image[at(4) : at(4) + SECTOR] = contents
+
     for cluster, name, target in (
-        (18, b"10         ", 19),
-        (19, b"27         ", 20),
+        (control, b"10         ", control + 1),
+        (control + 1, b"27         ", control + 2),
     ):
         sector = bytearray(SECTOR)
         _dir_entry(sector, 0, name, 0x10, target, 0, STAMP)
@@ -441,12 +445,12 @@ def _album_unicode_backslash_tree(
         VALID_NAME or f"{NAME_STAMP}-{valid_hash}.jpg",
         4,
         0x20,
-        21,
+        control + 3,
         len(JPEG),
         STAMP,
     )
-    image[at(20) : at(20) + SECTOR] = day
-    image[at(21) : at(21) + len(JPEG)] = JPEG
+    image[at(control + 2) : at(control + 2) + SECTOR] = day
+    image[at(control + 3) : at(control + 3) + len(JPEG)] = JPEG
 
 
 def build_image(

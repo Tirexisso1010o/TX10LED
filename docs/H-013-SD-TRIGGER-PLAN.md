@@ -18,28 +18,34 @@ NINTENDO/ALBUM/<..\ + 167 CJK>/<170 CJK>/<170 CJK>.jpg
 
 - The first component starts with `..\`, the parent-directory-plus-backslash pattern from the write-up.
 - The full path is **532 characters / 1546 UTF-8 bytes**, well above `0x301` (769 bytes).
-- The image also contains a normal `NINTENDO/ALBUM/2026/10/27` control image, so the album can show a known-good file and prove the card mounted.
+- The image also contains the owner's **real Exif screenshot** at `NINTENDO/ALBUM/2026/10/27` as the control, so the album can show a known-good file and prove the card mounted. A synthetic JPEG without Exif was ignored by the Album (`E-075`, `E-076`), so the control must be the real screenshot.
 - A **benign control image** has the same tree and path length, but the first component starts with `AA\` instead of `..\`. If the crafted image crashes and the benign one does not, the `..\` component is implicated.
 
 The paths are encoded as FAT32 long file names; the FS path is assumed to be UTF-8. If the console rejects the Unicode names or does not traverse the crafted directory, the test is negative for this surface, not evidence that the bug is absent.
 
 ## Images
 
-Generate both images with MBR wrapping (the D8 card used an MBR at LBA 8192):
+Generate both images with MBR wrapping (the D8 card used an MBR at LBA 8192), using the owner's real screenshot as the control:
 
 ```sh
-python3 scripts/sdcard_lab.py --mbr --anomaly album_unicode_parent_backslash --out h013-crafted.img
-python3 scripts/sdcard_lab.py --mbr --anomaly album_unicode_benign_path --out h013-benign.img
+python3 scripts/sdcard_lab.py --mbr --stamp 0045 \
+  --jpeg scripts/assets.local/real.jpg \
+  --valid-name '2026102700452400-57B4628D2267231D57E0FC1078C0596D.jpg' \
+  --anomaly album_unicode_parent_backslash --out h013-crafted.img
+python3 scripts/sdcard_lab.py --mbr --stamp 0045 \
+  --jpeg scripts/assets.local/real.jpg \
+  --valid-name '2026102700452400-57B4628D2267231D57E0FC1078C0596D.jpg' \
+  --anomaly album_unicode_benign_path --out h013-benign.img
 ```
 
 Prepared dry-run images (not committed; regenerate with the commands above):
 
 | Image | Anomaly | Size | SHA-256 |
 |---|---|---|---|
-| `h013-crafted.img` | `album_unicode_parent_backslash` | 71,303,168 bytes | `9f5339df3073ad7f724b81b9eb9d8ca418417b5af01124191b5b1679db684a83` |
-| `h013-benign.img` | `album_unicode_benign_path` | 71,303,168 bytes | `b78ed96efdee215389318faacd003acc7f05e26b09884dfbc48d599eb3b0e9b3` |
+| `h013-crafted.img` | `album_unicode_parent_backslash` | 71,303,168 bytes | `388a9549157a4cd92f28e7b3633a9ce247013cd2e9ba4d84873ad3f855520377` |
+| `h013-benign.img` | `album_unicode_benign_path` | 71,303,168 bytes | `818fee2774c009822c4972fcd649c0293f4cff0636d5b72c73e661678b6de4f0` |
 
-> **Revision note.** The first prepared benign image was missing the `NINTENDO/ALBUM` level and is invalid; it was never used for a console result. The SHA-256 values above are for the corrected images, verified by mounting them read-only. Rewrite the card with `h013-benign.img` before the console run.
+> **Revision note.** The first prepared benign image was missing the `NINTENDO/ALBUM` level; the second used a synthetic control that the Album ignored because it lacks Exif. Neither produced a console result. The SHA-256 values above use the corrected tree and the owner's real Exif screenshot (`MD5 ffa6936426b64d3c1689a3352915d80d`) as the control. Verify the images by mounting them read-only before writing.
 
 Verify either image read-only before writing:
 
