@@ -1,6 +1,10 @@
 # H-013 — File-picker capability probe
 
-> **Status: prepared, not run.** One page load; the owner selects a benign SD-card file; the page reports only name/size/type. It does not read or upload the file, and it does not send a crafted path.
+> **Status: run 2026-10-31; closed negative.** The applet renders the input but pressing Browse returns **“The file selection is not supported.”** No file was selected and no contents were read. The browser file surface is closed.
+
+## Result (2026-10-31)
+
+The page displayed **ready; choose a file**. Pressing Browse produced the applet message **“The file selection is not supported.”** No `file_picker` event was logged; the H-013 real-control card was inserted (`E-121`). This is an applet-level restriction, not a path or filename result.
 
 ## Purpose
 
