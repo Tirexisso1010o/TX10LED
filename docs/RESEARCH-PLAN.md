@@ -162,7 +162,7 @@ This test would confirm only the **trigger**, not code execution. Turning the ov
 - `album_unicode_parent_backslash` — a 532-character / 1546-byte UTF-8 path whose first component starts with `..\`;
 - `album_unicode_benign_path` — the same tree and path length with a benign `AA\` first component.
 
-Both images include the owner's real Exif screenshot as the `2026/10/27` control; a synthetic JPEG without Exif was ignored by the Album. The dry-run images are 71,303,168 bytes with MBR wrapping; the SHA-256 values and the card/console protocol are in [`H-013-SD-TRIGGER-PLAN.md`](H-013-SD-TRIGGER-PLAN.md). No card result yet; the card must be rewritten with the real-control benign image.
+Both images include the owner's real Exif screenshot as the `2026/10/27` control; a synthetic JPEG without Exif was ignored by the Album. The benign control was run on 2026-10-31: the real control appeared, the Album did not display the `AA\<CJK>` sibling directory, and there was no error (`E-119`). The crafted sibling image was **not written**; the Album does not traverse non-date directories. The next variant is a 255-character crafted filename inside the traversed day directory, which needs a two-sector directory image and explicit approval. The SHA-256 values and the protocol are in [`H-013-SD-TRIGGER-PLAN.md`](H-013-SD-TRIGGER-PLAN.md).
 
 ## D5 and D6 — blocked directions
 

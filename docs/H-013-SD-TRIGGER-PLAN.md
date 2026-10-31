@@ -1,6 +1,12 @@
 # H-013 — SD-card free-trigger test plan
 
-> **Status: prepared, not run.** No card has been written and the console has not been touched. This plan needs explicit approval for the card write and the console run.
+> **Status: benign control run 2026-10-31; sibling-directory route closed negative.** The crafted image was not written. The card/album setup is valid, but the Album does not traverse non-date directories under `NINTENDO/ALBUM`, so the crafted `..\<CJK>` sibling would be ignored. See the result below and the next variant at the end.
+
+## Result (2026-10-31)
+
+The corrected benign image displayed the owner's real Exif control screenshot at `NINTENDO/ALBUM/2026/10/27/…` with no error or crash. The Album did **not** display the `AA\<CJK>` sibling directory under `NINTENDO/ALBUM` (`E-119`). The Album therefore enumerates the date tree but not arbitrary sibling directories, so the crafted `..\<CJK>` image would not be reached and was **not written**.
+
+This is a negative for the sibling-directory SD-card route, not proof that the `fs` bug is absent. The next variant places the crafted filename **inside the traversed day directory**, where the Album already enumerates entries and skips invalid ones (the D8 `album_date_file_oob` control).
 
 ## Purpose
 
@@ -115,6 +121,14 @@ A crash is **not** fs-level code execution. It would confirm reachability only.
 - The console is not modified; the risk is an applet or `fs` hang, recoverable by a reboot.
 - The card write is destructive to the sacrificial card and requires owner approval.
 - **No run is authorized by this document.** The test needs a separate explicit approval naming the image SHA-256 and the console session.
+
+## Next variant — crafted filename inside the day directory
+
+The benign sibling test showed the Album only traverses `NINTENDO/ALBUM/YYYY/MM/DD`. The next image should keep the real Exif control and add a second, 255-character crafted filename in the same day directory, for example `..\` + 248 CJK + `.jpg` (255 characters). The path is `NINTENDO/ALBUM/2026/10/27/<name>`, about 27 + 751 UTF-8 bytes = ~778 bytes, just over `0x301`.
+
+The day directory must span two clusters to hold the 20 LFN entries plus the short entry. The benign length control uses the same name length with `AA\` instead of `..\`. If the Album filters the filename before `GetEntryType`, this variant will also be negative; the browser/download route is then the remaining free-surface candidate.
+
+The current generator does not build a two-sector day directory. This variant needs new code, a new card write, and explicit approval. It has not been run.
 
 ## References
 

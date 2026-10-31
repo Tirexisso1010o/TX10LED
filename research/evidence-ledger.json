@@ -1632,6 +1632,17 @@
       "evidence": "All 238 files parse as NCA3 after AES-XTS header decryption with the local header key. Title IDs were read at 0x210 and key generation at 0x220. No row has title ID 0100000000000000. The system program rows present in the 01000000000000xx range, including ldn at 0100000000000018, are all key generation 0x17. The key file stops at key_area_key_application_14 (20.0.0), so generation 0x17 content cannot be decrypted.",
       "limitations": "This shows the fs NCA is absent from this dump and that generation 0x17 content is not decryptable with the supplied keys. It does not show that fs is absent from the console or that the Switch 1 fs lacks the path-normalization bug. The dump is owner-supplied and folder-named 23.0.1; its version was not independently verified.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-119",
+      "claim": "The benign H-013 image displayed the owner's real Exif control screenshot with no error, and the Album did not display the AA\\<CJK> sibling directory; the Album does not traverse non-date directories under NINTENDO/ALBUM.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Owner observation, one console, 2026-10-31. Benign image only; the crafted image was not written.",
+      "sources": [],
+      "evidence": "The corrected benign image contained the real Exif screenshot at NINTENDO/ALBUM/2026/10/27/2026102700452400-57B4628D2267231D57E0FC1078C0596D.jpg and a long AA\\<CJK> sibling directory under NINTENDO/ALBUM. The Album displayed the control image with no error or crash and did not display the AA\\<CJK> directory. The control confirms the card path, filename, and Exif requirements.",
+      "limitations": "One console, one observation. It does not prove the crafted sibling directory would be ignored in every applet, but it shows the Album does not traverse it. It does not test a crafted filename inside the traversed day directory.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }
