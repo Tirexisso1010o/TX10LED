@@ -595,7 +595,7 @@
       "last_reviewed": "2026-10-31",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "The benign sibling-directory image displayed the real Exif control with no error and no AA\\<CJK> folder (E-119). The browser capability probe then showed no download attribute, no save/open/directory picker, and no storage/caches API (E-120), so the download route is closed negative. The applet does expose <input type=file>, indexedDB, and localStorage; a file-picker probe is the only remaining browser file surface. The day-directory SD-card filename variant also remains untested.",
+      "results": "The benign sibling-directory image displayed the real Exif control with no error and no AA\\<CJK> folder (E-119). The browser download probe showed no download attribute, no save/open/directory picker, and no storage/caches API (E-120), so the download route is closed negative. The applet exposes <input type=file>; a file-picker capability probe is prepared (scripts/webkit_file_picker_probe.html, docs/H-013-FILE-PICKER-PLAN.md) but not run. The day-directory SD-card filename variant also remains untested.",
       "uncertainties": "Whether any free applet calls GetEntryType on a user-controlled path; whether the 23.0.1 Switch 1 fs contains the same 0x301-byte Path::Normalize overflow; whether a confirmed crash can be developed into code execution without the fs binary.",
       "resolution": "blocked"
     }

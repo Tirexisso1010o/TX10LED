@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>File picker capability check</title></head>
+<body>
+<h1>File picker capability check</h1>
+<p>Select a file from the SD card. Only the file name, size, and type are reported. The file is not read or uploaded.</p>
+<p><input id="file" type="file"></p>
+<p id="status">waiting…</p>
+<pre id="report" style="white-space:pre-wrap"></pre>
+<script>
+(function () {
+  "use strict";
+
+  var status = document.getElementById("status");
+  var report = document.getElementById("report");
+  var input = document.getElementById("file");
+
+  function post(payload) {
+    var body;
+    try { body = JSON.stringify(payload); } catch (e) { return; }
+    try {
+      if (navigator.sendBeacon) {
+        var blob = new Blob([body], { type: "application/json" });
+        if (navigator.sendBeacon("/fp", blob)) { return; }
+      }
+    } catch (e) { /* fall through */ }
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/fp", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send(body);
+    } catch (e) { /* diagnostic only */ }
+  }
+
+  function fileInfo(file) {
+    return {
+      name: String(file.name || ""),
+      size: Number(file.size || 0),
+      type: String(file.type || ""),
+      lastModified: Number(file.lastModified || 0),
+      webkitRelativePath: String(file.webkitRelativePath || "")
+    };
+  }
+
+  input.addEventListener("change", function () {
+    var files = input.files || [];
+    if (!files.length) {
+      status.textContent = "no file selected";
+      post({ event: "file_picker_empty", t: Date.now() });
+      return;
+    }
+    var info = fileInfo(files[0]);
+    status.textContent = "selected: " + info.name + " (" + info.size + " bytes)";
+    report.textContent = JSON.stringify(info, null, 2);
+    post({ event: "file_picker", t: Date.now(), file: info });
+  });
+
+  input.addEventListener("cancel", function () {
+    status.textContent = "picker cancelled";
+    post({ event: "file_picker_cancel", t: Date.now() });
+  });
+
+  window.onerror = function (message, source, lineno, colno, error) {
+    post({
+      event: "error", t: Date.now(), message: String(message),
+      source: String(source), lineno: lineno, colno: colno,
+      stack: error && error.stack ? String(error.stack).slice(0, 2000) : null
+    });
+    return false;
+  };
+
+  function ready() {
+    post({
+      event: "file_picker_ready",
+      t: Date.now(),
+      features: {
+        inputFile: input.type === "file",
+        inputFiles: "files" in input,
+        inputWebkitDirectory: "webkitdirectory" in input,
+        userAgent: navigator.userAgent,
+        origin: location.origin
+      }
+    });
+    status.textContent = "ready; choose a file";
+  }
+
+  if (document.readyState === "complete") {
+    setTimeout(ready, 0);
+  } else {
+    window.addEventListener("load", function () { setTimeout(ready, 0); });
+  }
+})();
+</script>
+</body>
+</html>
