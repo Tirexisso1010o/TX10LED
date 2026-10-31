@@ -37,6 +37,14 @@ STAMP = (2026, 10, 27, 1, 0, 0)
 NAME_STAMP = "2026102701000000"
 VALID_NAME: str | None = None
 
+# H-013: long Unicode components for a free applet-to-fs path trigger. The first
+# directory starts with "..\" so the fs path contains a parent-directory
+# component with a backslash; the full UTF-8 path is longer than 0x301 bytes.
+UNICODE_DIR_1 = "..\\" + "\u4e00" * 167
+UNICODE_BENIGN_DIR_1 = "AA\\" + "\u4e00" * 167
+UNICODE_DIR_2 = "\u4e00" * 170
+UNICODE_FILE = "\u4e00" * 170 + ".jpg"
+
 ANOMALIES = {
     "none": "Valid control image with one 16-byte file.",
     "cluster_oob": "FAT chain for the file points far beyond the cluster count.",
@@ -49,6 +57,8 @@ ANOMALIES = {
     "album_file_oob": "Nintendo/Album image entry points at an out-of-range cluster.",
     "album_date_file_oob": "Nintendo/Album/YYYY/MM/DD image entry points out of range.",
     "album_dir_oob": "Nintendo/Album directory entry points at an out-of-range cluster.",
+    "album_unicode_parent_backslash": "Album tree with a long Unicode parent-backslash path (H-013).",
+    "album_unicode_benign_path": "Same long Unicode path with a benign first component (H-013 control).",
 }
 
 
@@ -188,6 +198,14 @@ def _build_fs(
         count = (len(JPEG) + SECTOR - 1) // SECTOR
         for cluster in range(8, 8 + count):
             chain[cluster] = cluster + 1 if cluster < 8 + count - 1 else EOC
+    if anomaly in {"album_unicode_parent_backslash", "album_unicode_benign_path"}:
+        count = (len(JPEG) + SECTOR - 1) // SECTOR
+        for cluster in range(6, 6 + count):
+            chain[cluster] = cluster + 1 if cluster < 6 + count - 1 else EOC
+        for cluster in range(20, 20 + count):
+            chain[cluster] = cluster + 1 if cluster < 20 + count - 1 else EOC
+        for cluster in (17, 18, 19):
+            chain[cluster] = EOC
     if anomaly == "cluster_oob":
         chain[FILE_CLUSTER] = 0x0FFFFFF0
     elif anomaly == "fat_loop":
@@ -206,6 +224,10 @@ def _build_fs(
     data_offset = layout.data_start * SECTOR
     if anomaly == "album_date_file_oob":
         _album_date_tree(image, layout)
+    elif anomaly == "album_unicode_parent_backslash":
+        _album_unicode_backslash_tree(image, layout, UNICODE_DIR_1)
+    elif anomaly == "album_unicode_benign_path":
+        _album_unicode_backslash_tree(image, layout, UNICODE_BENIGN_DIR_1)
     elif anomaly in {"album_file_oob", "album_dir_oob"}:
         _album_tree(image, layout, anomaly)
     else:
@@ -268,9 +290,12 @@ def _album_tree(image: bytearray, layout: Layout, anomaly: str) -> None:
 
 def _short_name(long_name: str, index: int) -> bytes:
     base, _, ext = long_name.rpartition(".")
-    cleaned = "".join(ch for ch in base if ch.isalnum())[:6].upper()
+    cleaned = "".join(ch for ch in base if ch.isascii() and ch.isalnum())[:6].upper()
+    if not cleaned:
+        cleaned = f"TX{index:02d}"
     short_base = (cleaned.ljust(6) + "~" + str(index)).ljust(8)[:8]
-    return (short_base + ext[:3].upper().ljust(3)).encode("ascii")
+    short_ext = "".join(ch for ch in ext if ch.isascii() and ch.isalnum())[:3].upper()
+    return (short_base + short_ext.ljust(3)).encode("ascii")
 
 
 def _lfn_checksum(short: bytes) -> int:
@@ -366,6 +391,58 @@ def _album_date_tree(image: bytearray, layout: Layout) -> None:
     )
     image[at(7) : at(7) + SECTOR] = day
     image[at(8) : at(8) + len(JPEG)] = JPEG
+
+
+def _album_unicode_backslash_tree(
+    image: bytearray, layout: Layout, first_name: str = UNICODE_DIR_1
+) -> None:
+    data = layout.data_start * SECTOR
+
+    def at(cluster: int) -> int:
+        return data + (cluster - 2) * SECTOR
+
+    root = bytearray(SECTOR)
+    _dir_entry(root, 0, b"NINTENDO   ", 0x10, 3, 0)
+    image[at(2) : at(2) + SECTOR] = root
+
+    album = bytearray(SECTOR)
+    _dir_entry(album, 0, b"2026       ", 0x10, 17, 0, STAMP)
+    _dir_entry_long(album, 32, first_name, 1, 0x10, 4, 0, STAMP)
+    image[at(3) : at(3) + SECTOR] = album
+
+    first = bytearray(SECTOR)
+    _dir_entry_long(first, 0, UNICODE_DIR_2, 2, 0x10, 5, 0, STAMP)
+    image[at(4) : at(4) + SECTOR] = first
+
+    second = bytearray(SECTOR)
+    _dir_entry_long(second, 0, UNICODE_FILE, 3, 0x20, 6, len(JPEG), STAMP)
+    image[at(5) : at(5) + SECTOR] = second
+
+    image[at(6) : at(6) + len(JPEG)] = JPEG
+
+    # Control date tree, so the album can show a known-good image.
+    for cluster, name, target in (
+        (17, b"2026       ", 18),
+        (18, b"10         ", 19),
+    ):
+        sector = bytearray(SECTOR)
+        _dir_entry(sector, 0, name, 0x10, target, 0, STAMP)
+        image[at(cluster) : at(cluster) + SECTOR] = sector
+
+    valid_hash = hashlib.md5(JPEG).hexdigest().upper()
+    day = bytearray(SECTOR)
+    _dir_entry_long(
+        day,
+        0,
+        VALID_NAME or f"{NAME_STAMP}-{valid_hash}.jpg",
+        4,
+        0x20,
+        20,
+        len(JPEG),
+        STAMP,
+    )
+    image[at(19) : at(19) + SECTOR] = day
+    image[at(20) : at(20) + len(JPEG)] = JPEG
 
 
 def build_image(

@@ -65,6 +65,7 @@ It binds the Mac's LAN address on UDP 53 and TCP 80 so the console's **Test Conn
 | Serve crafted TLS records or certificates through a local sinkhole | Medium; can hang or crash the `ssl` sysmodule and risks capturing unintended traffic | Separate explicit approval plus a sinkhole-scope decision; local connectivity-test hostname only; never proxy account/eShop traffic |
 | Run the local captive-portal DNS/HTTP responder on UDP 53 / TCP 80 | Low–medium; binds the Mac LAN address and serves one local page; requires `sudo`; the console's DNS entry is temporary | Explicit approval for the console page load; use the narrow exception above; revert DNS immediately |
 | Serve the public `CVE-2023-28205` PoC to the console | Medium–high; may crash the browser applet or hang/reboot the console; writes a bounded log to applet `localStorage` unless shimmed; this is exploit testing | Executed once on 2026-10-31 as an exploratory four-load run; no crash; DNS reverted; no repeat without a new hypothesis and approval; no payload execution |
+| Write a crafted FAT32 card and open the album (`H-013`) | Medium; the album or `fs` may hang or crash on the crafted path; no malformed `fs` commands; the card is sacrificial | Separate explicit approval for the card write and console run; follow [`H-013-SD-TRIGGER-PLAN.md`](H-013-SD-TRIGGER-PLAN.md) |
 | Run the Switch 2 `ns2jb` package, `mac2jb`, or a fork on the OLED | High; the package is hardcoded for Switch 2 and would fail or crash, and `mac2jb` additionally requires disabling SIP and loading an unsigned kernel extension | Prohibited; the package is not a Switch 1 port. Read-only inspection is allowed (`E-114`, `E-115`) |
 
 ## Before any device interaction
@@ -121,6 +122,13 @@ The tool never requires RCM for identity inspection.
 - Do not factory-reset or initialize the console. A browser crash is not a storage problem.
 - If a crash report or error code appears, copy it before rebooting and do not repeat the page load.
 - Record the page hash, the last portal log event, and whether the console rebooted. A crash is a signal to triage offline, not a jailbreak.
+
+### The console is unresponsive after the H-013 card test
+
+- Power off, remove the sacrificial card, wait 10 seconds, and boot normally.
+- Do not initialize the console or reformat the card on the console.
+- If a crash report or error code appears, copy it before rebooting and do not repeat the image.
+- Record the image SHA-256, whether the control image appeared, and whether the console rebooted or hung.
 
 ### A test SSID is stuck or the console's network settings misbehave
 

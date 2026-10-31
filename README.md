@@ -110,6 +110,7 @@ The captive-portal applet is the only browser surface the project can reach with
 | [`research/compatibility-matrix.json`](research/compatibility-matrix.json) | Higher-level compatibility record. |
 | [`research/hypotheses.json`](research/hypotheses.json) | Falsifiable hypotheses with test procedures and kill criteria. |
 | [`research/known-limitations.md`](research/known-limitations.md) | What the research cannot establish. |
+| [`docs/H-013-SD-TRIGGER-PLAN.md`](docs/H-013-SD-TRIGGER-PLAN.md) | Prepared SD-card free-trigger test plan; not run. |
 | [`research/CHECKPOINT.md`](research/CHECKPOINT.md) | Resumable project state. |
 
 Every material claim uses one of five labels:

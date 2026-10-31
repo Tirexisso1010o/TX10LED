@@ -170,6 +170,87 @@ class AnomalyTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from("<I", image, second)[0], 0x0FFFFFF0)
 
 
+class UnicodePathTests(unittest.TestCase):
+    def test_path_exceeds_the_fs_buffer(self) -> None:
+        path = (
+            "/NINTENDO/ALBUM/"
+            + lab.UNICODE_DIR_1
+            + "/"
+            + lab.UNICODE_DIR_2
+            + "/"
+            + lab.UNICODE_FILE
+        )
+        self.assertGreater(len(path.encode("utf-8")), 0x301)
+        self.assertTrue(lab.UNICODE_DIR_1.startswith("..\\"))
+
+    def test_benign_path_has_same_length_without_parent(self) -> None:
+        crafted = (
+            "/NINTENDO/ALBUM/"
+            + lab.UNICODE_DIR_1
+            + "/"
+            + lab.UNICODE_DIR_2
+            + "/"
+            + lab.UNICODE_FILE
+        )
+        benign = (
+            "/NINTENDO/ALBUM/"
+            + lab.UNICODE_BENIGN_DIR_1
+            + "/"
+            + lab.UNICODE_DIR_2
+            + "/"
+            + lab.UNICODE_FILE
+        )
+        self.assertEqual(len(crafted.encode("utf-8")), len(benign.encode("utf-8")))
+        self.assertTrue(crafted.split("/")[3].startswith("..\\"))
+        self.assertFalse(benign.split("/")[3].startswith("..\\"))
+
+    def test_benign_image_builds(self) -> None:
+        image = lab.build_image(64, "album_unicode_benign_path")
+        layout = lab.layout_for(64)
+        data = layout.data_start * lab.SECTOR
+        short1 = data + 1 * lab.SECTOR + 32 + 14 * 32
+        self.assertEqual(image[short1 + 11], 0x10)
+        self.assertEqual(struct.unpack_from("<H", image, short1 + 26)[0], 4)
+
+    def test_tree_points_at_the_crafted_entries(self) -> None:
+        image = lab.build_image(64, "album_unicode_parent_backslash")
+        layout = lab.layout_for(64)
+        data = layout.data_start * lab.SECTOR
+
+        def at(cluster: int) -> int:
+            return data + (cluster - 2) * lab.SECTOR
+
+        # Album cluster 3: control year at 0, crafted LFN at 32, short at 480.
+        self.assertEqual(image[at(3) : at(3) + 11], b"2026       ")
+        self.assertEqual(image[at(3) + 11], 0x10)
+        self.assertEqual(image[at(3) + 32 + 11], 0x0F)
+        short1 = at(3) + 32 + 14 * 32
+        self.assertEqual(image[short1 + 11], 0x10)
+        self.assertEqual(struct.unpack_from("<H", image, short1 + 26)[0], 4)
+
+        # First crafted directory at cluster 4 points to cluster 5.
+        short2 = at(4) + 14 * 32
+        self.assertEqual(image[short2 + 11], 0x10)
+        self.assertEqual(struct.unpack_from("<H", image, short2 + 26)[0], 5)
+
+        # Second crafted directory at cluster 5 holds the JPEG entry.
+        short3 = at(5) + 14 * 32
+        self.assertEqual(image[short3 + 11], 0x20)
+        self.assertEqual(struct.unpack_from("<H", image, short3 + 26)[0], 6)
+        self.assertEqual(struct.unpack_from("<I", image, short3 + 28)[0], len(lab.JPEG))
+
+        # Control file at cluster 19: five LFN chunks, then the short entry.
+        short4 = at(19) + 5 * 32
+        self.assertEqual(image[short4 + 11], 0x20)
+        self.assertEqual(struct.unpack_from("<H", image, short4 + 26)[0], 20)
+
+        # FAT chains: crafted data 6..16, control data 20..30.
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 6 * 4)[0], 7)
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 16 * 4)[0], lab.EOC)
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 20 * 4)[0], 21)
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 30 * 4)[0], lab.EOC)
+
+
 class WriteGateTests(unittest.TestCase):
     def test_refuses_disk0(self) -> None:
         with self.assertRaises(writer.UnsafeTarget):

@@ -1,0 +1,102 @@
+# H-013 — SD-card free-trigger test plan
+
+> **Status: prepared, not run.** No card has been written and the console has not been touched. This plan needs explicit approval for the card write and the console run.
+
+## Purpose
+
+`H-013` asks whether a free system applet can pass a user-controlled path containing a `..\` component to `fs` `GetEntryType`, triggering the same `Path::Normalize` overflow described in `ns2jb` **without SmileBASIC**. A positive result would confirm the bug is reachable on the target `23.0.1` build; it would still be a crash until the Switch 1 `fs` binary and heap-grooming exploit are available.
+
+The narrowed goal is fs-level native code execution, so a confirmed free trigger is worth knowing even though it is not code execution by itself.
+
+## Why the image is built this way
+
+The album's normal path is too short: `NINTENDO/ALBUM/YYYY/MM/DD/<file>` plus a 255-character filename is below the `0x301`-byte `Path::Normalize` buffer. The test image therefore uses a deep Unicode tree:
+
+```
+NINTENDO/ALBUM/<..\ + 167 CJK>/<170 CJK>/<170 CJK>.jpg
+```
+
+- The first component starts with `..\`, the parent-directory-plus-backslash pattern from the write-up.
+- The full path is **532 characters / 1546 UTF-8 bytes**, well above `0x301` (769 bytes).
+- The image also contains a normal `NINTENDO/ALBUM/2026/10/27` control image, so the album can show a known-good file and prove the card mounted.
+- A **benign control image** has the same tree and path length, but the first component starts with `AA\` instead of `..\`. If the crafted image crashes and the benign one does not, the `..\` component is implicated.
+
+The paths are encoded as FAT32 long file names; the FS path is assumed to be UTF-8. If the console rejects the Unicode names or does not traverse the crafted directory, the test is negative for this surface, not evidence that the bug is absent.
+
+## Images
+
+Generate both images with MBR wrapping (the D8 card used an MBR at LBA 8192):
+
+```sh
+python3 scripts/sdcard_lab.py --mbr --anomaly album_unicode_parent_backslash --out h013-crafted.img
+python3 scripts/sdcard_lab.py --mbr --anomaly album_unicode_benign_path --out h013-benign.img
+```
+
+Prepared dry-run images (not committed; regenerate with the commands above):
+
+| Image | Anomaly | Size | SHA-256 |
+|---|---|---|---|
+| `h013-crafted.img` | `album_unicode_parent_backslash` | 71,303,168 bytes | `f3b41f5cda6e44ed900be8695fb3b367efa4e489151a44a1b0a1bd22952a7f46` |
+| `h013-benign.img` | `album_unicode_benign_path` | 71,303,168 bytes | `da29ba893a56d10eb5d27cfb059a7cf46b3fd4139983dc3a216330178f70ce53` |
+
+Verify either image read-only before writing:
+
+```sh
+python3 scripts/sdcard_lab.py --describe h013-crafted.img
+```
+
+## Card write
+
+The write is destructive and must be run by the owner, against the sacrificial card only:
+
+```sh
+python3 scripts/sdcard_write.py --device /dev/diskN --image h013-crafted.img
+# inspect the printed plan, then re-run with --write
+python3 scripts/sdcard_write.py --device /dev/diskN --image h013-crafted.img --write
+```
+
+The writer refuses `disk0`, internal disks, partitions, and cards smaller than the image. Do not use the console's primary card.
+
+## Console run
+
+1. Insert the sacrificial card and open **Album**.
+2. Confirm the control image under `2026/10/27` appears. If it does not, the card or album setup failed; abort and do not interpret the result.
+3. Wait 60 seconds without touching the console. If the album displays the crafted `..\<CJK>` folder, open it once; otherwise leave the album on the control image.
+4. Record:
+   - whether the control image appeared;
+   - any error code, black screen, hang, reboot, or crash report;
+   - whether the console returned to the album or HOME normally.
+5. Reboot, remove the card, and restore the original card.
+6. Repeat the run with `h013-benign.img`. The benign image is the attribution control.
+
+## Abort and recovery
+
+Abort immediately if the console hangs for more than 60 seconds, shows a black screen or an error screen, reboots repeatedly, or the card becomes hot.
+
+Recovery: power off, remove the card, wait 10 seconds, power on. Do not factory-reset or initialize the console. The card is sacrificial; console data is not written by this test.
+
+## Interpretation
+
+| Result | Meaning |
+|---|---|
+| Control visible; crafted clean; benign clean | The album did not traverse the crafted path, rejected it, or the path did not reach `GetEntryType`. Negative for this surface; H-013 remains open for the browser/download route. |
+| Crafted crashes/hangs; benign clean | Possible `..\` trigger. Record the behavior and do not repeat without a new hypothesis. The next requirement is the Switch 1 `fs` binary and the heap-grooming exploit. |
+| Crafted and benign both crash | Likely a long-path/Unicode issue, not a `..\`-specific trigger. Record as a length/parser result, not a confirmed trigger. |
+| Control not visible | Card or album setup failure. Abort; no conclusion. |
+
+A crash is **not** fs-level code execution. It would confirm reachability only.
+
+## Safety and authorization
+
+- No firmware, keys, or SmileBASIC are used.
+- No malformed `fs` commands are sent; the test only places a crafted filename/path on a sacrificial FAT32 card.
+- The console is not modified; the risk is an applet or `fs` hang, recoverable by a reboot.
+- The card write is destructive to the sacrificial card and requires owner approval.
+- **No run is authorized by this document.** The test needs a separate explicit approval naming the image SHA-256 and the console session.
+
+## References
+
+- `H-013`, `H-004` — hypotheses.
+- `E-045` — the `ns2jb` `Path::Normalize` description.
+- `E-114`, `E-118` — the Switch 2-only package and the local `fs` artifact gap.
+- `docs/PORTABILITY.md` — why the `fs` binary remains the gate.

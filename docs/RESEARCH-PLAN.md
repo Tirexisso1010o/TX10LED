@@ -157,6 +157,13 @@ No malformed `fs` commands are sent. The signal is a crash, hang, reboot, or une
 
 This test would confirm only the **trigger**, not code execution. Turning the overflow into `fs`-level native code still requires the Switch 1 `fs` binary and heap grooming. `H-013` is `UNVERIFIED`/`blocked` and has not been run; it needs explicit approval plus a path to the `fs` binary before it can lead to the goal.
 
+**Prepared (2026-10-31).** `scripts/sdcard_lab.py` now builds two 64 MiB FAT32 filesystems with MBR wrapping (71,303,168-byte images):
+
+- `album_unicode_parent_backslash` — a 532-character / 1546-byte UTF-8 path whose first component starts with `..\`;
+- `album_unicode_benign_path` — the same tree and path length with a benign `AA\` first component.
+
+Both images include a normal `2026/10/27` control image. The dry-run images are 71,303,168 bytes with MBR wrapping; the SHA-256 values and the card/console protocol are in [`H-013-SD-TRIGGER-PLAN.md`](H-013-SD-TRIGGER-PLAN.md). No card was written and the console was not touched. The test still needs a separate explicit approval for the card write and the console run.
+
 ## D5 and D6 — blocked directions
 
 - **D5 (GameShare `splay`)**: requires a Switch 2 host. The 2026-10-29 read-only review found no public `splay`/GameShare vulnerability and no post-20.0.0 `splay` security fix. The local `splay` program NCA is key generation `0x17` and is blocked by the missing `key_area_key_application_16`; its meta CNMT is readable and matches the program NCA. The only program that decrypts with the current keys is the Mii editor applet `miiEdit` at key generation `0x15`, which is not a remote-input surface (`E-102`, `E-103`).
