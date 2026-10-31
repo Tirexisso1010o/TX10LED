@@ -1719,7 +1719,7 @@
         "switchbrew-nax0",
         "gbatemp-sd-seed"
       ],
-      "evidence": "The card is a 31.9 GB FAT32 volume with Nintendo/Album (empty), Nintendo/Contents/registered (four NCA containers: 19,968; 389,632; 165,376; 1,748,484,096 bytes), and Nintendo/save (8000000000000000, 1,916,928 bytes; 8000000000000124, 21,413,888 bytes). The NCA data files are <hash>.nca/00 and do not decrypt to NCA3 with the global header key; their first bytes are high-entropy. Nintendo/Contents/private is 16 bytes; the SD-seed system save 8000000000000043 is absent. The save files are high-entropy.",
+      "evidence": "The card is a 31.9 GB FAT32 volume with Nintendo/Album (empty), Nintendo/Contents/registered (four NCA containers: 19,968; 389,632; 165,376; 1,748,484,096 bytes), and Nintendo/save (8000000000000000, 1,916,928 bytes; 8000000000000124, 21,413,888 bytes). The NCA data files are <hash>.nca/00 and do not decrypt to NCA3 with the global header key; their first bytes are high-entropy. Nintendo/Contents/private is 16 bytes; the SD-seed system save 8000000000000043 is absent. The save files are high-entropy. Most prod.keys are global (master_key, titlekek, key_area_key_application, header_key, and sd_card_nca_key_source are reusable across consoles), but the NAX0 key derivation also requires the per-console sd_seed, and save data uses per-console save keys. The local sd_seed belongs to the source console, not the OLED.",
       "limitations": "If the card came from the lost 23.0.1 source console, its sd_seed in the local prod.keys might decrypt the NAX0 headers; this was not tested. If the card is the OLED's, the seed is internal and unavailable without CFW. No title IDs or key generations are claimed.",
       "last_reviewed": "2026-10-31"
     }
