@@ -208,9 +208,9 @@ class UnicodePathTests(unittest.TestCase):
         image = lab.build_image(64, "album_unicode_benign_path")
         layout = lab.layout_for(64)
         data = layout.data_start * lab.SECTOR
-        short1 = data + 1 * lab.SECTOR + 32 + 14 * 32
+        short1 = data + 2 * lab.SECTOR + 32 + 14 * 32
         self.assertEqual(image[short1 + 11], 0x10)
-        self.assertEqual(struct.unpack_from("<H", image, short1 + 26)[0], 4)
+        self.assertEqual(struct.unpack_from("<H", image, short1 + 26)[0], 5)
 
     def test_tree_points_at_the_crafted_entries(self) -> None:
         image = lab.build_image(64, "album_unicode_parent_backslash")
@@ -220,35 +220,41 @@ class UnicodePathTests(unittest.TestCase):
         def at(cluster: int) -> int:
             return data + (cluster - 2) * lab.SECTOR
 
-        # Album cluster 3: control year at 0, crafted LFN at 32, short at 480.
-        self.assertEqual(image[at(3) : at(3) + 11], b"2026       ")
+        # NINTENDO/ALBUM at cluster 3 points to the contents at cluster 4.
+        self.assertEqual(image[at(3) : at(3) + 11], b"ALBUM      ")
         self.assertEqual(image[at(3) + 11], 0x10)
-        self.assertEqual(image[at(3) + 32 + 11], 0x0F)
-        short1 = at(3) + 32 + 14 * 32
+        self.assertEqual(struct.unpack_from("<H", image, at(3) + 26)[0], 4)
+
+        # Contents cluster 4: control year at 0, crafted LFN at 32, short at 480.
+        self.assertEqual(image[at(4) : at(4) + 11], b"2026       ")
+        self.assertEqual(image[at(4) + 11], 0x10)
+        self.assertEqual(struct.unpack_from("<H", image, at(4) + 26)[0], 18)
+        self.assertEqual(image[at(4) + 32 + 11], 0x0F)
+        short1 = at(4) + 32 + 14 * 32
         self.assertEqual(image[short1 + 11], 0x10)
-        self.assertEqual(struct.unpack_from("<H", image, short1 + 26)[0], 4)
+        self.assertEqual(struct.unpack_from("<H", image, short1 + 26)[0], 5)
 
-        # First crafted directory at cluster 4 points to cluster 5.
-        short2 = at(4) + 14 * 32
+        # First crafted directory at cluster 5 points to cluster 6.
+        short2 = at(5) + 14 * 32
         self.assertEqual(image[short2 + 11], 0x10)
-        self.assertEqual(struct.unpack_from("<H", image, short2 + 26)[0], 5)
+        self.assertEqual(struct.unpack_from("<H", image, short2 + 26)[0], 6)
 
-        # Second crafted directory at cluster 5 holds the JPEG entry.
-        short3 = at(5) + 14 * 32
+        # Second crafted directory at cluster 6 holds the JPEG entry.
+        short3 = at(6) + 14 * 32
         self.assertEqual(image[short3 + 11], 0x20)
-        self.assertEqual(struct.unpack_from("<H", image, short3 + 26)[0], 6)
+        self.assertEqual(struct.unpack_from("<H", image, short3 + 26)[0], 7)
         self.assertEqual(struct.unpack_from("<I", image, short3 + 28)[0], len(lab.JPEG))
 
-        # Control file at cluster 19: five LFN chunks, then the short entry.
-        short4 = at(19) + 5 * 32
+        # Control file at cluster 20: five LFN chunks, then the short entry.
+        short4 = at(20) + 5 * 32
         self.assertEqual(image[short4 + 11], 0x20)
-        self.assertEqual(struct.unpack_from("<H", image, short4 + 26)[0], 20)
+        self.assertEqual(struct.unpack_from("<H", image, short4 + 26)[0], 21)
 
-        # FAT chains: crafted data 6..16, control data 20..30.
-        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 6 * 4)[0], 7)
-        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 16 * 4)[0], lab.EOC)
-        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 20 * 4)[0], 21)
-        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 30 * 4)[0], lab.EOC)
+        # FAT chains: crafted data 7..17, control data 21..31.
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 7 * 4)[0], 8)
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 17 * 4)[0], lab.EOC)
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 21 * 4)[0], 22)
+        self.assertEqual(struct.unpack_from("<I", image, FAT_OFFSET + 31 * 4)[0], lab.EOC)
 
 
 class WriteGateTests(unittest.TestCase):

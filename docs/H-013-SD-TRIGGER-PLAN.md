@@ -36,8 +36,10 @@ Prepared dry-run images (not committed; regenerate with the commands above):
 
 | Image | Anomaly | Size | SHA-256 |
 |---|---|---|---|
-| `h013-crafted.img` | `album_unicode_parent_backslash` | 71,303,168 bytes | `f3b41f5cda6e44ed900be8695fb3b367efa4e489151a44a1b0a1bd22952a7f46` |
-| `h013-benign.img` | `album_unicode_benign_path` | 71,303,168 bytes | `da29ba893a56d10eb5d27cfb059a7cf46b3fd4139983dc3a216330178f70ce53` |
+| `h013-crafted.img` | `album_unicode_parent_backslash` | 71,303,168 bytes | `9f5339df3073ad7f724b81b9eb9d8ca418417b5af01124191b5b1679db684a83` |
+| `h013-benign.img` | `album_unicode_benign_path` | 71,303,168 bytes | `b78ed96efdee215389318faacd003acc7f05e26b09884dfbc48d599eb3b0e9b3` |
+
+> **Revision note.** The first prepared benign image was missing the `NINTENDO/ALBUM` level and is invalid; it was never used for a console result. The SHA-256 values above are for the corrected images, verified by mounting them read-only. Rewrite the card with `h013-benign.img` before the console run.
 
 Verify either image read-only before writing:
 
