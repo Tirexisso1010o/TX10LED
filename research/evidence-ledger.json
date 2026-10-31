@@ -1515,7 +1515,7 @@
     },
     {
       "id": "E-111",
-      "claim": "A read-only desk review on 2026-10-30 identified CVE-2023-28205 as the only candidate in the reviewed set that combines a public WebKit proof of concept, no JavaScript JIT requirement, and a reachable structured-clone path. The public MIT-licensed PoC targets WebKit-613.1.17.1 and triggers a use-after-free by sending a Map/Date object graph through postMessage. The Switch applet executes local JavaScript and is feature-bracketed to Safari 15.4-15.6, but the PoC has not been run on the console and the exact patch level is unknown.",
+      "claim": "A read-only desk review on 2026-10-30 identified CVE-2023-28205 as the only candidate in the reviewed set that combines a public WebKit proof of concept, no JavaScript JIT requirement, and a reachable structured-clone path. The public MIT-licensed PoC targets WebKit-613.1.17.1 and triggers a use-after-free by sending a Map/Date object graph through postMessage. The Switch applet executes local JavaScript and is feature-bracketed to Safari 15.4-15.6, but at the time of the review the PoC had not been run on the console and the exact patch level was unknown; see E-113 for the later exploratory run.",
       "status": "PARTIALLY VERIFIED",
       "confidence": "low",
       "scope": "Read-only source review on 2026-10-30. No console interaction, no PoC execution, and no exploit attempt. The review covers public advisories, the WebKit fix commit, and the public PoC.",
@@ -1531,7 +1531,7 @@
         "nvd-cve-2025-31200"
       ],
       "evidence": "The review compared the applet's fingerprint (E-058, E-061, E-063) with public WebKit advisories and PoCs. CVE-2023-28205 is a JavaScriptCore SerializedScriptValue/CloneDeserializer use-after-free fixed by WebKit commit c9880de (MarkedVector); the public PoC uses postMessage with Map/Date objects and targets WebKit-613.1.17.1. JIT-dependent candidates (CVE-2022-42856, CVE-2023-37450, CVE-2023-41993, CVE-2024-23222, CVE-2024-44308) were excluded because the applet shows no JIT warm-up. CVE-2022-32912 was excluded because the applet has no WebGL. CVE-2023-32409 and CVE-2025-24201 were excluded as sandbox escapes that are not first-stage primitives. CVE-2024-44309 is an XSS/cookie issue. CVE-2024-27834 and CVE-2025-31201 are PAC bypasses and Switch 1 has no PAC. CVE-2025-31200 is a CoreAudio APAC decoder bug, not WebKit, and the codec is not expected on the Switch. CVE-2022-32893 remains a secondary candidate but has no public PoC in the reviewed sources. CVE-2023-4863 was already tested inconclusively in D7.",
-      "limitations": "The review is a desk exercise. The public PoC's crash analysis is from a PlayStation WebKit process, not the Switch. The Switch build may include a Nintendo backport of the MarkedVector fix. A browser crash would be applet-level only and would not reach Atmosph\u00e8re without a separate kernel/boot-stage chain. No console page was loaded and no exploit content was served.",
+      "limitations": "The review is a desk exercise. The public PoC's crash analysis is from a PlayStation WebKit process, not the Switch. The Switch build may include a Nintendo backport of the MarkedVector fix. A browser crash would be applet-level only and would not reach Atmosph\u00e8re without a separate kernel/boot-stage chain. No console page was loaded and no exploit content was served during this review; see E-113 for the later exploratory run.",
       "last_reviewed": "2026-10-30"
     },
     {
@@ -1546,6 +1546,20 @@
       ],
       "evidence": "The console at 192.168.178.136 made 30 DNS queries for ctest.cdn.nintendo.net, fetched /portal at 17:12:35 local, and posted a probe event at 16:12:38.494Z and a reachability event at 16:12:38.516Z. The reachability result was {ok: true, marker: 4660, mapSize: 1, dateValue: 0}; the features object reported postMessage, messageChannel, messagePort, broadcastChannel, worker, structuredClone, origin=http://192.168.178.167, and moduleScript=true. The probe's full feature report also showed Map, Date, localStorage, sessionStorage, indexedDB, and fetch present; WebAssembly, SharedArrayBuffer, Atomics, WebGL, Intl, and crypto.subtle absent. The page sent 20 heartbeats at two-second intervals and a done event at 16:13:18.169Z. The log contains 67 lines: 30 DNS, 35 HTTP (23 POST /fp and 12 GET), and no error or unhandledrejection events. The owner confirmed the console behaved normally and DNS was reverted to Automatic.",
       "limitations": "One console, one run, one page load. This is a reachability result, not a vulnerability result: a patched build can pass it. No PoC was served, no crash was induced, and the exact WebKit patch level remains unknown. The full JSONL log is local-only because it contains request headers and console network identifiers. A browser compromise would be applet-level only.",
+      "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-113",
+      "claim": "The pinned public CVE-2023-28205 PoC was served to the Switch applet on 2026-10-31 in an exploratory four-load run. The module graph loaded in every load, the page logged only Attempt lines, and no Stage 1 trigger, alert, crash, reboot, or hang occurred. The run deviated from the approved single-page protocol, so it is not a clean negative.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "D2 W2 exploratory run on 2026-10-31. Four page loads in crash, probe=1, and probe=2 modes over 227 s on the owner's home Wi-Fi, with the console's primary DNS temporarily set to the Mac at 192.168.178.167. The runner served the unmodified MIT-licensed PoC from commit 57126d03eeceb2e46b39adbe1fad2abf08ed33e3 (index.html SHA-256 3d9074f1c72bbff804ab84218124193b71a95c0666a9fbe0f2742c78028cc4a4, poc.js SHA-256 873fe43af25961b312ff3d24c20c15a5475a51ac359cdb572dcb150f11137be4). The owner approved the PoC's bounded localStorage log.",
+      "sources": [
+        "switchbrew-internet-browser",
+        "github-uaf-2023-28205"
+      ],
+      "evidence": "The console at 192.168.178.136 made 79 DNS queries for ctest.cdn.nintendo.net and 45 HTTP GET requests in a 227 s session (16:35:49Z-16:39:36Z). The log records four page loads: /portal?autorun=1 at 17:36:02 local (crash default, 16 s), /portal?autorun=1&mode=crash at 17:36:18 (43 s), /portal?autorun=1&mode=probe&probe=1 at 17:37:01 (44 s), and /portal?autorun=1&mode=probe&probe=2 at 17:37:45 (58 s). Each load fetched /poc.js and /module/{utils,constants,int64,mem,rw,offset}.mjs with HTTP 200 and text/javascript. There were no POST requests. The owner reports that the page stayed, no alert or crash occurred, the Load logs view showed only Attempt lines, and the console returned to normal. The owner reverted DNS to Automatic.",
+      "limitations": "Protocol deviation: four page loads in four modes instead of one bounded page load, with each mode reloaded after 16-58 s. The highest Attempt count was not recorded, and the localStorage log was not exported, so the PoC may not have run long enough to reach Stage 1. No crash dump or fault address was produced. This is not a clean negative for CVE-2023-28205 and does not show the build is patched. A browser compromise would be applet-level only.",
       "last_reviewed": "2026-10-31"
     }
   ]

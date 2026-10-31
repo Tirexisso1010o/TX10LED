@@ -1,6 +1,6 @@
 # WebKit N-day Assessment Plan
 
-> **Snapshot: 2026-10-31. W1 passed; W2 pending approval.** This plan tests whether the Switch 1 `23.0.1` browser applet is reachable by a public, no-JIT WebKit n-day. It is a stage-1 assessment. A browser compromise would not reach Atmosphère without additional kernel and boot-stage work.
+> **Snapshot: 2026-10-31. W1 passed; the W2 exploratory run produced no Stage 1 trigger; the candidate is deprioritized.** This plan tests whether the Switch 1 `23.0.1` browser applet is reachable by a public, no-JIT WebKit n-day. It is a stage-1 assessment. A browser compromise would not reach Atmosphère without additional kernel and boot-stage work.
 
 ## Purpose and boundary
 
@@ -10,7 +10,7 @@ The browser applet is a genuine attacker-controlled JavaScript surface: the capt
 
 - local harness validation, loopback self-tests, and read-only source review;
 - one bounded reachability page load on the console (W1), with the console's DNS temporarily pointed at the Mac and reverted immediately afterwards — **executed 2026-10-31**;
-- one bounded public-PoC page load (W2) only if W1 passes and the owner approves that exact run — **not yet approved**.
+- one bounded public-PoC page load (W2) only if W1 passes and the owner approves that exact run — **executed 2026-10-31 as an exploratory four-load run; this deviated from the single-load protocol**.
 
 **Not authorized by this plan:**
 
@@ -31,6 +31,7 @@ The browser applet is a genuine attacker-controlled JavaScript surface: the capt
 | The applet decodes PNG, JPEG, GIF, BMP, WebP, and SVG; the WebP decoder is non-stock. | `E-065`–`E-069` |
 | The applet has no URL whitelist and permits ignoring invalid TLS certificates. | `E-060` |
 | W1 passed on 2026-10-31: the applet loaded the local probe page and round-tripped a `Map`/`Date` graph through `postMessage` (`ok=true`, `mapSize=1`, `dateValue=0`). | `E-112`; `2026-10-31-webkit-w1.json` |
+| The W2 exploratory run on 2026-10-31 loaded the pinned public PoC in four modes; the module graph loaded each time, but the page logged only `Attempt` lines and produced no Stage 1 trigger, alert, crash, reboot, or hang. The run was four short reloads, not the approved single load. | `E-113`; `2026-10-31-webkit-w2-exploratory.json` |
 
 The engine bracket and the public PoC are **lineage-adjacent, not an exact build match**. The PoC was written against WebKit-613.1.17.1 (Safari 15.4 / PlayStation lineage); the console's UA token says 613.0 and its feature set brackets the Safari 15.4–15.6 generation. The exact patch level is unknown, and Nintendo may have backported the fix into the 2026 NetFront build. Only a console test can distinguish those cases.
 
@@ -44,7 +45,7 @@ The table separates bugs that are reachable without a JIT from bugs that require
 
 | CVE | Component / primitive | JIT needed? | Reachability on this applet | Status |
 |---|---|---|---|---|
-| **CVE-2023-28205** | JavaScriptCore `SerializedScriptValue` / `CloneDeserializer`; use-after-free during structured-clone deserialization of `Map`/`Date` objects | **No** | `postMessage` and `Map`/`Date` are present; W1 round-tripped a `Map`/`Date` graph successfully. | **Top candidate.** Public MIT-licensed PoC targets WebKit-613.1.17.1; **W1 passed, W2 not run**. Fix commit `c9880de` replaces non-GC-scanned `Vector` containers with `MarkedVector`. |
+| **CVE-2023-28205** | JavaScriptCore `SerializedScriptValue` / `CloneDeserializer`; use-after-free during structured-clone deserialization of `Map`/`Date` objects | **No** | `postMessage` and `Map`/`Date` are present; W1 round-tripped a `Map`/`Date` graph successfully. W2's exploratory run loaded the PoC but did not reach Stage 1. | **Top candidate, deprioritized.** Public MIT-licensed PoC targets WebKit-613.1.17.1; **W1 passed, W2 exploratory run no Stage 1 trigger**. The run was not a clean single-load test. Fix commit `c9880de` replaces non-GC-scanned `Vector` containers with `MarkedVector`. |
 | CVE-2022-32893 | WebKit out-of-bounds write (WebKit Bugzilla 243557); component not public in the reviewed text | Unknown | Generic web content; no public PoC found | **Secondary.** Fixed in Safari 15.6.1; the target build predates the fix. Requires patch-diff work, not a ready PoC. |
 | CVE-2022-32912 | WebGL2 `drawRangeElements` out-of-bounds read | No | **No WebGL** on the console (`E-061`) | Excluded. |
 | CVE-2022-42856 | JavaScriptCore type confusion | Yes | No JIT | Excluded. |
@@ -60,7 +61,7 @@ The table separates bugs that are reachable without a JIT from bugs that require
 | CVE-2025-31200 | CoreAudio APAC decoder memory corruption | No | Not WebKit; the APAC codec is not expected on the Switch | Excluded. |
 | CVE-2023-4863 | libwebp Huffman heap overflow | No | WebP decodes, but the decoder is non-stock and accepted the reproducers without an observable fault | Closed inconclusive in `D7` (`H-008`). |
 
-**Conclusion of the desk review:** only `CVE-2023-28205` combines a public PoC, no JIT requirement, and a reachable structured-clone path. W1 confirmed that the applet can deserialize a `Map`/`Date` graph, so the candidate is reachable; the remaining question is whether this build lacks the `MarkedVector` fix and whether the public PoC produces a controllable fault. W2 is the only way to test that, and it needs separate approval.
+**Conclusion of the desk review:** only `CVE-2023-28205` combines a public PoC, no JIT requirement, and a reachable structured-clone path. W1 confirmed that the applet can deserialize a `Map`/`Date` graph, so the candidate is reachable. The W2 exploratory run then loaded the PoC and ran its loop, but the page logged only `Attempt` lines: it did not reach Stage 1, show the crash alert, or crash the applet. Because the run used four short reloads instead of the approved single load, this is **not** a clean negative and does not show the build is patched. The candidate is deprioritized; a repeat would need a new hypothesis and a new approval.
 
 ## Reachability gates
 
@@ -69,8 +70,8 @@ The table separates bugs that are reachable without a JIT from bugs that require
 | **G1** | Does the applet execute a local page? | Captive-portal page load | **Passed** (`E-058`, re-confirmed by `E-112`). |
 | **G2** | Does `window.postMessage` round-trip a small `Map`/`Date` object? | `webkit_probe.html` reachability event | **Passed 2026-10-31** (`E-112`): `ok=true`, `mapSize=1`, `dateValue=0`. |
 | **G3** | Are ES modules, `Map`, `Date`, `localStorage`, and `window.origin` present? | Probe feature report | **Passed 2026-10-31** (`E-112`): all present, including `moduleScript=true`. |
-| **G4** | Does the public PoC's module graph load and run? | W2 page load with `?autorun=1` | Record a load failure as a harness/reachability negative, not a vulnerability negative. |
-| **G5** | Does the PoC produce a crash, reboot, or hang? | W2 observation | No signal means the build is not vulnerable to this PoC (or the PoC is incompatible); close the candidate. |
+| **G4** | Does the public PoC's module graph load and run? | W2 page load with `?autorun=1` | **Passed 2026-10-31** (`E-113`): all four exploratory loads fetched `poc.js` and the module graph with HTTP 200 and `text/javascript`. |
+| **G5** | Does the PoC produce a crash, reboot, or hang? | W2 observation | **No signal in the exploratory run** (`E-113`): only `Attempt` lines; no Stage 1 trigger, alert, crash, reboot, or hang. The run was four short reloads, not a clean single-load test; do not treat it as proof the build is patched. |
 | **G6** | Is the crash a controllable primitive? | Offline triage, repeat only with approval | A NULL dereference or a non-repeatable crash is a DoS signal, not an exploit primitive. |
 | **G7** | Can a stage-1 primitive reach kernel/boot? | Separate project direction | Outside this plan; a browser bug alone cannot reach Atmosphère. |
 
@@ -135,7 +136,7 @@ The public PoC is MIT-licensed (`Copyright (c) 2024 Nathan Fargo`) and uses ES m
 
 Do not vendor the PoC into git. Fetch it into `scripts/assets.local/uaf-2023-28205/` (ignored), keep its `LICENSE`, and serve it locally only after approval. A read-only source inspection has been done, but the PoC has **not** been served to the console or executed, and it is not in the repository.
 
-**Persistent write:** the PoC writes a run log and a run counter to the applet's `localStorage` (`uaf-2023-28205.logs`, capped at 2000 entries). This is applet-local storage, not the console filesystem, but it is a persistent write. W2 therefore needs either explicit approval for that write or an in-memory shim installed before `poc.js` is imported. A local WebKit test confirmed that `Object.defineProperty(window, 'localStorage', {value: shim})` works. A shim wrapper can also stop the PoC's infinite loop after 120 seconds by navigating to `about:blank`; without it, the 300-second runner bound stops DNS/HTTP but does **not** stop the page, so the owner must close the applet manually.
+**Persistent write:** the PoC writes a run log and a run counter to the applet's `localStorage` (`uaf-2023-28205.logs`, capped at 2000 entries). This is applet-local storage, not the console filesystem, but it is a persistent write. W2 therefore required either explicit approval for that write or an in-memory shim installed before `poc.js` is imported. A local WebKit test confirmed that `Object.defineProperty(window, 'localStorage', {value: shim})` works. A shim wrapper can also stop the PoC's infinite loop after 120 seconds by navigating to `about:blank`; without it, the 300-second runner bound stops DNS/HTTP but does **not** stop the page, so the owner must close the applet manually.
 
 **Observable signal:** in crash mode, if the UAF triggers without crashing, the PoC calls `alert('triggered, try crash')`. Dismiss it and record the index it displays. If neither a crash nor the alert appears within 120 seconds, close the applet and record a negative result.
 
@@ -156,11 +157,13 @@ Procedure (after approval):
 3. Revert DNS immediately. Do not reload the page, click retry, or run a second attempt.
 4. Record whether the applet crashed, the console rebooted, the page hung, the PoC alert appeared, or the page completed without a fault. Preserve the log and any crash report the console displays. If neither a crash nor the alert appears within 120 seconds, close the applet and record a negative result.
 
+**Result (2026-10-31): exploratory, no Stage 1 trigger.** The owner ran the pinned PoC, but used the page's three buttons after the initial auto-run load. The log therefore contains four page loads: `?autorun=1` at 17:36:02 local (crash default, 16 s), `?autorun=1&mode=crash` at 17:36:18 (43 s), `?autorun=1&mode=probe&probe=1` at 17:37:01 (44 s), and `?autorun=1&mode=probe&probe=2` at 17:37:45 (58 s). Each load fetched `poc.js` and the six module files with HTTP 200 and `text/javascript`. The 227-second session recorded 79 DNS queries, 45 HTTP GETs, and no POSTs. The owner saw only `Attempt` lines in the page's Load logs view; no Stage 1 trigger, alert, crash, reboot, or hang occurred, the console returned to normal, and DNS was reverted to Automatic. This was **not** the approved single-load protocol: the four reloads reset the heap, each mode ran only 16–58 seconds, and the highest attempt count was not recorded. It is therefore not a clean negative and does not show the build is patched. The sanitized record is [`research/hardware-observations/2026-10-31-webkit-w2-exploratory.json`](../research/hardware-observations/2026-10-31-webkit-w2-exploratory.json) and `E-113`; the full JSONL log is local-only. The candidate is deprioritized, and the PoC must not be run again under this plan without a new hypothesis and a new approval.
+
 **Signal:** a crash, reboot, or hang that occurs on the PoC page and not on the W1 page. A crash is **not** proof of exploitability; it is a reason to triage offline.
 
-**No signal:** the build is not vulnerable to this PoC, the PoC is incompatible with the applet, or the module graph did not load. Distinguish those cases from the log; close the candidate if the module graph loaded and the page completed.
+**No signal:** the build is not vulnerable to this PoC, the PoC is incompatible with the applet, or the module graph did not load. In the 2026-10-31 exploratory run the module graph loaded and the page logged only `Attempt` lines, so the PoC did not reach Stage 1 within 16–58 seconds per mode. That is not a clean negative because of the reloads and the unknown attempt count. Do not repeat without a new hypothesis and approval.
 
-**Stop conditions:** any crash/reboot/hang; the console becomes unresponsive; the DNS revert fails. Do not repeat the PoC without a new approval and a new hypothesis.
+**Stop conditions:** any crash/reboot/hang; the console becomes unresponsive; the DNS revert fails. The 2026-10-31 run already consumed the approved attempt. Do not repeat the PoC without a new approval and a new hypothesis.
 
 ### W3 — Crash triage and primitive assessment (offline/read-only; separate approval)
 
@@ -198,7 +201,7 @@ python3 scripts/webkit_portal.py --dry-run
 # W1: one bounded console page load; needs root for DNS 53 / HTTP 80
 sudo python3 scripts/webkit_portal.py --duration 300
 
-# W2 (only after separate approval): one bounded PoC page load
+# W2 (executed 2026-10-31 as an exploratory four-load run; do not repeat without new approval)
 sudo python3 scripts/webkit_portal.py \
   --site scripts/assets.local/uaf-2023-28205 \
   --entry-query autorun=1 \
@@ -219,8 +222,8 @@ The responder answers DNS locally and serves one page. It does not forward packe
 
 - The runner's JSONL log, kept local (`.local.jsonl` is ignored).
 - A tracked observation JSON with the console model/firmware, the page hash, the event counts, the reachability result, and the console's visible behavior. No full serial numbers, tokens, or credentials. W1 is recorded in [`research/hardware-observations/2026-10-31-webkit-w1.json`](../research/hardware-observations/2026-10-31-webkit-w1.json).
-- An evidence-ledger entry for W1 (and W2 if run), with the exact command, duration, page hash, and limitations. W1 is `E-112`.
-- A hypothesis update for `H-005` (browser WebKit n-day applicability), including the new candidate and the console result.
+- An evidence-ledger entry for W1 and W2, with the exact command, duration, page hash, and limitations. W1 is `E-112`; the W2 exploratory run is `E-113`.
+- A hypothesis update for `H-005` (browser WebKit n-day applicability), including the new candidate and the console result. `H-005` is now `UNVERIFIED`/`blocked`: the exploratory W2 run produced no Stage 1 trigger, and no clean repeat is planned without a new hypothesis.
 
 ## Stop conditions and recovery
 
@@ -236,4 +239,4 @@ The responder answers DNS locally and serves one page. It does not forward packe
 - `nvd-cve-2022-32893`, `webkit-bugzilla-243557`, `webkitgtk-wsa-2022-0009`, `nvd-cve-2025-31200`
 - `switchbrew-internet-browser`, `nvd-cve-2023-4863`
 
-The candidate table is a desk review, not a claim that any CVE is exploitable on this console. The only way to resolve the question is the bounded W1/W2 procedure above.
+The candidate table is a desk review, not a claim that any CVE is exploitable on this console. The bounded W1/W2 procedure above was the planned way to resolve the question; W1 passed, and the W2 exploratory run produced no Stage 1 trigger but was not a clean single-load test.

@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-31-webkit-w2-exploratory",
+  "observed_at": "2026-10-31T16:35:49Z",
+  "observed_at_precision": "exact to the runner session start; console HTTP timestamps are local UTC+1",
+  "phase_window": "2026-10-31T16:35:49Z to 2026-10-31T16:39:36Z",
+  "observation_type": "d2-w2-public-poc-exploratory",
+  "operator": "macOS host running the local DNS/HTTP runner; the console owner performed the console steps",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not enumerated during this test; the firmware value is the owner's report.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "webkit-captive-portal-w2-exploratory",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "mac_lan_ip": "192.168.178.167",
+    "console_ip": "192.168.178.136",
+    "console_network": "owner's home Wi-Fi; security not recorded",
+    "dns": "manual primary DNS to the Mac; secondary DNS the router or automatic",
+    "http": "local runner on TCP 80; DNS on UDP 53"
+  },
+  "poc": {
+    "repository": "seregonwar/uaf-2023-28205",
+    "commit": "57126d03eeceb2e46b39adbe1fad2abf08ed33e3",
+    "license": "MIT",
+    "entry": "index.html",
+    "entry_sha256": "3d9074f1c72bbff804ab84218124193b71a95c0666a9fbe0f2742c78028cc4a4",
+    "poc_js_sha256": "873fe43af25961b312ff3d24c20c15a5475a51ac359cdb572dcb150f11137be4",
+    "license_sha256": "f35dc89ed271b7cf6b599a6d1bd43269f2306c8e1669035f97db48f98184875a",
+    "entry_query": "autorun=1",
+    "modes_loaded": [
+      "crash (default)",
+      "crash",
+      "probe=1",
+      "probe=2"
+    ],
+    "local_storage_note": "The unmodified PoC writes a bounded run log (uaf-2023-28205.logs, max 2000 entries) and a run counter to applet localStorage. The owner approved this write for the run."
+  },
+  "session": {
+    "log": "research/hardware-observations/webkit-portal-20261031-w2.local.jsonl",
+    "log_kept_local": true,
+    "log_lines": 126,
+    "duration_seconds_observed": 227,
+    "duration_limit_seconds": 300,
+    "counts": {
+      "dns": 79,
+      "http": 45,
+      "http_get": 45,
+      "http_post": 0,
+      "page_loads": 4,
+      "poc_js_requests": 4,
+      "module_requests": 24,
+      "site_requests": 32,
+      "redirects": 13
+    },
+    "dns_name": "ctest.cdn.nintendo.net",
+    "first_http_local": "2026-10-31T17:35:55",
+    "first_page_load_local": "2026-10-31T17:36:02",
+    "last_page_load_local": "2026-10-31T17:37:45",
+    "last_http_local": "2026-10-31T17:39:23",
+    "session_end_utc": "2026-10-31T16:39:36Z"
+  },
+  "page_loads": [
+    {
+      "local_time": "2026-10-31T17:36:02",
+      "query": "?autorun=1",
+      "mode": "crash (default)",
+      "duration_until_next_seconds": 16
+    },
+    {
+      "local_time": "2026-10-31T17:36:18",
+      "query": "?autorun=1&mode=crash",
+      "mode": "crash",
+      "duration_until_next_seconds": 43
+    },
+    {
+      "local_time": "2026-10-31T17:37:01",
+      "query": "?autorun=1&mode=probe&probe=1",
+      "mode": "probe=1",
+      "duration_until_next_seconds": 44
+    },
+    {
+      "local_time": "2026-10-31T17:37:45",
+      "query": "?autorun=1&mode=probe&probe=2",
+      "mode": "probe=2",
+      "duration_until_next_seconds": 58
+    }
+  ],
+  "module_graph": {
+    "loaded_each_page_load": [
+      "/poc.js",
+      "/module/utils.mjs",
+      "/module/constants.mjs",
+      "/module/int64.mjs",
+      "/module/mem.mjs",
+      "/module/rw.mjs",
+      "/module/offset.mjs"
+    ],
+    "status": 200,
+    "content_type": "text/javascript; charset=utf-8",
+    "note": "All four page loads fetched the same module graph successfully. The remaining PoC modules were not requested by these modes."
+  },
+  "poc_logs": {
+    "owner_report": "Only Attempt lines were visible in the page's Load logs view.",
+    "stage1_triggered_reported": false,
+    "alert": false,
+    "highest_attempt_count": null,
+    "highest_attempt_count_note": "Not recorded; the log panel was not exported."
+  },
+  "console_behavior": {
+    "page_stayed": true,
+    "alert_or_crash": false,
+    "reboot_or_hang": false,
+    "owner_report": "The page stayed; no alert or crash; the console returned to normal.",
+    "dns_reverted_to_automatic": true,
+    "dns_revert_source": "owner confirmation after the run"
+  },
+  "protocol": {
+    "approved": "One bounded public-PoC page load, 300 s maximum, no repeats.",
+    "actual": "Four page loads in four modes over 227 s; each mode was reloaded after 16-58 s.",
+    "deviation": true,
+    "deviation_note": "The PoC's buttons reload the page in different modes; the owner used all three buttons after the initial autorun load."
+  },
+  "interpretation": "The pinned public PoC was served and its module graph executed on the applet. The page logged only Attempt lines, and no Stage 1 trigger, alert, crash, reboot, or hang occurred in any of the four short modes. This is not a clean negative for CVE-2023-28205: the approved single-run protocol was not followed, each mode was reloaded after 16-58 s, and the highest attempt count is unknown. It does show that the PoC's module graph loads and the loop runs, but it does not establish whether the build is patched or whether a longer single run would trigger the UAF.",
+  "limitations": [
+    "Protocol deviation: four page loads in four modes instead of one bounded page load; the heap and PoC state were reset at each reload.",
+    "Each mode ran only 16-58 seconds; the highest Attempt count was not recorded, so the PoC may not have run long enough to reach Stage 1.",
+    "The page's localStorage log was not exported; the Stage 1 result rests on the owner's Load logs view.",
+    "No crash dump or fault address was produced, so the result cannot distinguish a patched build from PoC incompatibility.",
+    "The exact WebKit patch level remains unknown, and Nintendo may have backported the MarkedVector fix.",
+    "A browser compromise would be applet-level only and would not reach Atmosphère without a separate kernel or boot-stage chain."
+  ],
+  "redactions": [
+    "Serial number truncated to a three-character prefix.",
+    "The full local JSONL log is not committed.",
+    "No credentials, tokens, or Nintendo account data were collected."
+  ],
+  "evidence_refs": [
+    "E-113"
+  ],
+  "sources": [
+    "switchbrew-internet-browser",
+    "github-uaf-2023-28205"
+  ]
+}
