@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "observation_id": "2026-10-31-webkit-w1",
+  "observed_at": "2026-10-31T16:12:02Z",
+  "observed_at_precision": "exact to the runner session start; console HTTP timestamps are local UTC+1",
+  "phase_window": "2026-10-31T16:12:02Z to 2026-10-31T16:13:32Z",
+  "observation_type": "d2-w1-webkit-reachability",
+  "operator": "macOS host running the local DNS/HTTP runner; the console owner performed the console steps",
+  "console": {
+    "model": "HEG-001",
+    "model_source": "owner manual confirmation; PTP DeviceInfo reports the generic model 'Nintendo Switch'",
+    "firmware_reported_by_user": "23.0.1",
+    "firmware_observed": null,
+    "firmware_observation_note": "The console was not enumerated during this test; the firmware value is the owner's report.",
+    "serial_prefix": "XTJ",
+    "ever_opened_or_modchipped": false,
+    "modification_source": "owner report; this test does not detect modifications"
+  },
+  "connection": {
+    "mode": "webkit-captive-portal-w1",
+    "host_os": "macOS 26.3",
+    "host_arch": "arm64",
+    "mac_lan_ip": "192.168.178.167",
+    "console_ip": "192.168.178.136",
+    "console_network": "owner's home Wi-Fi; security not recorded",
+    "dns": "manual primary DNS to the Mac; secondary DNS the router or automatic",
+    "http": "local runner on TCP 80; DNS on UDP 53"
+  },
+  "page": {
+    "path": "scripts/webkit_probe.html",
+    "sha256": "8b03e77729b1d0e130e786b08c4c54fe9eaff5dabd3228c2e127e3201173ae7b",
+    "title": "Network check",
+    "url": "http://192.168.178.167/portal",
+    "user_agent": "Mozilla/5.0 (Nintendo Switch; WifiWebAuthApplet) AppleWebKit/613.0 (KHTML, like Gecko) NF/6.0.3.31.11 NintendoBrowser/5.1.0.55481",
+    "screen": [
+      1280,
+      720,
+      1280,
+      648,
+      32,
+      32,
+      1
+    ],
+    "window": [
+      1280,
+      648,
+      1280,
+      648,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "session": {
+    "log": "research/hardware-observations/webkit-portal-20261031T161202Z.local.jsonl",
+    "log_kept_local": true,
+    "log_lines": 67,
+    "duration_seconds_observed": 90,
+    "duration_limit_seconds": 300,
+    "counts": {
+      "dns": 30,
+      "http": 35,
+      "http_get": 12,
+      "http_post": 23,
+      "probe": 1,
+      "reachability": 1,
+      "heartbeat": 20,
+      "done": 1,
+      "error": 0,
+      "unhandledrejection": 0
+    },
+    "dns_name": "ctest.cdn.nintendo.net",
+    "first_http_local": "2026-10-31T17:12:05",
+    "page_load_local": "2026-10-31T17:12:35",
+    "last_http_local": "2026-10-31T17:13:30",
+    "session_end_utc": "2026-10-31T16:13:32Z"
+  },
+  "reachability": {
+    "event": "reachability",
+    "ok": true,
+    "marker": 4660,
+    "mapSize": 1,
+    "dateValue": 0,
+    "features": {
+      "postMessage": true,
+      "messageChannel": true,
+      "messagePort": true,
+      "broadcastChannel": true,
+      "worker": true,
+      "structuredClone": true,
+      "origin": "http://192.168.178.167",
+      "moduleScript": true,
+      "Map": true,
+      "Date": true,
+      "localStorage": true,
+      "sessionStorage": true,
+      "indexedDB": true,
+      "WebAssembly": false,
+      "SharedArrayBuffer": false,
+      "Atomics": false,
+      "WebGLRenderingContext": false,
+      "WebGL2RenderingContext": false,
+      "Intl": false,
+      "crypto.subtle": false
+    }
+  },
+  "console_behavior": {
+    "page_reported_done": true,
+    "crash_or_reboot": false,
+    "hang": false,
+    "owner_report": "normal, no crash; the console returned to normal",
+    "dns_reverted_to_automatic": true,
+    "dns_revert_source": "owner confirmation after the run"
+  },
+  "interpretation": "The applet executes a local page and deserializes a Map/Date graph through postMessage. This passes the W1 reachability gate for CVE-2023-28205: the required API surface is present and the structured-clone path completes without an error. It does not show that the build is vulnerable to the CVE, that the MarkedVector fix is absent, or that a crash is reachable. The no-JIT, no-WebAssembly, no-WebGL, no-SharedArrayBuffer, no-Intl, and no-crypto.subtle results are consistent with the 2026-10-26 fingerprint and with the Safari 15.4-15.6 feature bracket.",
+  "limitations": [
+    "One console, one run, one page load. W1 is a reachability test, not a vulnerability test.",
+    "No PoC was served and no exploit was attempted. A patched build can still pass this test.",
+    "The exact WebKit patch level remains unknown; Nintendo may have backported the CVE-2023-28205 fix.",
+    "The log is kept local because it contains request headers and console network identifiers.",
+    "A browser compromise would be applet-level only and would not reach Atmosphère without a separate kernel or boot-stage chain."
+  ],
+  "redactions": [
+    "Serial number truncated to a three-character prefix.",
+    "The full local JSONL log is not committed.",
+    "No credentials, tokens, or Nintendo account data were collected."
+  ],
+  "evidence_refs": [
+    "E-112"
+  ],
+  "sources": [
+    "switchbrew-internet-browser",
+    "github-uaf-2023-28205"
+  ]
+}

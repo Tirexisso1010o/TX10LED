@@ -26,12 +26,34 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Sequence
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LOG = ROOT / "research" / "hardware-observations" / "browser-fingerprint.local.jsonl"
 
 QTYPE_A = 1
 QTYPE_AAAA = 28
+
+# Explicit types for the module graph of a local PoC. ``mimetypes`` does not
+# reliably map ``.mjs`` on every platform, and a module served as text/plain is
+# rejected by the browser.
+SITE_MIME = {
+    ".html": "text/html; charset=utf-8",
+    ".htm": "text/html; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".mjs": "text/javascript; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".wasm": "application/wasm",
+    ".map": "application/json; charset=utf-8",
+    ".txt": "text/plain; charset=utf-8",
+}
 QCLASS_IN = 1
 
 PAGE = """<!doctype html>
@@ -166,6 +188,26 @@ class DnsServer(threading.Thread):
                 self.sock.sendto(response, peer)
 
 
+def resolve_site_file(root: Path, request_path: str) -> Path | None:
+    """Resolve a URL path under ``root``, rejecting traversal and missing files."""
+
+    root = root.resolve()
+    name = unquote(urlsplit(request_path).path).lstrip("/")
+    if not name or name.endswith("/"):
+        name += "index.html"
+    if "\x00" in name or "\\" in name:
+        return None
+    # Do not serve dotfiles or dot-directories (for example ``.git/config``).
+    if any(part.startswith(".") for part in name.split("/") if part):
+        return None
+    candidate = (root / name).resolve()
+    if candidate != root and root not in candidate.parents:
+        return None
+    if not candidate.is_file():
+        return None
+    return candidate
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "TX10Lab/1.0"
 
@@ -207,7 +249,48 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _serve_site(self) -> None:
+        site = self.server.site_dir  # type: ignore[attr-defined]
+        if site is None:
+            self.send_error(404)
+            return
+        if urlsplit(self.path).path == "/":
+            location = f"http://{self.server.answer_ip}/portal"  # type: ignore[attr-defined]
+            entry_query = self.server.entry_query  # type: ignore[attr-defined]
+            if entry_query:
+                location += "?" + entry_query.lstrip("?")
+            self._record(served="redirect")
+            self.send_response(302)
+            self.send_header("Location", location)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        request_path = "/index.html" if urlsplit(self.path).path == "/portal" else self.path
+        candidate = resolve_site_file(site, request_path)
+        if candidate is None:
+            self.send_error(404)
+            return
+        body = candidate.read_bytes()
+        content_type = (
+            SITE_MIME.get(candidate.suffix.lower())
+            or mimetypes.guess_type(candidate.name)[0]
+            or "application/octet-stream"
+        )
+        self._record(
+            served="site",
+            site=str(candidate.relative_to(site.resolve())),
+        )
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self) -> None:
+        if self.server.site_dir is not None:  # type: ignore[attr-defined]
+            self._serve_site()
+            return
         if self.path.startswith("/assets/"):
             self._serve_asset()
             return
@@ -251,12 +334,16 @@ class HttpServer(ThreadingHTTPServer):
         log,
         page_file: Path | None = None,
         assets_dir: Path | None = None,
+        site_dir: Path | None = None,
+        entry_query: str | None = None,
     ) -> None:
         super().__init__(address, handler)
         self.answer_ip = answer_ip
         self._log = log
         self.page_file = page_file
         self.assets_dir = assets_dir
+        self.site_dir = site_dir.resolve() if site_dir is not None else None
+        self.entry_query = entry_query
 
     def page_bytes(self) -> bytes:
         if self.page_file is not None:
@@ -312,7 +399,32 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=None,
         help="Serve files under /assets/ from this directory.",
     )
+    parser.add_argument(
+        "--site",
+        type=Path,
+        default=None,
+        help="Serve a static site at /portal and its files at the URL root.",
+    )
+    parser.add_argument(
+        "--entry-query",
+        default=None,
+        help="Query string appended to the /portal redirect in site mode.",
+    )
     args = parser.parse_args(argv)
+
+    if args.entry_query and args.site is None:
+        print("--entry-query requires --site", file=sys.stderr)
+        return 1
+    if args.site is not None:
+        if args.page_file is not None or args.assets is not None:
+            print(
+                "--site cannot be combined with --page-file or --assets",
+                file=sys.stderr,
+            )
+            return 1
+        if not (args.site / "index.html").is_file():
+            print(f"site index not found: {args.site / 'index.html'}", file=sys.stderr)
+            return 1
 
     answer_ip = args.answer_ip or detect_ip()
     log = make_logger(args.log)
@@ -334,6 +446,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             log,
             args.page_file,
             args.assets,
+            args.site,
+            args.entry_query,
         )
     except OSError as exc:
         print(

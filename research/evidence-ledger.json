@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-30",
+  "last_reviewed": "2026-10-31",
   "entries": [
     {
       "id": "E-001",
@@ -1533,6 +1533,20 @@
       "evidence": "The review compared the applet's fingerprint (E-058, E-061, E-063) with public WebKit advisories and PoCs. CVE-2023-28205 is a JavaScriptCore SerializedScriptValue/CloneDeserializer use-after-free fixed by WebKit commit c9880de (MarkedVector); the public PoC uses postMessage with Map/Date objects and targets WebKit-613.1.17.1. JIT-dependent candidates (CVE-2022-42856, CVE-2023-37450, CVE-2023-41993, CVE-2024-23222, CVE-2024-44308) were excluded because the applet shows no JIT warm-up. CVE-2022-32912 was excluded because the applet has no WebGL. CVE-2023-32409 and CVE-2025-24201 were excluded as sandbox escapes that are not first-stage primitives. CVE-2024-44309 is an XSS/cookie issue. CVE-2024-27834 and CVE-2025-31201 are PAC bypasses and Switch 1 has no PAC. CVE-2025-31200 is a CoreAudio APAC decoder bug, not WebKit, and the codec is not expected on the Switch. CVE-2022-32893 remains a secondary candidate but has no public PoC in the reviewed sources. CVE-2023-4863 was already tested inconclusively in D7.",
       "limitations": "The review is a desk exercise. The public PoC's crash analysis is from a PlayStation WebKit process, not the Switch. The Switch build may include a Nintendo backport of the MarkedVector fix. A browser crash would be applet-level only and would not reach Atmosph\u00e8re without a separate kernel/boot-stage chain. No console page was loaded and no exploit content was served.",
       "last_reviewed": "2026-10-30"
+    },
+    {
+      "id": "E-112",
+      "claim": "W1 passed on 2026-10-31: the Switch 1 WifiWebAuthApplet loaded the local probe page and completed a postMessage structured-clone round-trip. The reachability event reported ok=true, marker=4660, mapSize=1, and dateValue=0. Map, Date, localStorage, postMessage, MessageChannel, MessagePort, BroadcastChannel, Worker, structuredClone, and ES modules were present. No error or unhandledrejection event occurred; the page sent 20 heartbeats and a done event. The console behaved normally, and the owner reverted DNS to Automatic.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "D2 W1 on 2026-10-31. One console page load on the owner's home Wi-Fi, with the console's primary DNS temporarily set to the Mac at 192.168.178.167. The runner served scripts/webkit_probe.html (SHA-256 8b03e77729b1d0e130e786b08c4c54fe9eaff5dabd3228c2e127e3201173ae7b). No PoC was served and no exploit was attempted.",
+      "sources": [
+        "switchbrew-internet-browser",
+        "github-uaf-2023-28205"
+      ],
+      "evidence": "The console at 192.168.178.136 made 30 DNS queries for ctest.cdn.nintendo.net, fetched /portal at 17:12:35 local, and posted a probe event at 16:12:38.494Z and a reachability event at 16:12:38.516Z. The reachability result was {ok: true, marker: 4660, mapSize: 1, dateValue: 0}; the features object reported postMessage, messageChannel, messagePort, broadcastChannel, worker, structuredClone, origin=http://192.168.178.167, and moduleScript=true. The probe's full feature report also showed Map, Date, localStorage, sessionStorage, indexedDB, and fetch present; WebAssembly, SharedArrayBuffer, Atomics, WebGL, Intl, and crypto.subtle absent. The page sent 20 heartbeats at two-second intervals and a done event at 16:13:18.169Z. The log contains 67 lines: 30 DNS, 35 HTTP (23 POST /fp and 12 GET), and no error or unhandledrejection events. The owner confirmed the console behaved normally and DNS was reverted to Automatic.",
+      "limitations": "One console, one run, one page load. This is a reachability result, not a vulnerability result: a patched build can pass it. No PoC was served, no crash was induced, and the exact WebKit patch level remains unknown. The full JSONL log is local-only because it contains request headers and console network identifiers. A browser compromise would be applet-level only.",
+      "last_reviewed": "2026-10-31"
     }
   ]
 }

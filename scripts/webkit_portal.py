@@ -9,9 +9,10 @@ This wraps ``scripts/captive_portal.py`` with:
 * a loopback self-test that needs neither root nor a console;
 * a printed, reversible console runbook.
 
-It serves one local page. It does not proxy Nintendo traffic, forward
-packets, capture credentials, or send exploit content. The console test is a
-single page load, not an exploit run.
+It serves one local page, or a static site with ``--site`` for a separately
+approved PoC run. It does not proxy Nintendo traffic, forward packets, or
+capture credentials. W1 is a single reachability page load; serving a PoC is a
+separate, explicitly approved step.
 """
 
 from __future__ import annotations
@@ -127,6 +128,13 @@ def preflight(
 
     if not args.page.is_file():
         errors.append(f"page file not found: {args.page}")
+    if args.site is not None:
+        if not args.site.is_dir():
+            errors.append(f"site directory not found: {args.site}")
+        elif not (args.site / "index.html").is_file():
+            errors.append(f"site index not found: {args.site / 'index.html'}")
+    if args.entry_query and args.site is None:
+        errors.append("--entry-query requires --site")
     if args.duration < 0:
         errors.append("--duration must be zero or greater")
     port_specs: list[tuple[int, str]] = []
@@ -180,6 +188,8 @@ def render_runbook(
     log_path: Path,
     duration: int,
     bind_host: str | None = None,
+    site: Path | None = None,
+    entry_query: str | None = None,
 ) -> str:
     duration_text = f"{duration} s (auto-stop)" if duration else "until Ctrl-C"
     lines = [
@@ -188,6 +198,10 @@ def render_runbook(
     ]
     if bind_host is not None:
         lines.append(f"  Bind       : {bind_host}")
+    if site is not None:
+        lines.append(f"  Site       : {site}")
+    if entry_query:
+        lines.append(f"  Entry      : /portal?{entry_query.lstrip('?')}")
     lines.extend(
         [
             f"  DNS        : {answer_ip}:{dns_port} (UDP)",
@@ -225,6 +239,95 @@ def dns_query(name: str, qtype: int = 1) -> bytes:
         + question
         + struct.pack("!HH", qtype, 1)
     )
+
+
+def site_local_test(
+    portal, entry_query: str | None = None
+) -> tuple[bool, str]:
+    """Exercise static-site serving and traversal protection on loopback."""
+
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory) / "site"
+        root.mkdir()
+        (root / "index.html").write_text(
+            '<!doctype html><script type="module" src="./mod.mjs"></script>',
+            encoding="utf-8",
+        )
+        (root / "mod.mjs").write_text("export const answer = 42;\n", encoding="utf-8")
+        (Path(directory) / "secret.txt").write_text("secret\n", encoding="utf-8")
+        log_path = Path(directory) / "site.jsonl"
+        log = portal.make_logger(log_path, echo=False)
+        httpd = portal.HttpServer(
+            ("127.0.0.1", 0),
+            portal.Handler,
+            "127.0.0.1",
+            log,
+            None,
+            None,
+            root,
+            entry_query,
+        )
+        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        thread.start()
+        port = httpd.server_address[1]
+
+        def get(path: str):
+            conn = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            try:
+                conn.request("GET", path)
+                response = conn.getresponse()
+                return response.status, dict(response.getheaders()), response.read()
+            finally:
+                conn.close()
+
+        try:
+            status, headers, _ = get("/")
+            expected = "/portal"
+            if entry_query:
+                expected += "?" + entry_query.lstrip("?")
+            if status != 302 or not headers.get("Location", "").endswith(expected):
+                return False, "site redirect query"
+            status, _, body = get("/portal")
+            if status != 200 or b"mod.mjs" not in body:
+                return False, "site index"
+            status, headers, body = get("/mod.mjs")
+            if status != 200 or not headers.get("Content-Type", "").startswith(
+                "text/javascript"
+            ):
+                return False, "module MIME type"
+            if b"42" not in body:
+                return False, "module body"
+            status, _, _ = get("/../secret.txt")
+            if status != 404:
+                return False, "path traversal"
+            status, _, _ = get("/.git/config")
+            if status != 404:
+                return False, "dotfile blocking"
+            conn = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            try:
+                conn.request(
+                    "POST",
+                    "/fp",
+                    body=b'{"event":"site-selftest"}',
+                    headers={"Content-Type": "application/json"},
+                )
+                response = conn.getresponse()
+                response.read()
+            finally:
+                conn.close()
+            if response.status != 204:
+                return False, "site fingerprint POST"
+            entries = [
+                json.loads(line)
+                for line in log_path.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            if not any(entry.get("served") == "site" for entry in entries):
+                return False, "site request not logged"
+            return True, f"site HTTP 127.0.0.1:{port}"
+        finally:
+            httpd.shutdown()
+            httpd.server_close()
 
 
 def local_test(args: argparse.Namespace) -> int:
@@ -306,15 +409,23 @@ def local_test(args: argparse.Namespace) -> int:
                 print("local self-test: FAIL (POST not logged)", file=sys.stderr)
                 return 1
 
-            print("local self-test: PASS")
+            print("page self-test: PASS")
             print(f"  DNS  127.0.0.1:{dns_port}")
             print(f"  HTTP 127.0.0.1:{http_port}")
             print(f"  log entries: {len(entries)}")
-            return 0
         finally:
             httpd.shutdown()
             httpd.server_close()
             dns.sock.close()
+
+    ok, message = site_local_test(portal, "autorun=1")
+    if not ok:
+        print(f"local self-test: FAIL ({message})", file=sys.stderr)
+        return 1
+    print("site self-test: PASS")
+    print(f"  {message}")
+    print("local self-test: PASS")
+    return 0
 
 
 def run_session(args: argparse.Namespace) -> int:
@@ -333,6 +444,8 @@ def run_session(args: argparse.Namespace) -> int:
             "dns_port": args.dns_port,
             "http_port": args.http_port,
             "page": str(args.page),
+            "site": str(args.site) if args.site is not None else None,
+            "entry_query": args.entry_query,
             "duration": args.duration,
         }
     )
@@ -350,6 +463,8 @@ def run_session(args: argparse.Namespace) -> int:
             log,
             args.page,
             args.assets,
+            args.site,
+            args.entry_query,
         )
     except OSError as exc:
         print(
@@ -368,6 +483,8 @@ def run_session(args: argparse.Namespace) -> int:
             log_path,
             args.duration,
             bind_host,
+            args.site,
+            args.entry_query,
         ),
         flush=True,
     )
@@ -403,6 +520,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--page", type=Path, default=DEFAULT_PAGE)
     parser.add_argument("--assets", type=Path, default=None)
     parser.add_argument(
+        "--site",
+        type=Path,
+        default=None,
+        help="Serve a static site at /portal and its files at the URL root.",
+    )
+    parser.add_argument(
+        "--entry-query",
+        default=None,
+        help="Query string appended to the /portal redirect in site mode.",
+    )
+    parser.add_argument(
         "--bind",
         default=None,
         help="Address to bind; defaults to the Mac LAN address.",
@@ -418,6 +546,16 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.local_test:
         return local_test(args)
+
+    if args.site is not None:
+        args.site = args.site.resolve()
+        if args.assets is not None:
+            print("--site cannot be combined with --assets", file=sys.stderr)
+            return 1
+        if args.page != DEFAULT_PAGE:
+            print("--site cannot be combined with --page", file=sys.stderr)
+            return 1
+        args.page = args.site / "index.html"
 
     try:
         answer_ip = args.answer_ip or lan_ip()
@@ -444,6 +582,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             log_path,
             args.duration,
             bind_host,
+            args.site,
+            args.entry_query,
         )
     )
     for note in notes:

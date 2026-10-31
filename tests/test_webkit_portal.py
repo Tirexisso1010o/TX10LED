@@ -30,6 +30,8 @@ def make_args(**overrides) -> argparse.Namespace:
     values = {
         "page": portal.DEFAULT_PAGE,
         "assets": None,
+        "site": None,
+        "entry_query": None,
         "bind": "127.0.0.1",
         "answer_ip": "127.0.0.1",
         "dns_port": 0,
@@ -113,6 +115,12 @@ class PreflightTests(unittest.TestCase):
         errors, _ = portal.preflight(make_args(answer_ip="not-an-ip"), "127.0.0.1")
         self.assertTrue(any("--answer-ip" in error for error in errors))
 
+    def test_entry_query_requires_site(self) -> None:
+        errors, _ = portal.preflight(
+            make_args(entry_query="autorun=1"), "127.0.0.1"
+        )
+        self.assertTrue(any("--entry-query requires --site" in error for error in errors))
+
     @unittest.skipIf(
         not hasattr(os, "geteuid") or os.geteuid() == 0,
         "root can bind low ports",
@@ -152,6 +160,97 @@ class RunbookTests(unittest.TestCase):
             0,
         )
         self.assertIn("until Ctrl-C", text)
+
+    def test_site_mode_is_shown(self) -> None:
+        text = portal.render_runbook(
+            "192.168.178.167",
+            53,
+            80,
+            Path("/tmp/site/index.html"),
+            Path("/tmp/session.jsonl"),
+            300,
+            "192.168.178.167",
+            Path("/tmp/site"),
+        )
+        self.assertIn("Site", text)
+        self.assertIn("/tmp/site", text)
+
+    def test_entry_query_is_shown(self) -> None:
+        text = portal.render_runbook(
+            "192.168.178.167",
+            53,
+            80,
+            Path("/tmp/site/index.html"),
+            Path("/tmp/session.jsonl"),
+            300,
+            "192.168.178.167",
+            Path("/tmp/site"),
+            "autorun=1",
+        )
+        self.assertIn("/portal?autorun=1", text)
+
+
+class SiteTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.captive = portal.load_portal()
+
+    def test_resolve_serves_index_for_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "index.html").write_text("ok", encoding="utf-8")
+            resolved = self.captive.resolve_site_file(root, "/")
+        self.assertEqual(resolved, (root / "index.html").resolve())
+
+    def test_resolve_rejects_traversal(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            root = base / "site"
+            root.mkdir()
+            (root / "index.html").write_text("ok", encoding="utf-8")
+            (base / "secret.txt").write_text("secret", encoding="utf-8")
+            plain = self.captive.resolve_site_file(root, "/../secret.txt")
+            encoded = self.captive.resolve_site_file(root, "/%2e%2e/secret.txt")
+        self.assertIsNone(plain)
+        self.assertIsNone(encoded)
+
+    def test_resolve_rejects_missing_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "index.html").write_text("ok", encoding="utf-8")
+            resolved = self.captive.resolve_site_file(root, "/missing.mjs")
+        self.assertIsNone(resolved)
+
+    def test_resolve_rejects_dotfiles(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "index.html").write_text("ok", encoding="utf-8")
+            (root / ".git").mkdir()
+            (root / ".git" / "config").write_text("secret", encoding="utf-8")
+            dotgit = self.captive.resolve_site_file(root, "/.git/config")
+            dotenv = self.captive.resolve_site_file(root, "/.env")
+        self.assertIsNone(dotgit)
+        self.assertIsNone(dotenv)
+
+    def test_site_local_test_passes(self) -> None:
+        ok, message = portal.site_local_test(self.captive, "autorun=1")
+        self.assertTrue(ok, message)
+
+    def test_preflight_accepts_site(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "index.html").write_text("ok", encoding="utf-8")
+            errors, _ = portal.preflight(
+                make_args(site=root, page=root / "index.html"), "127.0.0.1"
+            )
+        self.assertEqual(errors, [])
+
+    def test_preflight_rejects_missing_site_index(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            errors, _ = portal.preflight(
+                make_args(site=root, page=root / "index.html"), "127.0.0.1"
+            )
+        self.assertTrue(any("site index not found" in error for error in errors))
 
 
 class LocalTestTests(unittest.TestCase):

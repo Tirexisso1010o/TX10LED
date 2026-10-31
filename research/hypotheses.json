@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-30",
+  "last_reviewed": "2026-10-31",
   "purpose": "Falsifiable research hypotheses for a software-only Atmosph\u00e8re path on Mariko firmware 23.0.1. Each record states what would confirm or kill it, so a negative result is recorded instead of being rediscovered.",
   "status_legend": [
     {
@@ -203,7 +203,7 @@
       "expected_signal": "A browser build old enough to match a published, exploitable n-day, plus a reachable applet invocation.",
       "kill_criteria": "The browser build is patched for all matching public advisories, or no applet invocation can be reached without a modified console.",
       "risks": "Captive-portal testing changes the console's temporary network settings, which are reversible. Exploit development is out of scope and untested.",
-      "blocked_by": null,
+      "blocked_by": "W2 needs explicit approval; the static-site harness is ready and the public PoC revision is pinned.",
       "evidence": [
         "E-026",
         "E-028",
@@ -213,7 +213,8 @@
         "E-061",
         "E-063",
         "E-064",
-        "E-111"
+        "E-111",
+        "E-112"
       ],
       "sources": [
         "switchbrew-internet-browser",
@@ -229,11 +230,11 @@
         "nvd-cve-2022-32893",
         "webkit-bugzilla-243557"
       ],
-      "last_reviewed": "2026-10-30",
+      "last_reviewed": "2026-10-31",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "Originally closed negative on 2026-10-26 after the timing probe found no JIT warm-up and no public non-JIT proof of concept was found. Reopened on 2026-10-30: a read-only review found CVE-2023-28205, a JavaScriptCore SerializedScriptValue/CloneDeserializer use-after-free that does not require a JIT and is reachable through postMessage with Map/Date objects. The public MIT-licensed PoC targets WebKit-613.1.17.1; the applet's feature set brackets Safari 15.4-15.6 and its UA token is AppleWebKit/613.0. The PoC has not been run on the console. The local captive-portal harness and probe are ready; W1 (reachability) and W2 (bounded PoC crash check) require separate approval.",
-      "uncertainties": "Whether the applet's postMessage path can deserialize a Map/Date graph; whether Nintendo backported the MarkedVector fix into the 2026 NetFront build; whether the public PoC's PlayStation crash translates to the Switch; whether a crash would be controllable or only a denial of service. A browser compromise remains applet-level and cannot reach Atmosph\u00e8re without a separate kernel or boot-stage chain.",
+      "results": "Originally closed negative on 2026-10-26 after the timing probe found no JIT warm-up and no public non-JIT proof of concept was found. Reopened on 2026-10-30: a read-only review found CVE-2023-28205, a JavaScriptCore SerializedScriptValue/CloneDeserializer use-after-free that does not require a JIT and is reachable through postMessage with Map/Date objects. The public MIT-licensed PoC targets WebKit-613.1.17.1; the applet's feature set brackets Safari 15.4-15.6 and its UA token is AppleWebKit/613.0. The PoC has not been run on the console. The local captive-portal harness and probe are ready; W1 (reachability) required separate approval and passed, while W2 (the bounded PoC crash check) still requires approval. W1 passed on 2026-10-31: the applet loaded the local probe page and round-tripped a Map/Date graph through postMessage (ok=true, mapSize=1, dateValue=0), with postMessage, MessageChannel, BroadcastChannel, Worker, structuredClone, localStorage, and ES modules present. No error event occurred and the console behaved normally. This confirms the reachability gate only; the CVE-2023-28205 crash check (W2) has not been run.",
+      "uncertainties": "Whether Nintendo backported the MarkedVector fix into the 2026 NetFront build; whether the public PoC's PlayStation crash translates to the Switch; whether a crash would be controllable or only a denial of service. The applet's postMessage Map/Date round-trip is now confirmed. A browser compromise remains applet-level and cannot reach Atmosph\u00e8re without a separate kernel or boot-stage chain.",
       "resolution": "open"
     },
     {
