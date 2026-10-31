@@ -20,11 +20,11 @@
     "notes": "The owner manually confirmed the model, firmware, serial prefix, and no modification history on 2026-10-26. PTP GetDeviceInfo on the same date observed firmware 23.0.1 and serial prefix XTJ*** with 10 operations and no session. The DeviceInfo model string is generic ('Nintendo Switch'), so the HEG-001 model number and no-modification history remain owner-reported. PTP does not prove OLED-versus-LCD hardware, integrity, or exploitability. Do not update the firmware to verify it."
   },
   "conclusion": {
-    "claim": "A publicly documented, reproducible software-only path to Atmosph\u00e8re exists for an unmodified Switch OLED on firmware 23.0.1.",
+    "claim": "A publicly documented, reproducible software-only path to fs-level native code execution exists for an unmodified Switch OLED on firmware 23.0.1.",
     "claim_status": "DISPROVEN",
     "software_only_path_documented": false,
     "scope": "Reviewed public documentation as of 2026-10-31.",
-    "summary": "No publicly documented, reproducible software-only path to Atmosph\u00e8re was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosph\u00e8re 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. Read-only inspection on 2026-10-31 confirmed the public repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets; the macOS wrapper and maintained forks are also Switch 2-only. GameShare (the splay applet) is recorded as a newly reviewed receiver-side surface: a documented remote-input path with no public vulnerability and an applet-level capability ceiling.",
+    "summary": "No publicly documented, reproducible software-only path to Atmosph\u00e8re was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosph\u00e8re 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. Read-only inspection on 2026-10-31 confirmed the public repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets; the macOS wrapper and maintained forks are also Switch 2-only. GameShare (the splay applet) is recorded as a newly reviewed receiver-side surface: a documented remote-input path with no public vulnerability and an applet-level capability ceiling. On 2026-10-31 the success criterion was narrowed to fs-level native code execution; boot-stage CFW is no longer required. No public fs-level chain was found for the target.",
     "undisclosed_exploit_status": "UNKNOWN",
     "evidence": [
       "E-007",
@@ -37,7 +37,9 @@
       "E-043",
       "E-048",
       "E-114",
-      "E-115"
+      "E-115",
+      "E-117",
+      "E-118"
     ]
   },
   "entry_point_analysis": {
@@ -46,7 +48,7 @@
     "surfaces_reviewed": 11,
     "software_only_surfaces": 10,
     "public_software_only_chain_on_target": false,
-    "documented_route": "Hardware modchip (out of scope)",
+    "documented_route": "No public software-only route to fs-level native code; ns2jb is the closest public artifact.",
     "closest_public_lead": "L-001",
     "closest_public_lead_name": "ns2jb",
     "notes": "Detailed surface-by-surface analysis, access requirements, and fixed public flaws are in research/entry-points.json. This matrix keeps only the higher-level compatibility record."

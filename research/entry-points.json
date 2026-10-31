@@ -18,21 +18,22 @@
     "note": "Owner-confirmed manually on 2026-10-26. PTP GetDeviceInfo on the same date observed firmware 23.0.1 and serial prefix XTJ*** with 10 operations and no session. The DeviceInfo model string is generic; the HEG-001 model number and no-modification history remain owner-reported. See research/hardware-observations/2026-10-26-manual.json, research/hardware-observations/2026-10-26-ptp.json, and research/compatibility-matrix.json. Do not update the firmware to verify it."
   },
   "summary": {
-    "question": "Is there a publicly documented, reproducible, software-only entry point to Atmosph\u00e8re on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",
-    "answer": "No publicly documented, reproducible software-only entry point was found in the reviewed public sources as of 2026-10-31.",
+    "question": "Is there a publicly documented, reproducible, software-only path to fs-level native code execution on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",
+    "answer": "No publicly documented, reproducible software-only path to fs-level native code execution was found in the reviewed public sources as of 2026-10-31.",
     "status": "DISPROVEN",
     "scope": "Public documentation reviewed on 2026-10-31. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
     "software_only_public_chain_on_target": false,
-    "documented_route": "Hardware modchip (out of scope for this software-only project)",
+    "documented_route": "No public software-only route to fs-level native code on the OLED; the closest public artifact is ns2jb on Switch 2. A hardware modchip remains the documented route to Atmosph\u00e8re, which is no longer required for this goal.",
     "closest_public_lead": "L-001",
     "closest_public_lead_name": "ns2jb",
-    "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1: the repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets. The macOS wrapper and maintained forks are also Switch 2-only and still require SmileBASIC. It does not provide kernel or bootROM access and is not documented on OLED/Mariko 23.0.1.",
+    "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1: the repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets. The macOS wrapper and maintained forks are also Switch 2-only and still require SmileBASIC. It does not provide kernel or bootROM access and is not documented on OLED/Mariko 23.0.1. Its fs-level ceiling matches the narrowed goal.",
     "undisclosed_method_status": "UNKNOWN",
     "notes": [
       "Firmware compatibility is a separate axis: Atmosph\u00e8re 1.12.1 and hekate v6.5.4 support 23.0.1, but neither provides an entry point.",
       "The only documented route for patched/Mariko consoles is a hardware modchip, which is outside this project's scope.",
       "The surface matrix records what is publicly documented; it does not claim that any surface is unexploitable.",
-      "GameShare is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. It is recorded as EP-011 / L-006; no public vulnerability exists for it."
+      "GameShare is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. It is recorded as EP-011 / L-006; no public vulnerability exists for it.",
+      "Success criterion narrowed on 2026-10-31: native code execution as fs (tethered) is sufficient; boot-stage CFW is not required."
     ]
   },
   "field_notes": {

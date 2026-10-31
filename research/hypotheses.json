@@ -555,6 +555,45 @@
       "results": "Phase 1 baseline completed on 2026-10-29 (E-105): the console obtained DHCP lease 192.168.77.94 and queried ctest.cdn.nintendo.net on both the open and WPA2 APs. Phase 4 control C and D-01 completed on 2026-10-29 (E-110): the valid control passed the DHCP/DNS stages and failed at the internet step with 2110-3129; D-01 (DHCPOFFER option 1 length 0) caused 2110-2963 with no crash and a normal 30.1-second association lifetime. The first D-01 attempt was inconclusive because the AP data path wedged, and D-02-D-08 plus the DNS cases were not completed because the adapter data path remained intermittent. H-012 remains UNVERIFIED.",
       "uncertainties": "Whether the console uses IPv6 on the test AP; whether the TLS connectivity-test flow reaches a local listener; whether malformed data reaches the parser before certificate or protocol validation; whether the 23.0.0 bsdsocket fix covers the tested AddrInfo paths; whether the ssl sysmodule uses a patched NSS build.",
       "resolution": "open"
+    },
+    {
+      "id": "H-013",
+      "title": "Free applet-to-fs path trigger on Switch 1",
+      "stage": "2",
+      "surface": "EP-008",
+      "component": "System applets (album, browser) and the fs sysmodule IFileSystem GetEntryType / Path::Normalize path",
+      "hypothesis": "A system applet on Switch 1 23.0.1 may pass a user-controlled path containing a '..\\' component to the fs sysmodule's IFileSystem GetEntryType command, triggering the same Path::Normalize buffer overflow described in ns2jb without SmileBASIC.",
+      "status": "UNVERIFIED",
+      "confidence": "low",
+      "applies_to_target": true,
+      "prerequisites": [
+        "A system applet that calls GetEntryType on a user-influenced path (album enumeration, browser download/cache, or a similar free surface)",
+        "A sacrificial SD card or a local captive-portal page, depending on the surface",
+        "Explicit approval for the bounded active test",
+        "The Switch 1 fs binary to turn a confirmed crash into code execution"
+      ],
+      "expected_capability": "At most a crash or memory corruption in the fs sysmodule. It would be a stage-1-to-stage-2 trigger, not code execution by itself; exploiting the overflow still requires the Switch 1 fs binary and heap grooming.",
+      "test_procedure": "Build a FAT32 image with a control image and one crafted long filename containing a '..\\' component under a path the album enumerates, mount it on a sacrificial card, and open the album. If the album does not call GetEntryType on the path, try a captive-portal page that offers a download with a crafted filename. Send no malformed fs commands; observe only for a crash, hang, reboot, or fs error.",
+      "expected_signal": "The console crashes, hangs, or reboots while the applet enumerates or opens the crafted path, or fs returns an unexpected error. Clean enumeration and normal behavior are a negative.",
+      "kill_criteria": "The applet rejects or sanitizes the path, does not call GetEntryType on it, or the console remains normal through the bounded test.",
+      "risks": "The console may hang or crash in an applet or in fs. Recovery is a reboot; the SD card is sacrificial and no console data is written. Do not run without approval.",
+      "blocked_by": "No active test has been approved, and a confirmed trigger would still need the Switch 1 fs binary and exploit to reach code execution.",
+      "evidence": [
+        "E-045",
+        "E-114",
+        "E-118"
+      ],
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "switchbrew-filesystem",
+        "switchbrew-nca"
+      ],
+      "last_reviewed": "2026-10-31",
+      "hardware": "HEG-001 (Mariko)",
+      "firmware": "23.0.1",
+      "results": "Not tested. Proposed only; no console interaction, no SD-card write, and no page load.",
+      "uncertainties": "Whether any free applet calls GetEntryType on a user-controlled path; whether the 23.0.1 Switch 1 fs contains the same 0x301-byte Path::Normalize overflow; whether a confirmed crash can be developed into code execution without the fs binary.",
+      "resolution": "blocked"
     }
   ]
 }
