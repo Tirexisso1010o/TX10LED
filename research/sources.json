@@ -958,6 +958,39 @@
       "snapshot": "Forum guide: match the 16-byte Nintendo/Contents/private value in system save 8000000000000043 and take the next 16 bytes as the SD seed.",
       "license": "Forum guide; cited, not redistributed.",
       "notes": "Community guide, not authoritative. Used only to explain why the card's private file is not the seed."
+    },
+    {
+      "id": "tarnkappe-gezine",
+      "title": "Gezine entdeckt Userland-Exploit für Nintendo Switch 1 & 2",
+      "publisher": "Tarnkappe.info",
+      "kind": "news",
+      "url": "https://tarnkappe.info/artikel/jailbreaks/gezine-entdeckt-userland-exploit-fuer-nintendo-switch-1-2-331326.html",
+      "retrieved_at": "2026-11-01",
+      "snapshot": "Published 2026-07-11. Reports an ARM64 ROP-based userland exploit for Switch 1 and Switch 2, offline, without WebKit or save data. Quotes Gezine's correction that 20.0.0+ firmware is needed on Switch 2 to enable Switch 1 compatibility, and that a physical cartridge with 20.0.0 firmware is needed to update manually.",
+      "license": "News article; cited, not redistributed.",
+      "notes": "Used to correct the firmware-floor claim: 20.0.0+ applies to Switch 2's Switch 1 compatibility mode, not to Switch 1 itself."
+    },
+    {
+      "id": "switch2unlock-gezine-cartridge",
+      "title": "Gezine says there is a physical-cartridge exploit",
+      "publisher": "Switch2Unlock",
+      "kind": "news",
+      "url": "https://switch2unlock.com/en/news/gezine-cartucho/",
+      "retrieved_at": "2026-11-01",
+      "snapshot": "Published 2026-10-22 and labelled rumor/unconfirmed. Reports Gezine saying SmileBASIC 4 is not strictly needed, that an exploit is based on a physical game cartridge, and that an untethered jailbreak may be possible. States none of it is released.",
+      "license": "Independent news site; cited, not redistributed.",
+      "notes": "Used only to record the October claims and their unconfirmed status."
+    },
+    {
+      "id": "wccftech-untethered",
+      "title": "Nintendo Switch 2's First Jailbreak Already Has YouTube Running on the Console, and an Untethered Exploit Is Reportedly Next",
+      "publisher": "Wccftech",
+      "kind": "news",
+      "url": "https://www.wccftech.com/nintendo-switch-2-first-jailbreak-untethered-exploit-next/",
+      "retrieved_at": "2026-11-01",
+      "snapshot": "Published 2026-10-26. Reports a Gezine untethered concept for Switch 2: an installer that plants the exploit chain in save data and triggers on the next boot, providing userland-level access. Does not describe a Switch 1 package or a public release.",
+      "license": "News article; cited, not redistributed.",
+      "notes": "Used to distinguish the Switch 2 untethered concept from the July Switch 1/2 userland claim."
     }
   ],
   "last_reviewed": "2026-10-31"

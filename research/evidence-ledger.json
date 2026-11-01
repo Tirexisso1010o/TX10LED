@@ -660,16 +660,17 @@
     },
     {
       "id": "E-048",
-      "claim": "Gezine claims a Switch 1/2 userland exploit that is neither WebKit-based nor save-based, works offline across firmware versions, and remains unreleased with no public technical details.",
+      "claim": "Gezine claims a Switch 1/2 userland exploit that is neither WebKit-based nor save-based, works offline, uses an ARM64 ROP-based approach and avoids the PAC-protected WebKit path, and remains unreleased with no public code or technical write-up.",
       "status": "UNVERIFIED",
       "confidence": "low",
       "scope": "A claimed but unpublished userland entry point.",
       "sources": [
-        "wccftech-gezine-userland"
+        "wccftech-gezine-userland",
+        "tarnkappe-gezine"
       ],
-      "evidence": "Wccftech quotes Gezine saying 'I created Switch 1/2 userland exploit that is not webkit or save exploit', that existing save-based userland exploits require online save transfer, and that this one works offline and across all firmware versions. The same article describes it as a userland starting point rather than a full jailbreak.",
-      "limitations": "No code, advisory, technical write-up, or independent reproduction was found. The claim does not identify the vulnerable component or the Switch 1 model and firmware. It cannot be treated as a method.",
-      "last_reviewed": "2026-10-26"
+      "evidence": "Wccftech quotes Gezine saying 'I created Switch 1/2 userland exploit that is not webkit or save exploit', that existing save-based userland exploits require online save transfer, and that this one works offline and across all firmware versions. Tarnkappe describes the bug as based on ARM64 ROP. Gezine separately said Switch 2 WebKit's ARM PAC makes ROP harder, so he chose an easier path. Tarnkappe also quotes his correction: 'To use this exploit You will need 20.0.0+ fw at switch 2 to enable switch 1 compatibility. Any physical cartridge with 20.0.0 fw will be needed to manually update fw.' That correction makes 20.0.0+ a Switch 2 compatibility requirement, not a Switch 1 firmware floor.",
+      "limitations": "No code, advisory, technical write-up, CVE, or independent reproduction was found as of 2026-11-01. The claim does not identify the vulnerable component, the compromised process, the Switch 1 model/firmware, or any fs-level primitive. It cannot be treated as a method. It would not by itself provide kernel, bootROM, Atmosph\u00e8re, or fs-sysmodule code execution.",
+      "last_reviewed": "2026-11-01"
     },
     {
       "id": "E-049",
@@ -1722,6 +1723,21 @@
       "evidence": "The card is a 31.9 GB FAT32 volume with Nintendo/Album (empty), Nintendo/Contents/registered (four NCA containers: 19,968; 389,632; 165,376; 1,748,484,096 bytes), and Nintendo/save (8000000000000000, 1,916,928 bytes; 8000000000000124, 21,413,888 bytes). The NCA data files are <hash>.nca/00 and do not decrypt to NCA3 with the global header key; their first bytes are high-entropy. Nintendo/Contents/private is 16 bytes; the SD-seed system save 8000000000000043 is absent. The save files are high-entropy. Most prod.keys are global (master_key, titlekek, key_area_key_application, header_key, and sd_card_nca_key_source are reusable across consoles), but the NAX0 key derivation also requires the per-console sd_seed, and save data uses per-console save keys. The local sd_seed belongs to the source console, not the OLED.",
       "limitations": "If the card came from the lost 23.0.1 source console, its sd_seed in the local prod.keys might decrypt the NAX0 headers; this was not tested. If the card is the OLED's, the seed is internal and unavailable without CFW. No title IDs or key generations are claimed.",
       "last_reviewed": "2026-10-31"
+    },
+    {
+      "id": "E-126",
+      "claim": "As of 2026-11-01 Gezine's Switch 1/2 userland exploit has no public release, repository, technical write-up, or reproduction. Gezine's public GitHub contains no Switch exploit project, and the October physical-cartridge and untethered-jailbreak claims are Switch 2-specific and unreleased.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Public release status checked on 2026-11-01 against Gezine's GitHub API listing and three news sources.",
+      "sources": [
+        "tarnkappe-gezine",
+        "switch2unlock-gezine-cartridge",
+        "wccftech-untethered"
+      ],
+      "evidence": "The GitHub API lists 12 public repositories, most recently updated 2026-11-01; all are PS4/PS5 or general tooling (Y2JB, BD-JB5, Luac0re, elfldr, ftpsrv, remote_lua_loader, sdk, kexp). ArtemisLuaLoader, the closest Switch-related repo, was archived on 2025-06-06 and is a savedata Lua loader, not the claimed exploit. No Switch 1 package, offsets, or payload exist. Switch2Unlock labels the 2026-10-22 physical-cartridge and untethered claims 'Rumor / unconfirmed' and says none of it is released. Wccftech describes the untethered concept as a Switch 2 save-data installer providing userland-level access, not a Switch 1 package.",
+      "limitations": "Absence of public code at the time of checking does not prove no private work exists, and the author may release later. The 20.0.0+ figure is a Switch 2 compatibility requirement (E-048), not evidence about Switch 1 23.0.1. The exploit's target process and primitives are unknown, so its usefulness for reaching the fs sysmodule cannot be assessed.",
+      "last_reviewed": "2026-11-01"
     }
   ]
 }

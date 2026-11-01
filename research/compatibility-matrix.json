@@ -357,16 +357,17 @@
     {
       "id": "C-022",
       "component": "Gezine universal userland exploit claim",
-      "version": "Claimed Switch 1/2, all firmware; unreleased",
+      "version": "Claimed Switch 1/2; unreleased as of 2026-11-01",
       "dimension": "Entry point",
       "status": "UNVERIFIED",
       "applies_to_target": true,
       "in_scope": true,
       "evidence": [
         "E-048",
-        "E-049"
+        "E-049",
+        "E-126"
       ],
-      "notes": "A userland claim with no public package, technical detail, or reproduction. Even if accurate, it would not by itself provide kernel, bootROM, CFW, or Atmosph\u00e8re."
+      "notes": "A userland claim with no public package, technical detail, CVE, or reproduction. The 20.0.0+ floor is a Switch 2's Switch 1 compatibility mode, not a Switch 1 floor. Even if released, it would be a stage-1 game/process primitive, not fs-level code execution; reaching fs still needs a second-stage fs bug. It would not by itself provide kernel, bootROM, CFW, or Atmosph\u00e8re."
     },
     {
       "id": "C-023",

@@ -12,7 +12,7 @@ Only `ns2jb` has a technically credible port path, and it is not buildable from 
 | **`mac2jb`** | **Host-side only** | Its USB typing and RPC wrapper could in principle drive a Switch 1 chain, but it supplies no target-side chain. It also requires SIP disabled and an unsigned kernel extension, which this project does not authorize. |
 | **WebKit port** | **No code to modify** | Unpublished, Switch 2-specific, and the Switch 1 browser is a different, older build. The *approach* is a research idea, not a port. |
 | **MintBrew / HBLauncher / GPUBrewLauncher / OunceCake / ftpd-sb / Stremio** | **Downstream** | They need a working `ns2jb` session first. They add no independent entry point. |
-| **Gezine universal userland** | **Nothing to modify** | Unreleased and unverified. If it ships as claimed it is the best future lead, but it is userland only. |
+| **Gezine universal userland** | **Nothing to modify** | Unreleased and unverified as of 2026-11-01: no public repo, write-up, CVE, or reproduction. The `20.0.0+` floor is a Switch 2 requirement for Switch 1 compatibility mode, not a Switch 1 floor. If it ships as claimed it is the best future stage-1 lead, but it is userland only and reaching `fs` would still need a second-stage fs bug. |
 | **Atmosphère 1.12.1 / hekate v6.5.4** | **Not an entry point** | Firmware-compatible, but on an OLED they still require a modchip. |
 
 ## What the author actually demonstrated on Switch 1
@@ -63,7 +63,7 @@ The modded 22.0.0 console could theoretically supply an older `fs` binary, but t
 1. The author publishes a Switch 1 package, or a Switch 1 bootstrap/offsets/payload.
 2. The owner owns SmileBASIC 4.4.9, or a free Switch 1 entry point appears.
 3. A Switch 1 `23.0.1` `fs` binary becomes available from an owner-controlled source.
-4. Gezine releases the claimed universal userland exploit.
+4. Gezine releases the claimed universal userland exploit, with code or a write-up identifying the target process and primitives. (As of 2026-11-01 there is no public release; `E-126`.)
 
 Even then, the result is stage 1–2: native code as `fs`, not kernel, bootROM, CFW, or persistence. Stage 3 remains the decisive missing link.
 
