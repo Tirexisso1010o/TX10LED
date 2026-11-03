@@ -284,7 +284,7 @@ It is bounded by four things:
 - **Stage gap.** The public chain stops at native ROP in the game process. Reaching `fs` needs a separate Switch 1 `fs` bug, an IPC trigger, and the missing Switch 1 `fs` binary.
 - **Destructive option.** The installer wipes Civ VII saves and is not needed for a loader test.
 
-**This is a stage-1 artifact, not an fs-level chain.** No fs escalation is public.
+**This is a stage-1 artifact, not an fs-level chain.** No fs escalation is public. On 2026-11-03 the owner kept the free-only rule and declined the cartridge, the Pico, and the loader test, so this remains a monitoring-only lead.
 
 ## Historical leads
 

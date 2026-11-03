@@ -87,7 +87,7 @@ CivSwitch 1.0 (2026-11-01, MIT) is a public XSS toolchain for the **Switch 1 edi
 | Does it provide kernel, bootROM, CFW, or persistence? | **No.** It is native code in the game process. |
 | Does it change the conclusion for the OLED? | **Not yet.** It closes stage 1 in principle, but the fs stage and the Switch 1 `fs` binary are still missing. |
 
-The optional `installer-creator` writes `XSTRIG.Civ7Save` and wipes `save:/saves/Single/`; it is not needed for a session-only loader test. The cartridge, the Pico, and any console test are not authorized. Recorded as `L-008`, `EP-012`, `C-038`, `E-127`, and `E-128`.
+The optional `installer-creator` writes `XSTRIG.Civ7Save` and wipes `save:/saves/Single/`; it is not needed for a session-only loader test. The owner kept the free-only rule on 2026-11-03 and declined the cartridge, the Pico, and the loader test. Recorded as `L-008`, `EP-012`, `C-038`, `E-127`, and `E-128`.
 
 ## GameShare as a receiver-side surface
 

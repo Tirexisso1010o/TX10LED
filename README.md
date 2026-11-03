@@ -8,7 +8,7 @@ A source-backed investigation into a potential software-only Atmosphère jailbre
 
 A WebKit n-day assessment is now set up. The local captive-portal runner and probe are validated on loopback, and `CVE-2023-28205` (a no-JIT JavaScriptCore structured-clone use-after-free) is the top public candidate. W1 passed on 2026-10-31: the console loaded the probe and round-tripped a `Map`/`Date` graph through `postMessage` (`ok=true`, `mapSize=1`, `dateValue=0`), with the required APIs and ES modules present. The W2 exploratory run on 2026-10-31 loaded the pinned public PoC in four short modes; the module graph loaded, but the page logged only `Attempt` lines and produced no Stage 1 trigger, alert, crash, reboot, or hang. The run deviated from the single-load protocol, so it is not a clean negative; the candidate is deprioritized. A browser compromise would be stage 1 only; see [`docs/WEBKIT-NDAY-PLAN.md`](docs/WEBKIT-NDAY-PLAN.md).
 
-On 2026-11-03, CivSwitch 1.0 was recorded as the closest public **Switch 1 stage-1** lead. It is an MIT-licensed XSS toolchain for the Switch 1 edition of Civilization VII 1.0.0 physical cartridge: a chat XSS reaches the game's embedded V8, a pointer-compression exploit gives arbitrary read/write, and a ROP chain calls native game/SDK functions and exposes a TCP JavaScript loader on port 9026. It is not fs-level, the public code has no fs payload, and Switch 1 23.0.1 is claimed but untested (Switch 1 22.5.0 is the only tested Switch 1 firmware). It requires a paid 1.0.0 cartridge, a Pico RP2040/RP2350 USB HID, English(US) settings, and a local-wireless lobby; the optional installer wipes `save:/saves/Single/`. No purchase or console test is authorized.
+On 2026-11-03, CivSwitch 1.0 was recorded as the closest public **Switch 1 stage-1** lead. It is an MIT-licensed XSS toolchain for the Switch 1 edition of Civilization VII 1.0.0 physical cartridge: a chat XSS reaches the game's embedded V8, a pointer-compression exploit gives arbitrary read/write, and a ROP chain calls native game/SDK functions and exposes a TCP JavaScript loader on port 9026. It is not fs-level, the public code has no fs payload, and Switch 1 23.0.1 is claimed but untested (Switch 1 22.5.0 is the only tested Switch 1 firmware). It requires a paid 1.0.0 cartridge, a Pico RP2040/RP2350 USB HID, English(US) settings, and a local-wireless lobby; the optional installer wipes `save:/saves/Single/`. The owner kept the free-only rule on 2026-11-03 and declined the purchase and console test.
 
 This repository does not contain a working exploit, a payload, or a flashing tool. It is a potential-jailbreak research ledger and a read-only USB inspection tool.
 
@@ -101,7 +101,7 @@ The install route is the blocker: a hacked Switch 1 seed must install the editor
 
 The SD card is not a bypass for the OLED: its NCA/save content is NAX0/console-encrypted, and the OLED's SD seed is in its internal system save, not on the card. Most `prod.keys` are global, but the NAX0 layer also needs the per-console `sd_seed`, and save data uses per-console save keys. If this card is from the lost source console, the source `sd_seed` might decode it, but that still does not deliver the save to the OLED. Only the FAT tree is readable (`E-125`). The owner's only hacked Switch 1 is on 22.0.0, the 23.0.1 source console is gone, and the modded 22.0.0 console is off-limits by prior decision. The OLED is 23.0.1 and can install the free demo, but cannot receive the editor save without the seed/transfer.
 
-**Future-proofing:** installing the free demo on the OLED is harmless and keeps the option open; it is not an exploit. Do not transfer a modified save or update the seed console without explicit approval. See `L-007`, `H-014`, `E-122`, `E-123`, `E-124`, and `E-125`.
+**Future-proofing:** the owner approved installing the free demo on the OLED on 2026-11-03 as a normal eShop user action. It is harmless and keeps the option open; it is not an exploit. Do not transfer a modified save or update the seed console without explicit approval. See `L-007`, `H-014`, `E-122`, `E-123`, `E-124`, and `E-125`.
 
 ## New public stage-1 lead: CivSwitch (2026-11-01)
 
@@ -122,7 +122,7 @@ Its limits matter:
 - **Firmware.** The README claims Switch 1/2 20.x.x–23.0.1; Switch 1 22.5.0 and Switch 2 20.4.0/23.0.1 are the tested configurations. Switch 1 23.0.1 is **claimed but untested**.
 - **Destructive optional installer.** `installer-creator` writes `XSTRIG.Civ7Save` and wipes every file in `save:/saves/Single/`. It is not needed for a session-only loader test.
 
-**Status:** recorded as `L-008`, `EP-012`, and `C-038`; evidence `E-127`/`E-128`. The project's no-paid-games rule and the lack of a Switch 1 `fs` binary still block any fs-level follow-up. A non-destructive loader test would need explicit approval for the cartridge, the Pico, and the console session.
+**Status:** recorded as `L-008`, `EP-012`, and `C-038`; evidence `E-127`/`E-128`. The owner kept the free-only rule on 2026-11-03 and declined the cartridge, the Pico, and the loader test. The lack of a Switch 1 `fs` binary still blocks any fs-level follow-up.
 
 ## WebKit n-day assessment (2026-10-31)
 

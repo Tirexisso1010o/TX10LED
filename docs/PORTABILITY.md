@@ -31,7 +31,7 @@ CivSwitch is not a Switch 2 progression, so it is not a port candidate in the ta
 
 For the fs-level goal, CivSwitch changes the stage-1 picture but not the stage-2 blocker. It supplies a userland process with native code and arbitrary read/write in principle, but it is tied to the Civ VII 1.0.0 game build, the public code has no fs escalation, and the exact Switch 1 23.0.1 `fs` binary is still missing. A CivSwitch-to-`fs` chain would be original work: derive the fs anchors, confirm the `Path::Normalize` bug on Switch 1 23.0.1, and build an IPC trigger from the game process.
 
-**Status:** recorded as `L-008`, `EP-012`, `C-038`, `E-127`, `E-128`. The paid cartridge, the Pico, and a console test are not authorized.
+**Status:** recorded as `L-008`, `EP-012`, `C-038`, `E-127`, `E-128`. The owner kept the free-only rule on 2026-11-03 and declined the paid cartridge, the Pico, and the console test.
 
 ## What the author actually demonstrated on Switch 1
 
