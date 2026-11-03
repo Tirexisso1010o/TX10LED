@@ -10,6 +10,8 @@ The general Wi-Fi/network plan (`D10`) has completed **Phase 0, Phase 1, Phase 2
 
 The research conclusion is that an unmodified Switch OLED has no publicly documented, reproducible software-only path to Atmosphère. The safe response is not to try increasingly invasive workarounds. It is to stop, document the state, and use a documented route only if you deliberately choose to accept its risks.
 
+The CivSwitch repository was inspected **read-only** on 2026-11-03. No cartridge was purchased, no Pico was flashed, and no payload was run on the console. A purchase or a loader test requires explicit approval and is covered by the risk table below.
+
 ## Prohibited actions
 
 Do not use this repository to:
@@ -69,6 +71,9 @@ It binds the Mac's LAN address on UDP 53 and TCP 80 so the console's **Test Conn
 | Serve the browser download capability probe (`H-013`) | Low; one page load; feature detection only; no download click or crafted filename | Explicit approval for the page load; use the narrow portal exception; revert DNS immediately; follow [`H-013-BROWSER-PROBE-PLAN.md`](H-013-BROWSER-PROBE-PLAN.md) |
 | Serve the file-picker capability probe (`H-013`) | Low; one page load; the owner selects a benign SD-card file; the page reads only name/size/type; no contents sent or written | Executed once on 2026-10-31; the applet returned “The file selection is not supported”; no file selected, no contents read; no repeat |
 | Install the free Seedsow Lullaby demo on the OLED | Low; eShop software install; no exploit; reversible through Data Management | User action; no modified save or transfer; check region/availability |
+| Buy a used Civilization VII 1.0.0 physical cartridge and a Pico RP2040/RP2350 | Low–medium; a purchase and external USB HID hardware; the cartridge version must be exactly 1.0.0; no console modification | Not authorized; requires explicit approval to relax the no-paid-games rule and buy the Pico |
+| Run the CivSwitch Pico loader on the OLED (session-only) | Medium; types an exploit payload into a game, may crash the game or console, and opens a TCP JavaScript loader; non-destructive to saves only if `installer-creator` is not used | Not authorized; separate explicit approval; loader only, no installer, record the outcome, and stop on a crash or hang |
+| Run CivSwitch `installer-creator` | High; wipes every file in `save:/saves/Single/` and writes a boot-persistent `XSTRIG.Civ7Save` trigger | Not authorized; separate explicit approval after a verified save backup; not needed for a session-only loader test |
 | Use JKSV on the modded 22.0.0 seed and Nintendo's official save transfer | Medium; touches the modded console, account/network, and save state | Not authorized; separate explicit approval; Nintendo requires the latest system version, so the 22.0.0 seed is blocked as-is (`E-124`) |
 | Update the modded 22.0.0 seed console to 23.0.1 | High; irreversible firmware change; may affect the modchip/CFW and the owner's prior no-update decision | Not authorized; separate explicit approval; currently prohibited |
 | Run the Switch 2 `ns2jb` package, `mac2jb`, or a fork on the OLED | High; the package is hardcoded for Switch 2 and would fail or crash, and `mac2jb` additionally requires disabling SIP and loading an unsigned kernel extension | Prohibited; the package is not a Switch 1 port. Read-only inspection is allowed (`E-114`, `E-115`) |
@@ -127,6 +132,10 @@ The tool never requires RCM for identity inspection.
 - Do not factory-reset or initialize the console. A browser crash is not a storage problem.
 - If a crash report or error code appears, copy it before rebooting and do not repeat the page load.
 - Record the page hash, the last portal log event, and whether the console rebooted. A crash is a signal to triage offline, not a jailbreak.
+
+### The console is unresponsive after a CivSwitch loader test
+
+The CivSwitch loader is a game-process exploit. If the game crashes or the console hangs after the Pico types the payload, do not retry blindly. Hold the power button until the console powers off, wait ten seconds, and power it on normally. The game may have unsaved progress; do not run `installer-creator` as a recovery step. If the console boots but the game save is damaged, restore it only from a backup the owner made before the test. Record the observed screen, error code, and whether the console rebooted. Do not attempt fs escalation from a crashed state.
 
 ### The console is unresponsive after the H-013 card test
 

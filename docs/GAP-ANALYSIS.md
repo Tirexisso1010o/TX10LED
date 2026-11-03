@@ -27,7 +27,7 @@ Atmosphère is a **boot-time** CFW. A runtime kernel exploit can patch a running
 | Stage | Public status on Mariko 23.0.1 | Closest public artifact |
 |---|---|---|
 | 0. Trigger | **Unavailable to this owner** | `ns2jb` needs SmileBASIC 4.4.9 (or the 4.4.6 demo), which was delisted and is not owned; the public package is Switch 2-only (`E-114`, `E-115`) |
-| 1. Initial execution | **Not publicly demonstrated on Switch 1 23.0.1** | `ns2jb`'s SmileBASIC integer overflow; the author got ROP on a Switch 1, but no package or firmware is public (`E-117`) |
+| 1. Initial execution | **Public stage-1 primitive exists, but not on Switch 1 23.0.1** | CivSwitch 1.0: chat XSS → V8 arbitrary read/write → native ROP in the Civilization VII 1.0.0 game process. Switch 1 22.5.0 tested; Switch 1 23.0.1 claimed but untested; paid cartridge and Pico required (`E-127`, `E-128`). `ns2jb`'s SmileBASIC ROP remains Switch 1-unpackaged (`E-117`). |
 | 2. Privilege escalation | **Not publicly demonstrated on Switch 1 23.0.1** | `ns2jb`'s `fs` `Path::Normalize` overflow, packaged for Switch 2; no Switch 1 `fs` binary in the dump (`E-118`) |
 | 3. Boot stage | **Nothing public** | Caffeine, a warmboot exploit for **Erista 4.0.0–4.1.0 only**; not required for fs-level |
 | 4. Launch | Packages exist, launch path missing | Atmosphère 1.12.1 and hekate v6.5.4 support 23.0.1 |
@@ -35,6 +35,8 @@ Atmosphère is a **boot-time** CFW. A runtime kernel exploit can patch a running
 Stage 4 is the only stage with maintained software behind it — Atmosphère and hekate exist and support 23.0.1 — but it has nothing to hand off to without stage 3. Stage 3 is empty.
 
 > **Seedsow Lullaby update (2026-10-31):** a free-demo game-level Lua primitive exists and bypasses SmileBASIC, but it is stage 1, not fs-level. The save transfer needs a hacked 23.0.1 seed; the owner's seed is 22.0.0. See `L-007`/`H-014`.
+
+> **CivSwitch update (2026-11-03):** a public Switch 1 stage-1 primitive now exists. CivSwitch 1.0 uses a Civilization VII 1.0.0 chat XSS to reach V8, arbitrary read/write, and native ROP in the game process (`E-127`). It is still not fs-level: the public code has no fs payload or privilege escalation. It needs a paid 1.0.0 physical cartridge and a Pico USB HID, and Switch 1 23.0.1 is claimed but untested (`E-128`). The stage-2 blocker is unchanged: no Switch 1 `fs` binary and no CivSwitch-to-`fs` chain.
 
 ## Stage 3 is the one people forget
 
@@ -89,6 +91,7 @@ So "userland is fine" is true only for the first meaning. For the second meaning
 | Candidate | What it actually gives | Why it does not close stage 1 |
 |---|---|---|
 | Artemis Engine save loading | Lua script execution inside a game, chain-loaded from a save file | Documented for PS4 and Windows; requires placing a crafted save on the console; yields game-script level, not native code; no Switch reproduction |
+| CivSwitch / Civilization VII chat XSS | Native ROP in the game process, with arbitrary read/write and a TCP JavaScript loader | Public and MIT-licensed, but stage 1 only; needs a paid 1.0.0 cartridge and a Pico; Switch 1 23.0.1 claimed but untested; no fs payload (`E-127`, `E-128`) |
 | GameShare / `splay` | A Switch 2 host feeds a system applet data to parse | No public vulnerability; needs a Switch 2 host; applet-level even if broken |
 | Browser / WebKit applets | A userland primitive in an applet | No public 23.0.1 chain; a browser bug would still only be stage 1 |
 | Save and cartridge exploits | Game-context execution | No public native-code chain on 23.0.1 |
@@ -98,7 +101,7 @@ None of these is dismissed as impossible. Each is recorded as a surface with no 
 
 ## What would actually move this forward
 
-1. **A Switch 1 package of `ns2jb`.** This would close stage 0 and possibly stages 1–2 for a console that owns SmileBASIC. It would still not be Atmosphère, because stage 3 remains.
+1. **A Switch 1 package of `ns2jb`.** This would close stage 0 and possibly stages 1–2 for a console that owns SmileBASIC. It would still not be Atmosphère, because stage 3 remains. CivSwitch now supplies an alternative stage-1 input, but it does not supply the `fs` stage or a Switch 1 `fs` binary.
 2. **A public Mariko warmboot or pre-Horizon bug on modern firmware.** This is the decisive missing piece. It is also the piece no public source currently hints at.
 3. **A public kernel exploit for 23.x plus a launch method.** A kernel exploit alone is not enough, and none is public for this firmware.
 

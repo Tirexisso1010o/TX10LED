@@ -991,7 +991,62 @@
       "snapshot": "Published 2026-10-26. Reports a Gezine untethered concept for Switch 2: an installer that plants the exploit chain in save data and triggers on the next boot, providing userland-level access. Does not describe a Switch 1 package or a public release.",
       "license": "News article; cited, not redistributed.",
       "notes": "Used to distinguish the Switch 2 untethered concept from the July Switch 1/2 userland claim."
+    },
+    {
+      "id": "civswitch-repository",
+      "title": "Gezine/CivSwitch: CivSwitch 1.0",
+      "publisher": "GitHub / Gezine",
+      "kind": "source-code",
+      "url": "https://github.com/Gezine/CivSwitch",
+      "retrieved_at": "2026-11-03",
+      "snapshot": "README, repository tree, and release 1.0 (2026-11-01) retrieved 2026-11-03. MIT. XSS toolchain for the Switch 1 edition of Civilization VII; only the 1.0.0 physical cartridge is supported. Claims Switch 1/2 firmware 20.x.x through 23.0.1; tested on Switch 1 22.5.0 and Switch 2 20.4.0/23.0.1. Includes PicoSwitch (RP2040/RP2350 USB HID), core.js (V8 exploit and ROP), send_js.py, and installer-creator.",
+      "license": "MIT for project code; game content retains its own rights.",
+      "notes": "Used to record L-008/EP-012. The public code is stage 1 only; it contains no fs sysmodule payload. Switch 1 23.0.1 is claimed but not tested."
+    },
+    {
+      "id": "civswitch-core-js",
+      "title": "CivSwitch core.js: chat XSS to V8 read/write and native ROP",
+      "publisher": "GitHub / Gezine",
+      "kind": "source-code",
+      "url": "https://raw.githubusercontent.com/Gezine/CivSwitch/main/core.js",
+      "retrieved_at": "2026-11-03",
+      "snapshot": "60,695-byte JavaScript payload retrieved 2026-11-03. Uses V8 pointer compression, addrof/fakeobj, arbitrary read/write, a ROP chain with game main-image and SDK gadgets, call_rop, and nn::socket functions; starts a TCP JavaScript loader on port 9026. No fs IPC or fs sysmodule payload.",
+      "license": "MIT for project code.",
+      "notes": "Read-only inspection. The ROP offsets are for the Civ VII 1.0.0 game build, not for a system sysmodule."
+    },
+    {
+      "id": "civswitch-pico-readme",
+      "title": "CivSwitch PicoSwitch (Macro build)",
+      "publisher": "GitHub / Gezine",
+      "kind": "documentation",
+      "url": "https://github.com/Gezine/CivSwitch/blob/main/PicoSwitch/README.md",
+      "retrieved_at": "2026-11-03",
+      "snapshot": "RP2040/RP2350 firmware that acts as a Switch gamepad and USB keyboard macro and types the Civ VII chat-XSS payload once, about 10 s after boot. The shipped payload is the Remote JS Loader bootstrap, about 87 typed lines and about 15-20 minutes. Build presets are pico1 and pico2.",
+      "license": "MIT for project code.",
+      "notes": "The Pico is an external USB HID device, not a console modification. The README says the chat eval context is synchronous and the payload must not use top-level await."
+    },
+    {
+      "id": "civswitch-installer-readme",
+      "title": "CivSwitch installer-creator",
+      "publisher": "GitHub / Gezine",
+      "kind": "documentation",
+      "url": "https://github.com/Gezine/CivSwitch/blob/main/installer-creator/README.md",
+      "retrieved_at": "2026-11-03",
+      "snapshot": "Installer that uploads a save template to the Remote JS Loader, splices a compressed payload into the currentTurnDate record, wipes every file in save:/saves/Single/, writes save:/saves/Single/XSTRIG.Civ7Save, and commits. Optional boot-persistent trigger; not needed for a session-only loader test.",
+      "license": "MIT for project code.",
+      "notes": "Destructive to Civilization VII save data. Do not run without a separate approval and a backup."
+    },
+    {
+      "id": "civswitch-gbatemp",
+      "title": "CivSwitch offers a new offline entrypoint for Switch 2 homebrew",
+      "publisher": "GBAtemp",
+      "kind": "news",
+      "url": "https://gbatemp.net/news/civswitch-offers-a-new-offline-entrypoint-for-switch-2-homebrew.686115/",
+      "retrieved_at": "2026-11-03",
+      "snapshot": "Published 2026-11-01. Reports Gezine's CivSwitch release, quotes the README's physical 1.0.0 cartridge requirement and Pico installer, and notes the game was readily available in the UK for about \u00a330 at publication.",
+      "license": "News article; cited, not redistributed.",
+      "notes": "Used for release date, public reception, and the approximate used-cartridge price. The article frames the release for Switch 2 homebrew, but the quoted README is for the Switch 1 edition."
     }
   ],
-  "last_reviewed": "2026-10-31"
+  "last_reviewed": "2026-11-03"
 }

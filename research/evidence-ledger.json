@@ -1738,6 +1738,37 @@
       "evidence": "The GitHub API lists 12 public repositories, most recently updated 2026-11-01; all are PS4/PS5 or general tooling (Y2JB, BD-JB5, Luac0re, elfldr, ftpsrv, remote_lua_loader, sdk, kexp). ArtemisLuaLoader, the closest Switch-related repo, was archived on 2025-06-06 and is a savedata Lua loader, not the claimed exploit. No Switch 1 package, offsets, or payload exist. Switch2Unlock labels the 2026-10-22 physical-cartridge and untethered claims 'Rumor / unconfirmed' and says none of it is released. Wccftech describes the untethered concept as a Switch 2 save-data installer providing userland-level access, not a Switch 1 package.",
       "limitations": "Absence of public code at the time of checking does not prove no private work exists, and the author may release later. The 20.0.0+ figure is a Switch 2 compatibility requirement (E-048), not evidence about Switch 1 23.0.1. The exploit's target process and primitives are unknown, so its usefulness for reaching the fs sysmodule cannot be assessed.",
       "last_reviewed": "2026-11-01"
+    },
+    {
+      "id": "E-127",
+      "claim": "CivSwitch 1.0 is a public MIT-licensed Switch 1 game-process exploit for Civilization VII 1.0.0 physical cartridge. A chat XSS runs JavaScript in the game's embedded V8 context, a pointer-compression exploit provides addrof/fakeobj and arbitrary read/write, and a ROP chain calls native game/SDK functions and exposes a TCP JavaScript loader on port 9026. It is stage 1 only: the public code contains no fs sysmodule payload or privilege escalation.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only inspection of Gezine/CivSwitch release 1.0, README, core.js, PicoSwitch, and installer-creator on 2026-11-03. No code was run on a console.",
+      "sources": [
+        "civswitch-repository",
+        "civswitch-core-js",
+        "civswitch-pico-readme"
+      ],
+      "evidence": "The repository was created 2026-10-28 and release 1.0 was published 2026-11-01. core.js (60,695 bytes) implements V8 pointer-compression primitives, addrof/fakeobj, arbitrary read/write, a ROP chain built from game main-image and SDK gadgets, call_rop, and nn::socket Socket/Bind/Listen/Accept/Connect/Recv/Send/Close wrappers. It starts a TCP listener on port 9026 and evaluates JavaScript received over it. The README describes the chain as an XSS toolchain for the Switch 1 edition of Civilization VII, with the Pico typing a chat payload and the Remote JS Loader running for that session. A repository tree and grep found no fs IPC calls, no fs sysmodule payload, and no privilege-escalation stage.",
+      "limitations": "The ROP offsets are for the Civ VII 1.0.0 game build; they do not establish system-firmware compatibility. Switch 1 23.0.1 is claimed but the README lists only Switch 1 22.5.0 as tested. The public code is a game-process primitive, not fs-level. No independent reproduction on a Switch 1 23.0.1 was found.",
+      "last_reviewed": "2026-11-03"
+    },
+    {
+      "id": "E-128",
+      "claim": "CivSwitch requires a paid Civilization VII 1.0.0 physical cartridge, a Pico RP2040/RP2350 USB HID (or equivalent typing macro), English(US) system and USB-keyboard settings, and a local-wireless lobby. The optional installer writes XSTRIG.Civ7Save and wipes save:/saves/Single/. Switch 1 23.0.1 is claimed but untested; Switch 1 22.5.0 is the only tested Switch 1 firmware.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "README, PicoSwitch README, installer-creator README, and release 1.0 retrieved 2026-11-03. No purchase, install, or console test.",
+      "sources": [
+        "civswitch-repository",
+        "civswitch-pico-readme",
+        "civswitch-installer-readme",
+        "civswitch-gbatemp"
+      ],
+      "evidence": "The README says only the 1.0.0 version in physical cartridge is supported, every Switch 1/2 firmware from 20.x.x to 23.0.1 should work, and the tested configurations are Switch 1 22.5.0 and Switch 2 20.4.0/23.0.1. It requires English(US) system language and USB Keyboard language, a local-wireless host lobby, and the Pico typing about 87 chat lines over roughly 15-20 minutes. The installer README says it wipes every file in save:/saves/Single/, writes save:/saves/Single/XSTRIG.Civ7Save, and is optional for the session-only loader. GBAtemp reported the game was readily available in the UK for about \u00a330 on 2026-11-01.",
+      "limitations": "The 23.0.1 Switch 1 configuration is claimed but not tested. The installer is destructive to Civ VII save data and is not needed for a first loader test. The Pico is an additional purchase. The game is paid, so the project's no-paid-games rule currently blocks the test.",
+      "last_reviewed": "2026-11-03"
     }
   ]
 }

@@ -1,10 +1,10 @@
 # Portability Assessment: Switch 2 Progressions on Mariko 23.0.1
 
-> **Snapshot: 2026-10-31.** This is a read-only assessment. It asks whether any public Switch 2 progression could be modified into a method for the target: a Switch OLED (`HEG-001`, Mariko) on firmware `23.0.1`, serial prefix `XTJ`, no modification history reported. It does not authorize running an exploit, changing console state, or weakening the Mac.
+> **Snapshot: 2026-11-03.** This is a read-only assessment. It asks whether any public Switch 2 progression could be modified into a method for the target: a Switch OLED (`HEG-001`, Mariko) on firmware `23.0.1`, serial prefix `XTJ`, no modification history reported. It does not authorize running an exploit, changing console state, or weakening the Mac.
 
 ## Verdict
 
-Only `ns2jb` has a technically credible port path, and it is not buildable from the public package or the current local artifacts.
+Among the Switch 2 progressions, only `ns2jb` has a technically credible port path, and it is not buildable from the public package or the current local artifacts. A separate Switch 1 artifact, CivSwitch, now supplies a public stage-1 primitive, but it is not fs-level and is untested on Switch 1 23.0.1.
 
 | Progression | Modifiable for the OLED? | Bottom line |
 |---|---|---|
@@ -14,6 +14,24 @@ Only `ns2jb` has a technically credible port path, and it is not buildable from 
 | **MintBrew / HBLauncher / GPUBrewLauncher / OunceCake / ftpd-sb / Stremio** | **Downstream** | They need a working `ns2jb` session first. They add no independent entry point. |
 | **Gezine universal userland** | **Nothing to modify** | Unreleased and unverified as of 2026-11-01: no public repo, write-up, CVE, or reproduction. The `20.0.0+` floor is a Switch 2 requirement for Switch 1 compatibility mode, not a Switch 1 floor. If it ships as claimed it is the best future stage-1 lead, but it is userland only and reaching `fs` would still need a second-stage fs bug. |
 | **Atmosphère 1.12.1 / hekate v6.5.4** | **Not an entry point** | Firmware-compatible, but on an OLED they still require a modchip. |
+
+## CivSwitch: a Switch 1 stage-1 artifact (2026-11-03)
+
+CivSwitch is not a Switch 2 progression, so it is not a port candidate in the table above. It matters because it is the first public **Switch 1** stage-1 primitive found in this project that does not need SmileBASIC or a modchip.
+
+| Property | Finding |
+|---|---|
+| Trigger | Civilization VII 1.0.0 **physical cartridge**; chat XSS typed by a Pico RP2040/RP2350 USB HID. |
+| Primitive | JavaScript in the game's embedded V8; `addrof`/`fakeobj`; arbitrary read/write; native ROP in the game process. |
+| Loader | TCP JavaScript loader on port 9026. |
+| Firmware | README claims Switch 1/2 20.x.x–23.0.1; Switch 1 22.5.0 and Switch 2 20.4.0/23.0.1 are tested. Switch 1 23.0.1 is claimed but untested. |
+| Stage ceiling | Game process only. The public `core.js` has no `fs` IPC, fs sysmodule payload, or privilege escalation. |
+| Extra requirements | Paid 1.0.0 cartridge, Pico USB HID, English(US) system and USB-keyboard settings, local-wireless lobby. |
+| Destructive option | `installer-creator` writes `XSTRIG.Civ7Save` and wipes `save:/saves/Single/`; not needed for a session-only loader test. |
+
+For the fs-level goal, CivSwitch changes the stage-1 picture but not the stage-2 blocker. It supplies a userland process with native code and arbitrary read/write in principle, but it is tied to the Civ VII 1.0.0 game build, the public code has no fs escalation, and the exact Switch 1 23.0.1 `fs` binary is still missing. A CivSwitch-to-`fs` chain would be original work: derive the fs anchors, confirm the `Path::Normalize` bug on Switch 1 23.0.1, and build an IPC trigger from the game process.
+
+**Status:** recorded as `L-008`, `EP-012`, `C-038`, `E-127`, `E-128`. The paid cartridge, the Pico, and a console test are not authorized.
 
 ## What the author actually demonstrated on Switch 1
 
@@ -64,6 +82,7 @@ The modded 22.0.0 console could theoretically supply an older `fs` binary, but t
 2. The owner owns SmileBASIC 4.4.9, or a free Switch 1 entry point appears.
 3. A Switch 1 `23.0.1` `fs` binary becomes available from an owner-controlled source.
 4. Gezine releases the claimed universal userland exploit, with code or a write-up identifying the target process and primitives. (As of 2026-11-01 there is no public release; `E-126`.)
+5. CivSwitch is reproduced on Switch 1 23.0.1 and a Switch 1 `fs` payload or the missing `fs` binary appears (`E-127`, `E-128`).
 
 Even then, the result is stage 1–2: native code as `fs`, not kernel, bootROM, CFW, or persistence. Stage 3 remains the decisive missing link.
 
@@ -80,4 +99,5 @@ Even then, the result is stage 1–2: native code as `fs`, not kernel, bootROM, 
 - `E-114`, `E-115`, `E-116` — the public package, macOS wrapper, forks, and WebKit claim.
 - `E-117` — the author’s Switch 1 development and test statements.
 - `E-118` — the local NCA dump check.
-- `L-001`, `EP-008`, `H-004` — the machine-readable lead, surface, and hypothesis records.
+- `E-127`, `E-128` — the CivSwitch stage-1 primitive and its requirements.
+- `L-001`, `L-008`, `EP-008`, `EP-012`, `H-004` — the machine-readable lead, surface, and hypothesis records.

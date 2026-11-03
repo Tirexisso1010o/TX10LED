@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-31",
+  "last_reviewed": "2026-11-03",
   "target": {
     "model": "HEG-001",
     "family": "Nintendo Switch OLED",
@@ -19,14 +19,17 @@
   },
   "summary": {
     "question": "Is there a publicly documented, reproducible, software-only path to fs-level native code execution on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",
-    "answer": "No publicly documented, reproducible software-only path to fs-level native code execution was found in the reviewed public sources as of 2026-10-31.",
+    "answer": "No publicly documented, reproducible software-only path to fs-level native code execution was found in the reviewed public sources as of 2026-11-03. A public Switch 1 stage-1 game-process primitive now exists (CivSwitch), but it is not fs-level and is untested on Switch 1 23.0.1.",
     "status": "DISPROVEN",
-    "scope": "Public documentation reviewed on 2026-10-31. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
+    "scope": "Public documentation reviewed on 2026-11-03. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
     "software_only_public_chain_on_target": false,
-    "documented_route": "No public software-only route to fs-level native code on the OLED; the closest public artifact is ns2jb on Switch 2. A hardware modchip remains the documented route to Atmosph\u00e8re, which is no longer required for this goal.",
+    "documented_route": "No public software-only route to fs-level native code on the OLED. The closest public fs-level artifact is ns2jb on Switch 2; the closest public Switch 1 stage-1 artifact is CivSwitch (game-process ROP). A hardware modchip remains the documented route to Atmosph\u00e8re, which is no longer required for this goal.",
     "closest_public_lead": "L-001",
     "closest_public_lead_name": "ns2jb",
     "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1: the repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets. The macOS wrapper and maintained forks are also Switch 2-only and still require SmileBASIC. It does not provide kernel or bootROM access and is not documented on OLED/Mariko 23.0.1. Its fs-level ceiling matches the narrowed goal.",
+    "closest_stage1_lead": "L-008",
+    "closest_stage1_lead_name": "CivSwitch",
+    "closest_stage1_lead_note": "A public MIT-licensed Switch 1 game-process ROP chain for Civilization VII 1.0.0 physical cartridge. It is native code in the game process, not fs-level, and it requires a paid cartridge, a Pico USB HID, and a local-wireless lobby. Switch 1 22.5.0 is tested; Switch 1 23.0.1 is claimed but untested.",
     "undisclosed_method_status": "UNKNOWN",
     "notes": [
       "Firmware compatibility is a separate axis: Atmosph\u00e8re 1.12.1 and hekate v6.5.4 support 23.0.1, but neither provides an entry point.",
@@ -34,7 +37,8 @@
       "The surface matrix records what is publicly documented; it does not claim that any surface is unexploitable.",
       "GameShare is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. It is recorded as EP-011 / L-006; no public vulnerability exists for it.",
       "Success criterion narrowed on 2026-10-31: native code execution as fs (tethered) is sufficient; boot-stage CFW is not required.",
-      "Seedsow Lullaby (Artemis engine) is recorded as L-007/H-014: a free-demo save Lua primitive that runs game-level code on Switch 1/2 without SmileBASIC. It is not fs-level, the Artemis/FS bootstrap is not public, and the OLED route is blocked by the seed console/current-firmware transfer."
+      "Seedsow Lullaby (Artemis engine) is recorded as L-007/H-014: a free-demo save Lua primitive that runs game-level code on Switch 1/2 without SmileBASIC. It is not fs-level, the Artemis/FS bootstrap is not public, and the OLED route is blocked by the seed console/current-firmware transfer.",
+      "CivSwitch 1.0 is recorded as L-008/EP-012: a public Switch 1 game-process exploit for Civilization VII 1.0.0 physical cartridge. It provides native ROP in the game process, not fs-level code. It requires a paid cartridge and a Pico USB HID, and Switch 1 23.0.1 is claimed but untested. The optional installer wipes save:/saves/Single/."
     ]
   },
   "field_notes": {
@@ -469,6 +473,42 @@
         "switchbrew-system-flaws"
       ],
       "notes": "This is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. Boundaries: hosting requires a Switch 2, Switch 1 receivers are local-wireless only, the host's AdvertiseData is ECC-verified, and any compromise stops at applet privileges. The 2026-10-29 review found no public splay/GameShare vulnerability or post-20.0.0 splay security fix. The local splay program NCA is key generation 0x17 and cannot be decrypted with the owner's keys; the only key-generation-0x15 program is the Mii editor applet miiEdit, which is not a remote-input surface. This is a surface, not an exploit."
+    },
+    {
+      "id": "EP-012",
+      "surface": "in_game_webview_chat",
+      "name": "In-game web content / cartridge chat (CivSwitch lead)",
+      "layer": "userland",
+      "description": "HTML/JavaScript content rendered inside a game, such as Civilization VII's multiplayer chat. A cross-site scripting flaw in chat message handling executes JavaScript in the game's embedded V8 context, which can be escalated to native ROP inside the game process.",
+      "access_required": "A supported game cartridge (Civilization VII 1.0.0 physical), a local-wireless lobby, and a USB HID macro (Pico RP2040/RP2350) to type the payload; English(US) system and USB-keyboard settings.",
+      "software_only": true,
+      "physical_access": "required (game cartridge and USB HID device)",
+      "target_reachable": true,
+      "public_chain_on_target": false,
+      "status": "PARTIALLY VERIFIED",
+      "status_basis": "CivSwitch 1.0 is public and MIT-licensed. Read-only inspection of core.js on 2026-11-03 confirmed a chat-XSS JavaScript primitive escalated to addrof/fakeobj, arbitrary read/write, and native ROP in the game process, with a TCP JavaScript loader on port 9026. The README claims Switch 1/2 20.x.x-23.0.1; Switch 1 22.5.0 and Switch 2 20.4.0/23.0.1 are the tested configurations. No OLED 23.0.1 test and no fs stage are public.",
+      "capability_if_successful": "Native code execution in the Civilization VII game process; arbitrary read/write and ROP calls to game/SDK functions. Not fs, kernel, bootROM, CFW, or persistence.",
+      "leads_to_atmosphere": false,
+      "in_scope": true,
+      "requires": [
+        "A paid Civilization VII 1.0.0 physical cartridge",
+        "A Pico RP2040/RP2350 USB HID or equivalent typing macro",
+        "English(US) system and USB-keyboard settings",
+        "A local-wireless lobby",
+        "A Switch 1 fs bug and IPC trigger for fs-level escalation"
+      ],
+      "evidence": [
+        "E-127",
+        "E-128"
+      ],
+      "sources": [
+        "civswitch-repository",
+        "civswitch-core-js",
+        "civswitch-pico-readme",
+        "civswitch-installer-readme",
+        "civswitch-gbatemp"
+      ],
+      "notes": "Stage-1 only. The public repository contains no fs sysmodule payload or privilege escalation. The optional installer writes XSTRIG.Civ7Save and wipes save:/saves/Single/, so it is not needed for a session-only loader test. Switch 1 23.0.1 is claimed but untested; the Switch 2 23.0.1 test is not a Switch 1 23.0.1 test. The game is paid and not owned."
     }
   ],
   "leads": [
@@ -629,6 +669,29 @@
         "onejailbreak-seedsow"
       ],
       "next_step": "Decide whether to install the free demo on the OLED as future-proofing and whether to authorize a harmless normal-save transfer test across 22.0.0/23.0.1 or an update of the 22.0.0 seed console to 23.0.1. Do not transfer a modified save or touch the seed console without explicit approval. Monitor the Artemis FS bootstrap and Gezine."
+    },
+    {
+      "id": "L-008",
+      "name": "CivSwitch / Civilization VII chat XSS",
+      "surface": "EP-012",
+      "status": "PARTIALLY VERIFIED",
+      "target_applicability": "UNVERIFIED",
+      "leads_to_atmosphere": false,
+      "what_it_is": "A public MIT-licensed Switch 1 game-process exploit for Civilization VII 1.0.0 physical cartridge. A chat XSS runs JavaScript in the game's embedded V8 context, a pointer-compression exploit provides arbitrary read/write, and a ROP chain calls native game/SDK functions. It exposes a TCP JavaScript loader on port 9026. The trigger is a Pico RP2040/RP2350 USB HID that types the payload into a local-wireless lobby chat.",
+      "what_it_proves": "A public, offline, software-only stage-1 native-code primitive exists for the Switch 1 edition of Civilization VII on firmware 20.x-23.0.1 (Switch 1 22.5.0 tested; 23.0.1 claimed). It gives native ROP in the game process without a modchip or SmileBASIC.",
+      "what_it_does_not_prove": "It is not fs-level. The public repository has no fs sysmodule payload or privilege escalation; reaching fs still needs a Switch 1 fs bug and IPC trigger. Switch 1 23.0.1 is claimed but untested. It requires a paid 1.0.0 physical cartridge, a Pico, English(US) settings, and a local-wireless lobby. The optional installer wipes save:/saves/Single/. It does not provide kernel, bootROM, CFW, or persistence.",
+      "evidence": [
+        "E-127",
+        "E-128"
+      ],
+      "sources": [
+        "civswitch-repository",
+        "civswitch-core-js",
+        "civswitch-pico-readme",
+        "civswitch-installer-readme",
+        "civswitch-gbatemp"
+      ],
+      "next_step": "Decide whether to relax the no-paid-games rule for a used Civilization VII 1.0.0 physical cartridge and a Pico, and whether to authorize a non-destructive session-only loader test on the OLED 23.0.1. Do not run installer-creator (it wipes Civilization VII saves) unless separately approved after a backup. If approved, test only the loader and record whether port 9026 comes up; do not attempt fs escalation without a Switch 1 fs binary and a new approval."
     }
   ],
   "fixed_public_flaws": [
@@ -696,19 +759,19 @@
     }
   ],
   "surface_summary": {
-    "total_surfaces": 11,
-    "software_only_surfaces": 10,
+    "total_surfaces": 12,
+    "software_only_surfaces": 11,
     "public_software_only_chain_on_target": false,
     "surfaces_with_public_chain_on_target": [
       "EP-010"
     ],
-    "in_scope_surfaces": 10,
+    "in_scope_surfaces": 11,
     "out_of_scope_surfaces": [
       "EP-010"
     ],
     "status_counts": {
       "VERIFIED": 1,
-      "PARTIALLY VERIFIED": 2,
+      "PARTIALLY VERIFIED": 3,
       "UNVERIFIED": 0,
       "DISPROVEN": 3,
       "UNKNOWN": 5

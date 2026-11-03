@@ -1,6 +1,6 @@
 # Entry Points
 
-> **Research snapshot: 2026-10-26.** No publicly documented, reproducible software-only entry point to Atmosphère was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. The closest public lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.
+> **Research snapshot: 2026-11-03.** No publicly documented, reproducible software-only entry point to fs-level native code was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. The closest public fs-level lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. CivSwitch is a new public Switch 1 stage-1 game-process primitive, but it is not fs-level and is untested on Switch 1 23.0.1. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.
 
 This document is the readable companion to [`research/entry-points.json`](../research/entry-points.json). The JSON is the source of truth for the surface matrix; this page explains what each surface is, what access it requires, and why it does or does not change the conclusion.
 
@@ -23,13 +23,13 @@ An entry point is only one link. Atmosphère needs a chain, and the links are no
 
 | Stage | What it must achieve | Public status on Mariko 23.0.1 |
 |---|---|---|
-| **0. Trigger** | Obtain the software the entry lives in | Unavailable to this owner: `ns2jb` needs SmileBASIC 4.4.9 |
-| **1. Initial code execution** | Arbitrary code in an ordinary userland process | Not publicly demonstrated on Switch 1 23.0.1 |
+| **0. Trigger** | Obtain the software the entry lives in | Unavailable to this owner: `ns2jb` needs SmileBASIC 4.4.9; CivSwitch needs a paid Civilization VII 1.0.0 cartridge and a Pico |
+| **1. Initial code execution** | Arbitrary code in an ordinary userland process | Public stage-1 primitive exists (CivSwitch game-process ROP), but it is not fs-level and is untested on Switch 1 23.0.1 |
 | **2. Privilege escalation** | A sysmodule with useful permissions, or the kernel | Not publicly demonstrated on Switch 1 23.0.1 |
 | **3. Boot-stage execution** | Code at warmboot/package1, before Horizon verifies its modules | **Nothing public** |
 | **4. Launch and persistence** | Hand off to a payload or CFW | Solved: Atmosphère 1.12.1, hekate v6.5.4 |
 
-Stage 3 is the one that is usually skipped in discussion, and it is the decisive one. Atmosphère replaces verified system modules, so a kernel exploit that arrives after boot cannot make the boot chain load unsigned code. The historical proof that this is possible on patched hardware is **Caffeine**, a warmboot exploit for patched Erista on 4.0.0–4.1.0, which ran full CFW without Fusée Gelée. No Mariko equivalent is public for modern firmware.
+For the narrowed **fs-level** goal, stage 3 is **not required**; stages 0–2 are the target. Stage 3 remains the decisive link for Atmosphère. Atmosphère replaces verified system modules, so a kernel exploit that arrives after boot cannot make the boot chain load unsigned code. The historical proof that this is possible on patched hardware is **Caffeine**, a warmboot exploit for patched Erista on 4.0.0–4.1.0, which ran full CFW without Fusée Gelée. No Mariko equivalent is public for modern firmware.
 
 The full stage-by-stage analysis is in [`docs/GAP-ANALYSIS.md`](GAP-ANALYSIS.md).
 
@@ -245,6 +245,47 @@ It is bounded by four things:
 
 **This is a surface, not an exploit.** No proof of concept exists publicly, and the project does not have one.
 
+## EP-012 — In-game web content / cartridge chat (CivSwitch lead)
+
+Civilization VII's multiplayer chat renders HTML/JavaScript inside the game. CivSwitch 1.0 is a public, MIT-licensed exploit for the **Switch 1 edition of Civilization VII 1.0.0 physical cartridge** that abuses this surface.
+
+### What is documented
+
+| Property | Finding |
+|---|---|
+| Trigger | A Pico RP2040/RP2350 USB HID types a chat-XSS payload into a local-wireless lobby. |
+| Primitive | JavaScript in the game's embedded V8 context; V8 pointer compression; `addrof`/`fakeobj`; arbitrary read/write. |
+| Native stage | A ROP chain built from game main-image and SDK gadgets; `call_rop`; `nn::socket` wrappers; TCP JavaScript loader on port 9026. |
+| Firmware | README claims Switch 1/2 20.x.x–23.0.1; Switch 1 22.5.0 and Switch 2 20.4.0/23.0.1 are tested. Switch 1 23.0.1 is claimed but untested. |
+| Requirements | Paid 1.0.0 physical cartridge, Pico USB HID, English(US) system and USB-keyboard settings, local-wireless lobby. |
+| Optional installer | `installer-creator` writes `XSTRIG.Civ7Save` and wipes `save:/saves/Single/`; not needed for a session-only loader test. |
+
+### What it proves — and what it does not
+
+| Question | Answer |
+|---|---|
+| Is it a real software-only stage-1 primitive? | **Yes.** Read-only inspection of `core.js` on 2026-11-03 confirmed the V8 primitives and native ROP (`E-127`). |
+| Is it fs-level? | **No.** The public code contains no fs IPC, no fs sysmodule payload, and no privilege-escalation stage. |
+| Does it work on Switch 1 23.0.1? | **Unverified.** Switch 1 22.5.0 is the only tested Switch 1 firmware; 23.0.1 is claimed. |
+| Does it need extra hardware? | **Yes.** A paid 1.0.0 cartridge and a Pico RP2040/RP2350 USB HID. |
+| Does it provide kernel, bootROM, CFW, or persistence? | **No.** It is native code in the game process. |
+| Is a console test authorized? | **No.** The cartridge, the Pico, and a session-only loader test need explicit approval. |
+
+The surface is `PARTIALLY VERIFIED`: the primitive is public and real, but it does not meet the fs-level goal and is untested on the target firmware. It is recorded as lead `L-008`.
+
+### Why it matters, and why it is bounded
+
+It matters because it is the first public **Switch 1** stage-1 primitive found in this project that does not need SmileBASIC or a modchip. That removes the SmileBASIC ownership blocker in principle and makes the `H-004` fs path-normalization hypothesis testable, if the game works on 23.0.1.
+
+It is bounded by four things:
+
+- **Paid trigger.** Only the 1.0.0 physical cartridge is supported; there is no free demo and the eShop version is not usable.
+- **Firmware gap.** Switch 1 23.0.1 is claimed but not tested.
+- **Stage gap.** The public chain stops at native ROP in the game process. Reaching `fs` needs a separate Switch 1 `fs` bug, an IPC trigger, and the missing Switch 1 `fs` binary.
+- **Destructive option.** The installer wipes Civ VII saves and is not needed for a loader test.
+
+**This is a stage-1 artifact, not an fs-level chain.** No fs escalation is public.
+
 ## Historical leads
 
 | Lead | Era | Why it does not apply |
@@ -268,11 +309,11 @@ Both are recorded in the JSON as `L-002` and `L-003`. They are useful for unders
 
 ## What this means
 
-As of **2026-10-29**, the reviewed public documentation supports this conclusion:
+As of **2026-11-03**, the reviewed public documentation supports this conclusion:
 
-> Firmware 23.0.1 is compatible with Atmosphère 1.12.1 and hekate v6.5.4, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to launch Atmosphère. The documented route requires a hardware modchip, which is outside this project's scope.
+> Firmware 23.0.1 is compatible with Atmosphère 1.12.1 and hekate v6.5.4, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to fs-level native code. The documented route to Atmosphère requires a hardware modchip, which is outside this project's scope.
 
-The closest public lead is `ns2jb`. It is a genuine software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. It does not change the conclusion for the OLED.
+The closest public fs-level lead is `ns2jb`. It is a genuine software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. It does not change the conclusion for the OLED. CivSwitch (`EP-012`) is the closest public Switch 1 stage-1 artifact, but it is native code in the Civilization VII game process, not fs-level, and it is untested on Switch 1 23.0.1.
 
 GameShare (`EP-011`) was reviewed as a receiver-side remote-input surface and recorded as `UNKNOWN`. It is reachable on the target, but no public vulnerability exists, hosting requires a Switch 2, and any compromise would stop at applet privileges. A second read-only review on 2026-10-29 found no public `splay`/GameShare vulnerability and no post-20.0.0 `splay` security fix; the local `splay` program NCA is blocked by key generation `0x17`, while its meta CNMT is readable (`E-102`, `E-103`). It does not change the conclusion either.
 
@@ -282,6 +323,7 @@ The conclusion would need to be revisited if any of the following became availab
 
 - A public, independently reproduced Mariko bootROM or pre-boot software vulnerability that works on 23.0.1.
 - A packaged, reproducible Switch 1 version of the `ns2jb` chain, with the model and firmware identified.
+- A CivSwitch reproduction on Switch 1 23.0.1 plus a Switch 1 `fs` payload or the missing `fs` binary.
 - A public chain that connects a userland/sysmodule primitive to kernel or bootROM access on Mariko, with reproducible steps and hardware evidence.
 - A public vulnerability in `splay` or the GameShare protocol, combined with a Mariko kernel or bootROM stage.
 - A documented software-only entry point from a maintained project that explicitly supports the OLED on 23.0.1.

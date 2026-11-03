@@ -10,7 +10,7 @@
 | Serial prefix | `XTJ` (Japan) | **VERIFIED** via PTP; three characters only |
 | Modification history | None reported | Owner-reported; PTP cannot establish it |
 | Preferred CFW | Atmosphère | User preference |
-| Entry point | No public software-only path to Atmosphère; closest lead is a userland/sysmodule chain (`ns2jb`) | **DISPROVEN** for the target; **PARTIALLY VERIFIED** for the primitive |
+| Entry point | No public software-only path to fs-level native code; closest fs-level lead is `ns2jb`, and the closest Switch 1 stage-1 lead is CivSwitch | **DISPROVEN** for the target; **PARTIALLY VERIFIED** for both primitives |
 
 The owner manually confirmed the model, firmware, serial prefix, and no-modification history on 2026-10-26. PTP `GetDeviceInfo` on the same date independently observed firmware `23.0.1` and serial prefix `XTJ`, with 10 operations and no session opened. The DeviceInfo model string is generic (`Nintendo Switch`), so the exact `HEG-001` model number and the no-modification history remain owner-reported. PTP does not distinguish OLED from LCD or prove integrity. The compatibility conclusion does not depend on the exact unit being on 23.0.1: the OLED hardware family is the limiting factor.
 
@@ -73,6 +73,22 @@ The full ledger, including scope and limitations, is in [`research/evidence-ledg
 
 The author's write-up says the exploit chain was also tested on Switch 1, but it has not been packaged for Switch 1, and the author says it would not provide the capabilities of a modchip. The published repository is Switch 2 only. This is recorded in E-021, E-022, E-032, E-034, E-045, E-046, E-114, and E-115. The 2026-10-31 tooling (`mac2jb` and two maintained forks) is also Switch 2-only and still requires SmileBASIC; `mac2jb` additionally requires an unsigned kernel extension with SIP disabled. A Switch 1 port is technically credible because the author developed the SmileBASIC trigger and ROP stage on a Switch 1 (`E-117`), but it is not actionable: the public bootstrap is Switch 2-specific, and the owner's 23.0.1 dump has no `fs` NCA and cannot decrypt the key generation `0x17` system programs (`E-118`). It is a lead worth following, not a method to run on the target. See [`PORTABILITY.md`](PORTABILITY.md).
 
+## The closest public Switch 1 stage-1 lead: CivSwitch
+
+CivSwitch 1.0 (2026-11-01, MIT) is a public XSS toolchain for the **Switch 1 edition of Civilization VII 1.0.0 physical cartridge**. It is the first public Switch 1 stage-1 primitive found in this project that does not need SmileBASIC or a modchip.
+
+| Question | Finding |
+|---|---|
+| Is it software-only? | **Yes**, on Switch 1/2, with a paid 1.0.0 cartridge and a Pico USB HID. |
+| What primitive does it give? | Chat XSS → V8 `addrof`/`fakeobj` → arbitrary read/write → native ROP in the game process. |
+| Is it fs-level? | **No.** The public `core.js` has no fs IPC, fs sysmodule payload, or privilege escalation. |
+| Is it confirmed on Switch 1 23.0.1? | **No.** Switch 1 22.5.0 is the only tested Switch 1 firmware; 23.0.1 is claimed. |
+| Does it need extra hardware? | **Yes.** A paid 1.0.0 physical cartridge and a Pico RP2040/RP2350 USB HID. |
+| Does it provide kernel, bootROM, CFW, or persistence? | **No.** It is native code in the game process. |
+| Does it change the conclusion for the OLED? | **Not yet.** It closes stage 1 in principle, but the fs stage and the Switch 1 `fs` binary are still missing. |
+
+The optional `installer-creator` writes `XSTRIG.Civ7Save` and wipes `save:/saves/Single/`; it is not needed for a session-only loader test. The cartridge, the Pico, and any console test are not authorized. Recorded as `L-008`, `EP-012`, `C-038`, `E-127`, and `E-128`.
+
 ## GameShare as a receiver-side surface
 
 GameShare is a Switch 2 feature that streams a shared game to nearby systems. On the receiving system the session runs in the **`splay` system applet**, added in system update **20.0.0**. It is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game, so it is recorded separately as `EP-011` and `L-006`.
@@ -133,6 +149,7 @@ The conclusion would need to be revisited if any of the following became availab
 
 - A public, independently reproduced Mariko bootROM or pre-boot software vulnerability that works on 23.0.1.
 - A packaged, reproducible Switch 1 version of the `ns2jb` chain, with the model and firmware identified.
+- A CivSwitch reproduction on Switch 1 23.0.1 plus a Switch 1 `fs` payload or the missing `fs` binary.
 - A public chain that connects a userland/sysmodule primitive to kernel or bootROM access on Mariko, with reproducible steps and hardware evidence.
 - A documented software-only entry point from a maintained project, with reproducible steps and hardware evidence.
 - A correction showing that the target is not Mariko/OLED hardware (for example, a different model or a modified console).
@@ -161,8 +178,8 @@ See [`USB_INTEGRATION.md`](USB_INTEGRATION.md) for the implementation and its li
 
 ## Bottom line
 
-As of **2026-10-26**, the reviewed public documentation supports this conclusion:
+As of **2026-11-03**, the reviewed public documentation supports this conclusion:
 
-> Firmware 23.0.1 is compatible with Atmosphère 1.12.1 and hekate v6.5.4, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to launch Atmosphère. The documented route requires a hardware modchip, which is outside this project's scope. The closest public lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access.
+> Firmware 23.0.1 is compatible with Atmosphère 1.12.1 and hekate v6.5.4, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to fs-level native code. The documented route to Atmosphère requires a hardware modchip, which is outside this project's scope. The closest public fs-level lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. CivSwitch is a public Switch 1 stage-1 game-process primitive, but it is not fs-level and is untested on Switch 1 23.0.1.
 
 This is an absence-of-documented-method finding. It is not proof that no undisclosed exploit exists. See [`research/known-limitations.md`](../research/known-limitations.md).
