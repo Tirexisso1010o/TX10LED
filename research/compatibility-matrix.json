@@ -23,8 +23,8 @@
     "claim": "A publicly documented, reproducible software-only path to fs-level native code execution exists for an unmodified Switch OLED on firmware 23.0.1.",
     "claim_status": "DISPROVEN",
     "software_only_path_documented": false,
-    "scope": "Reviewed public documentation as of 2026-11-03.",
-    "summary": "No publicly documented, reproducible software-only path to Atmosph\u00e8re was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosph\u00e8re 1.12.1 and hekate v6.5.4, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public fs-level lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. Read-only inspection on 2026-10-31 confirmed the public repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets; the macOS wrapper and maintained forks are also Switch 2-only. On 2026-11-03 CivSwitch 1.0 was recorded as a new public Switch 1 stage-1 primitive: a Civilization VII 1.0.0 chat XSS that reaches V8, arbitrary read/write, and native ROP in the game process. It is not fs-level, requires a paid physical cartridge and a Pico USB HID, and is untested on Switch 1 23.0.1. GameShare (the splay applet) remains a documented receiver-side surface with no public vulnerability and an applet-level capability ceiling. On 2026-10-31 the success criterion was narrowed to fs-level native code execution; boot-stage CFW is no longer required. No public fs-level chain was found for the target.",
+    "scope": "Reviewed public documentation through 2026-11-25.",
+    "summary": "No publicly documented, reproducible software-only path to Atmosph\u00e8re was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. Firmware 23.0.1 is supported by Atmosph\u00e8re 1.12.2 and hekate 6.5.5, but that is firmware compatibility, not an entry point. The documented route requires a hardware modchip, which is outside this project's software-only scope. The closest public fs-level lead is ns2jb, a real software-only userland/sysmodule chain that is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, CFW, or persistence. Read-only inspection on 2026-10-31 confirmed the public repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets; the macOS wrapper and maintained forks are also Switch 2-only. On 2026-11-03 CivSwitch 1.0 was recorded as a new public Switch 1 stage-1 primitive: a Civilization VII 1.0.0 chat XSS that reaches V8, arbitrary read/write, and native ROP in the game process. It is not fs-level, requires a paid physical cartridge and a Pico USB HID, and is untested on Switch 1 23.0.1. GameShare (the splay applet) remains a documented receiver-side surface with no public vulnerability and an applet-level capability ceiling. On 2026-10-31 the success criterion was narrowed to fs-level native code execution; boot-stage CFW is no longer required. No public fs-level chain was found for the target. On 2026-11-10 firmware 23.5.0 fixed the fs PathNormalizer::Normalize overflow on Switch 1 and Switch 2 and updated the anti-downgrade fuse list; dauth now requires it, so 23.0.1 is the preservation target. The target's web applets are blocked by a persistent supernag in system save 0x8000000000000049 and the ns:vm vulnerability setting; maintenance mode and console initialization do not clear it, and no stock-safe clearance is known. The November 2026 public fs chains (KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen) are Switch 2-only, and the BigInt WebKit candidate is tested only on Switch 2 20.4.0. The only remaining offline free surface is the prepared H-013 Album image.",
     "undisclosed_exploit_status": "UNKNOWN",
     "evidence": [
       "E-007",
@@ -41,21 +41,31 @@
       "E-117",
       "E-118",
       "E-127",
-      "E-128"
+      "E-128",
+      "E-129",
+      "E-130",
+      "E-131",
+      "E-133",
+      "E-136",
+      "E-138",
+      "E-141",
+      "E-142",
+      "E-143",
+      "E-144"
     ]
   },
   "entry_point_analysis": {
     "file": "research/entry-points.json",
-    "last_reviewed": "2026-11-03",
+    "last_reviewed": "2026-11-25",
     "surfaces_reviewed": 12,
     "software_only_surfaces": 11,
     "public_software_only_chain_on_target": false,
-    "documented_route": "No public software-only route to fs-level native code. The closest public fs-level artifact is ns2jb on Switch 2; the closest public Switch 1 stage-1 artifact is CivSwitch (game-process ROP).",
+    "documented_route": "No public software-only route to fs-level native code. The closest public fs-level artifact is ns2jb on Switch 2; the closest public Switch 1 stage-1 artifact is CivSwitch (game-process ROP). The November 2026 fs packages are Switch 2-only, 23.5.0 fixes the fs bug, and the target's browser is supernag-gated.",
     "closest_public_lead": "L-001",
     "closest_public_lead_name": "ns2jb",
     "closest_stage1_lead": "L-008",
     "closest_stage1_lead_name": "CivSwitch",
-    "notes": "Detailed surface-by-surface analysis, access requirements, and fixed public flaws are in research/entry-points.json. This matrix keeps only the higher-level compatibility record. CivSwitch is a stage-1 game-process primitive, not an fs-level chain."
+    "notes": "Detailed surface-by-surface analysis, access requirements, and fixed public flaws are in research/entry-points.json. This matrix keeps only the higher-level compatibility record. CivSwitch is a stage-1 game-process primitive, not an fs-level chain. The November 2026 fs chains are Switch 2-only (E-131); the fs bug is fixed in 23.5.0 (E-129, E-130); the browser applet is blocked by the supernag (E-136, E-138)."
   },
   "rows": [
     {

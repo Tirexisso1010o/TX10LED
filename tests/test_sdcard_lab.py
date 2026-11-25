@@ -170,6 +170,61 @@ class AnomalyTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from("<I", image, second)[0], 0x0FFFFFF0)
 
 
+class LongDayFileTests(unittest.TestCase):
+    def _image(self, anomaly: str) -> tuple[bytes, int]:
+        image = lab.build_image(64, anomaly)
+        layout = lab.layout_for(64)
+        return image, layout.data_start * lab.SECTOR
+
+    def test_long_file_path_exceeds_the_fs_buffer(self) -> None:
+        for name in (lab.LONG_FILE_PARENT, lab.LONG_FILE_BENIGN):
+            self.assertEqual(len(name), 255)
+            path = "NINTENDO/ALBUM/2026/10/27/" + name
+            self.assertGreater(len(path.encode("utf-8")), 0x301)
+
+    def test_day_directory_spans_two_clusters(self) -> None:
+        image, data = self._image("album_date_file_long_parent")
+        fat = lab.RESERVED * lab.SECTOR
+        fat7 = struct.unpack_from("<I", image, fat + 7 * 4)[0] & 0x0FFFFFFF
+        fat8 = struct.unpack_from("<I", image, fat + 8 * 4)[0] & 0x0FFFFFFF
+        self.assertEqual(fat7, 8)
+        self.assertEqual(fat8, lab.EOC)
+
+        def at(cluster: int) -> int:
+            return data + (cluster - 2) * lab.SECTOR
+
+        # The control entry is first (six 32-byte entries for the real name),
+        # then the 20 LFN entries and short entry for the crafted name.
+        day = image[at(7) : at(7) + 2 * lab.SECTOR]
+        self.assertEqual(day[11], 0x0F)
+        self.assertEqual(day[0] & 0x40, 0x40)
+        crafted = 192
+        self.assertEqual(day[crafted + 11], 0x0F)
+        self.assertEqual(day[crafted] & 0x40, 0x40)
+        short = crafted + 20 * 32
+        self.assertEqual(day[short + 11], 0x20)
+        low = struct.unpack_from("<H", day, short + 26)[0]
+        high = struct.unpack_from("<H", day, short + 20)[0]
+        count = (len(lab.JPEG) + lab.SECTOR - 1) // lab.SECTOR
+        self.assertEqual((high << 16) | low, 9 + count)
+
+    def test_parent_and_benign_prefixes_differ(self) -> None:
+        parent, data = self._image("album_date_file_long_parent")
+        benign, _ = self._image("album_date_file_long_benign")
+
+        def first_chars(image: bytes) -> bytes:
+            # The crafted LFN entries are stored last-chunk-first, so the
+            # sequence-1 entry (the first 13 filename chars) is the 20th
+            # LFN entry, immediately before the short entry at offset 832.
+            start = data + 5 * lab.SECTOR + 800
+            return image[start + 1 : start + 1 + 6]
+
+        parent_prefix = first_chars(parent)
+        benign_prefix = first_chars(benign)
+        self.assertEqual(parent_prefix, b".\x00.\x00\\\x00")
+        self.assertEqual(benign_prefix, b"A\x00A\x00\\\x00")
+
+
 class UnicodePathTests(unittest.TestCase):
     def test_path_exceeds_the_fs_buffer(self) -> None:
         path = (

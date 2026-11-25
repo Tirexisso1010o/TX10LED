@@ -1,6 +1,6 @@
 # WebKit N-day Assessment Plan
 
-> **Snapshot: 2026-10-31. W1 passed; the W2 exploratory run produced no Stage 1 trigger; the candidate is deprioritized.** This plan tests whether the Switch 1 `23.0.1` browser applet is reachable by a public, no-JIT WebKit n-day. It is a stage-1 assessment. A browser compromise would not reach Atmosphère without additional kernel and boot-stage work.
+> **Snapshot: 2026-11-25. W1 passed; the W2 exploratory run produced no Stage 1 trigger; the applet is now blocked by the target's supernag; the candidate is deprioritized.** This plan tests whether the Switch 1 `23.0.1` browser applet is reachable by a public, no-JIT WebKit n-day. It is a stage-1 assessment. A browser compromise would not reach Atmosphère without additional kernel and boot-stage work.
 
 ## Purpose and boundary
 
@@ -187,6 +187,18 @@ Only if W3 yields a controllable primitive. This requires a full exploit chain, 
 - If negative, close the candidate and do not fuzz the applet blindly.
 - Continue read-only monitoring for a packaged Switch 1 `ns2jb`, a new `23.0.1` Mariko chain, or a new no-JIT browser candidate.
 
+## 2026-11-25 addendum: the supernag gate and the BigInt candidate
+
+Two developments change the W2 picture without changing the plan's authorization.
+
+**The applet is gated by the supernag.** The target's web applets are blocked by a persistent local state in system save `0x8000000000000049` and the `ns:vm` vulnerability setting (`vulnerability!needs_update_vulnerability_policy`). Maintenance mode and console initialization do not clear it; the documented clearances are CFW patches, a NAND restore, or updating to the cached version, and the cached version is now `23.5.0`, which fixes the fs bug and updates the anti-downgrade fuses (`E-136`, `E-138`). The 2026-11-17 local attempt in `webkit-portal-20261117T152521Z.local.jsonl` reached only `NX NIFM/00` connection-test requests and never loaded the applet, consistent with this gate (`E-137`). A November 2026 report describes the same `23.0.1` supernag wave for SmileBASIC 4 and Civilization VII (`E-144`). The `luci-app-switch2-block` spoof prevents the update check; it does not open the browser or clear an existing flag (`E-139`). **Do not retry the captive-portal test until a stock-safe clearance is demonstrated; an isolated network does not bypass a local flag.**
+
+**A new browser candidate exists, but it is not a Switch 1 chain.** `jamesrover45/switch2-webkit-exploit` uses a BigInt structured-clone desync in `history.replaceState` to reach object confusion and an `addrof` primitive in the Switch 2 `WifiWebAuthApplet`. It is tested only on Switch 2 `20.4.0`, is explicitly not verified on `23.0.1`, succeeds about 5% of the time, and a failed attempt can kernel-panic with `2168-0002` (`E-133`). Its ROP is PS5/x86_64-derived, not a Switch 1 ARM64 chain. A source check found that upstream WebKit `safari-613-branch` handles `BigIntTag`/`BigIntObjectTag` in the deserializer, so the exploit's stated "deserializer does not support BigInt" premise does not match that branch; Nintendo's NetFront `3.12.11` build may differ (`E-134`). Independent `project-zero-switch-mariko` research confirms the Mariko `23.0.1` applet executes pages and Fetch/WebSocket traffic, but it found no vulnerability or jailbreak (`E-135`).
+
+**If a future approval ever opens the applet,** the bounded diagnostic should be a Switch 1-specific serialization-identity probe, not the public exploit: one page load, no `?jb=1`, no `addrof`, no ROP, no kernel stage. It would serialize a small graph with a duplicate object reference and a controlled number of BigInt values, read it back through `history.state`, and report whether duplicate identity is preserved and whether the array length is unchanged. A divergence is memory unsafety and can crash the applet or the console; treat the page as crash-capable, keep the duration short, and do not retry. This diagnostic is **not authorized** by this plan, and it cannot be reached while the supernag blocks the applet.
+
+**Status:** `H-005` remains `UNVERIFIED`/`blocked`. Do not repeat W2, do not serve the BigInt exploit, and do not update the console to clear the nag.
+
 ## Runbook summary
 
 ```sh
@@ -238,5 +250,7 @@ The responder answers DNS locally and serves one page. It does not forward packe
 - `nvd-cve-2023-28205`, `apple-security-ios-16.4.1`, `webkit-commit-c9880de`, `github-uaf-2023-28205`
 - `nvd-cve-2022-32893`, `webkit-bugzilla-243557`, `webkitgtk-wsa-2022-0009`, `nvd-cve-2025-31200`
 - `switchbrew-internet-browser`, `nvd-cve-2023-4863`
+- `switch2-webkit-exploit-repository`, `webkit-safari-613-ssv-source`, `project-zero-switch-mariko`
+- `gag-order-repository`, `switch-sys-tweak-repository`, `gbatemp-captive-portals-supernag`, `gbatemp-ipatched-supernag`, `reddit-switch2hacks-supernag-2026`, `luci-app-switch2-block-repository`
 
 The candidate table is a desk review, not a claim that any CVE is exploitable on this console. The bounded W1/W2 procedure above was the planned way to resolve the question; W1 passed, and the W2 exploratory run produced no Stage 1 trigger but was not a clean single-load test.

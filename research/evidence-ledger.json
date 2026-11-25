@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-31",
+  "last_reviewed": "2026-11-25",
   "entries": [
     {
       "id": "E-001",
@@ -1769,6 +1769,236 @@
       "evidence": "The README says only the 1.0.0 version in physical cartridge is supported, every Switch 1/2 firmware from 20.x.x to 23.0.1 should work, and the tested configurations are Switch 1 22.5.0 and Switch 2 20.4.0/23.0.1. It requires English(US) system language and USB Keyboard language, a local-wireless host lobby, and the Pico typing about 87 chat lines over roughly 15-20 minutes. The installer README says it wipes every file in save:/saves/Single/, writes save:/saves/Single/XSTRIG.Civ7Save, and is optional for the session-only loader. GBAtemp reported the game was readily available in the UK for about \u00a330 on 2026-11-01.",
       "limitations": "The 23.0.1 Switch 1 configuration is claimed but not tested. The installer is destructive to Civ VII save data and is not needed for a first loader test. The Pico is an additional purchase. The game is paid, so the project's no-paid-games rule currently blocks the test.",
       "last_reviewed": "2026-11-03"
+    },
+    {
+      "id": "E-129",
+      "claim": "Firmware 23.5.0 fixes the fs PathNormalizer::Normalize heap buffer overflow on Switch 1 and Switch 2, updates the anti-downgrade fuse list, and is required by dauth as of about 2026-11-16.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Public patch notes and wiki; 23.5.0 was not installed on the target.",
+      "sources": [
+        "switchbrew-23.5.0",
+        "switchbrew-system-flaws",
+        "atmosphere-release-1.12.2",
+        "hekate-release-v6.5.5"
+      ],
+      "evidence": "Switchbrew's 23.5.0 page lists the FS KIP as updated and records 'A vuln was fixed' for fs; its flaw table says the temporary path buffer is now sized to the source path up to 0x600 bytes. The same page says the anti-downgrade fuses were updated and that dauth required 23.5.0 as of about 2026-11-16. Atmosph\u00e8re 1.12.2 and hekate 6.5.5 add 23.5.0 support, confirming the update is shared across the family.",
+      "limitations": "The wiki is community documentation; the fix details are consistent with the ns2jb write-up. The target remains on 23.0.1.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-130",
+      "claim": "The Switch 1 fs sysmodule on 23.0.1 and below contains the PathNormalizer::Normalize overflow: a fixed 0x301-byte temporary buffer, source paths up to the 0x800-byte HIPC pointer buffer, and up to 0x4FF bytes of overflow, yielding arbitrary read/write including on Switch 2.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Public flaw documentation plus the ns2jb write-up; no local Switch 1 fs binary.",
+      "sources": [
+        "switchbrew-system-flaws",
+        "switchbrew-filesystem",
+        "pepsipu-ns2jb-blog"
+      ],
+      "evidence": "The Switch System Flaws table entry says parent-directory replacement allocates a fixed 0x301-byte buffer and copies the source path without bounds checking; fs's PointerBufferSize is 0x800, so the overflow is up to 0x4FF bytes; 23.5.0 sizes the buffer to the source path up to 0x600. It labels the result 'fs-sysmodule heap buffer overflow. Allows arbitrary read/write including on [S2].' Pepsipu's write-up says the same sequence was tested on Switch 1.",
+      "limitations": "Confirms the bug class and the fix, not a packaged Switch 1 exploit. The exact Switch 1 23.0.1 fs offsets and heap layout remain unpublished.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-131",
+      "claim": "The public Switch 2 fs chains (KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen) are Switch 2-only and do not provide a Switch 1 fs package.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only repository review on 2026-11-25; no Switch 2 hardware and no execution.",
+      "sources": [
+        "kaihen-repository",
+        "seedsow-fs-kaihen-repository",
+        "civswitchfs-repository",
+        "civ7-fs-kaihen-repository"
+      ],
+      "evidence": "KaiHEN describes itself as a Switch 2 homebrew environment and minimal CFW with full NAND access. Seedsow FS drives kaiHEN on a retail Switch 2 23.0.1 from a Seedsow save and warns of brick risk. CivSwitchFS is tested only on Switch 2 23.0.1 with Civilization VII 1.0.0 and exposes a full fsp-srv handle; civ7-fs-kaihen targets Switch 2 23.0.1 and recommends CivSwitchFS-kaiHEN. None lists a Switch 1 build.",
+      "limitations": "Absence of a Switch 1 package in the reviewed repositories, not proof that no private port exists.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-132",
+      "claim": "Atmosph\u00e8re 1.12.2 and hekate 6.5.5 support 23.5.0; hekate 6.5.5 supersedes the earlier 6.5.4 ceiling at 23.0.1.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Firmware compatibility only.",
+      "sources": [
+        "atmosphere-release-1.12.2",
+        "hekate-release-v6.5.5"
+      ],
+      "evidence": "Atmosph\u00e8re 1.12.2 adds basic support for 23.5.0; its fusee was re-released on 2026-11-13 to fix a nogc patch failure on 23.5.0. hekate 6.5.5 lists 'Latest HOS supported: 23.5.0' and a same-day fat32 NOGC fix.",
+      "limitations": "Firmware support does not create an entry point on Mariko.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-133",
+      "claim": "The BigInt structured-clone desync WebKit exploit is tested only on Switch 2 20.4.0, is not verified on 23.0.1, succeeds about 5% of the time, and a failed attempt can kernel-panic with 2168-0002.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Author's README and source; no independent reproduction.",
+      "sources": [
+        "switch2-webkit-exploit-repository"
+      ],
+      "evidence": "The README states the target is the Switch 2 WifiWebAuthApplet, tested on 20.4.0, 'Has NOT been tested on 23.0.1 - needs porting, will not work', only works on about 5% of attempts, and an attempt that failed will crash with error code 2168-0002 (kernel panic). It lists UA AppleWebKit/613.0 NF/7.0.3.12.11 NintendoBrowser/5.2.0.55481, JIT disabled, WebGL/WASM disabled, and Gigacage disabled.",
+      "limitations": "Author claim only. The exploit is Switch 2-specific and includes PS5/x86_64-derived ROP, not a Switch 1 ARM64 chain.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-134",
+      "claim": "The upstream WebKit safari-613-branch deserializer handles BigIntTag and BigIntObjectTag, so the public exploit's stated 'deserializer does not support the BigInt tag' premise does not match that upstream branch; Nintendo's Switch NetFront build may differ.",
+      "status": "PARTIALLY VERIFIED",
+      "confidence": "medium",
+      "scope": "Source inspection of WebKit safari-613-branch; Nintendo's build is not available.",
+      "sources": [
+        "webkit-safari-613-ssv-source",
+        "switch2-webkit-exploit-repository"
+      ],
+      "evidence": "In safari-613-branch's SerializedScriptValue.cpp, readTerminal has 'case BigIntTag: return readBigInt();' and 'case BigIntObjectTag: ... readBigInt ... BigIntObject::create'. The serializer's dumpIfTerminal writes BigIntTag for heap BigInts and BigIntObjectTag for boxed BigInts. The public exploit instead describes a serializer/deserializer pool-count divergence in Nintendo's webkit_3.12.11 build.",
+      "limitations": "Upstream 613 is not Nintendo's NetFront build; the Switch build could have a different clone implementation or a Nintendo-specific regression. No Switch 1 test has been run.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-135",
+      "claim": "Independent project-zero-switch-mariko research confirms that the Mariko 23.0.1 WifiWebAuthApplet executes attacker pages with DOM, Fetch/XHR, and WebSocket but found no vulnerability or jailbreak.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Independent AI-assisted research report; one physical console test.",
+      "sources": [
+        "project-zero-switch-mariko"
+      ],
+      "evidence": "The repository's Phase 12 record and report describe a physical test on 23.0.1: the applet returned its UA, executed DOM tests, completed Fetch/XHR with HTTP 200, and echoed a WebSocket message. The agent report says no public Mariko/23.0.1 browser-to-homebrew chain was found and that the highest lead is openWeb/BrowserDll, blocked on encrypted NCAs.",
+      "limitations": "Not peer-reviewed; the test confirms reachability, not exploitability.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-136",
+      "claim": "The supernag is a persistent local state in system save 0x8000000000000049 and the setsys setting vulnerability!needs_update_vulnerability_policy; it blocks web applets and cannot be cleared by maintenance mode or system initialization on stock firmware.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "CFW tool source plus community reports from 2018-2026; no stock API exposes it.",
+      "sources": [
+        "gag-order-repository",
+        "switch-sys-tweak-repository",
+        "gbatemp-ipatched-supernag",
+        "gbatemp-captive-portals-supernag",
+        "reddit-switch2hacks-supernag-2026"
+      ],
+      "evidence": "Gag-Order mounts system save 0x8000000000000049, reads ns:vm NeedsUpdateVulnerability, and checks the setsys item 'vulnerability'/'needs_update_vulnerability_policy'; its patch flips NAGGED_BYTES to UNNAGGED_BYTES at ns_ssversion:/entry. switch-sys-tweak's FEAT_NSVM_SAFE mitms ns:vm to return 0 'to enable using web applets on outdated fws'. GBAtemp's 2019 PSA and the May 2026 captive-portal thread say the browser is blocked and that maintenance mode/system initialization do not clear it. A November 2026 r/switch2hacks post reports the same on 23.0.1 for SmileBASIC 4 and Civilization VII.",
+      "limitations": "The save/setting names and mechanism are from CFW tools and community reports; the exact event that set the flag on the target is not known.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-137",
+      "claim": "The OLED's 2026-11-17 captive-portal attempt was blocked before the applet loaded, consistent with the local supernag rather than a network failure.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Local hardware observation.",
+      "sources": [
+        "gbatemp-captive-portals-supernag",
+        "gbatemp-ipatched-supernag",
+        "gag-order-repository"
+      ],
+      "evidence": "research/hardware-observations/webkit-portal-20261117T152521Z.local.jsonl shows only repeated 'NX NIFM/00' requests to '/', with no WifiWebAuthApplet page load. The owner reported that the console refused with a system-update message. The supernag mechanism explains why a served page would not open.",
+      "limitations": "The log alone cannot distinguish a supernag refusal from another applet-launch failure; the owner's screen observation and the known mechanism make the supernag explanation the best-supported one.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-138",
+      "claim": "No stock-safe supernag clearance is known; the documented options are CFW patches, a NAND restore, or updating to at least the cached version, and updating to 23.5.0 would remove the fs vulnerability.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Historical community testing plus current CFW tooling and 23.5.0 patch notes.",
+      "sources": [
+        "gbatemp-ipatched-supernag",
+        "gag-order-repository",
+        "switch-sys-tweak-repository",
+        "switchbrew-23.5.0"
+      ],
+      "evidence": "The 2019 PSA lists maintenance mode, console initialization, failed updates, and browser entry points as tested and ineffective, and says only CFW/Gag-Order or a NAND restore works; a later post says the only denag without updating to 8.1.0 was a cartridge update to the cached version. Gag-Order and switch-sys-tweak are CFW-only. 23.5.0 is the current cached version and patches fs.",
+      "limitations": "Community testing is historical (2018-2019) but the mechanism and reports are consistent through 2026. A future stock exploit could change this.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-139",
+      "claim": "The luci-app-switch2-block OpenWrt plugin spoofs the Nintendo LAN test and blocks outbound traffic to prevent updates and supernag, but it does not open the browser or clear an existing supernag.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Project README; no router or console test.",
+      "sources": [
+        "luci-app-switch2-block-repository"
+      ],
+      "evidence": "The README describes a standalone dnsmasq + uHTTPd that answers the Nintendo connection test with the expected header and firewall rules that block the console from the internet, 'to prevent updates/supernag'. It requires an OpenWrt router and the console's MAC.",
+      "limitations": "It is a prevention tool; the target console already has the flag. It also suppresses the captive-portal trigger.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-140",
+      "claim": "Nintendo's November 2026 DMCA takedown removed 144 Picofly modchip-firmware repositories and other Switch projects; this does not change the software-only path.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "News report; context only.",
+      "sources": [
+        "torrentfreak-picofly-dmca"
+      ],
+      "evidence": "TorrentFreak reported on 2026-11-11 that Nintendo's DMCA notice disabled 144 GitHub repositories of Picofly, SX Core, and HWFLY-related modchip firmware.",
+      "limitations": "No effect on the target's firmware or the public fs research.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-141",
+      "claim": "The H-013 day-directory variant is prepared as two FAT32 images (benign and parent) with a 255-character crafted filename and a 777-byte path, but has not been written to a card or run.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Local image generation and read-only mount validation.",
+      "sources": [
+        "pepsipu-ns2jb-blog",
+        "switchbrew-filesystem"
+      ],
+      "evidence": "docs/H-013-SD-TRIGGER-PLAN.md records the generators, two-sector day directory, filenames, image sizes, and SHA-256 hashes. Both images mount read-only; the test suite passes. The benign image must run first; the parent image only after a clean benign run.",
+      "limitations": "Preparation only; no console result. A crash would not be code execution without the Switch 1 fs binary.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-142",
+      "claim": "The public ns2jb repository remains Switch 2-only and was last active on 2026-11-16; no Switch 1 package or ns1jb port was found in the November 2026 sweep.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Read-only repository and project metadata review.",
+      "sources": [
+        "ns2jb-repository",
+        "pepsipu-ns2jb-blog"
+      ],
+      "evidence": "GitLab project metadata shows last_activity_at 2026-11-16; the README still requires SmileBASIC 4.4.9 and says 'Switch 2 only'; run.cjs sets platform 2 and spawns engine/switch2/pipeline.cjs. No ns1jb or Switch 1 port appeared on GitHub or GitLab in the sweep.",
+      "limitations": "Absence of a public package; the author still says the exploit was tested on Switch 1.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-143",
+      "claim": "The public Switch 2 WebKit research (s2wkjb) targets 23.0.1 through the captive portal but has no exploit and only plans a Switch 1 port.",
+      "status": "VERIFIED",
+      "confidence": "high",
+      "scope": "Project README; research status only.",
+      "sources": [
+        "s2wkjb-repository"
+      ],
+      "evidence": "The README says 'This is research in progress. Nothing here is a jailbreak yet, and no exploit is claimed', lists the applets and the conntest trigger, and says a Switch 1 port is planned. The lab is a benign DNS/HTTP server that logs the UA.",
+      "limitations": "No public code or result.",
+      "last_reviewed": "2026-11-25"
+    },
+    {
+      "id": "E-144",
+      "claim": "The 2026-11-12 supernag wave was reported on 23.0.1 for SmileBASIC 4 and Civilization VII after 23.5.0; the target's browser block is consistent with that wave.",
+      "status": "VERIFIED",
+      "confidence": "medium",
+      "scope": "Community report about Switch 2 titles plus the shared ns:vm mechanism.",
+      "sources": [
+        "reddit-switch2hacks-supernag-2026",
+        "switchbrew-23.5.0"
+      ],
+      "evidence": "The r/switch2hacks announcement says multiple 23.0.1 users report supernag on SmileBASIC 4 and Civilization VII, that it forces an update to 23.5.0, and that maintenance mode does not clear it. Switchbrew says dauth began requiring 23.5.0 around 2026-11-16.",
+      "limitations": "The reports are about Switch 2 titles; the target is a Switch 1 OLED. The shared ns:vm mechanism and the local browser refusal make the same explanation likely, but the exact trigger is unproven.",
+      "last_reviewed": "2026-11-25"
     }
   ]
 }

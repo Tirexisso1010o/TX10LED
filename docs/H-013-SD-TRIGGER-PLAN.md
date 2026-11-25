@@ -1,6 +1,6 @@
 # H-013 — SD-card free-trigger test plan
 
-> **Status: benign control run 2026-10-31; sibling-directory route closed negative.** The crafted image was not written. The card/album setup is valid, but the Album does not traverse non-date directories under `NINTENDO/ALBUM`, so the crafted `..\<CJK>` sibling would be ignored. See the result below and the next variant at the end.
+> **Status: benign control run 2026-10-31; sibling-directory route closed negative; day-directory variant prepared 2026-11-25, not run.** The crafted sibling image was not written. The card/album setup is valid, but the Album does not traverse non-date directories under `NINTENDO/ALBUM`, so the crafted `..\<CJK>` sibling would be ignored. The next variant places the crafted name inside the traversed day directory; it needs a sacrificial-card write and explicit approval. See the result below and the prepared images at the end.
 
 ## Result (2026-10-31)
 
@@ -126,13 +126,37 @@ A crash is **not** fs-level code execution. It would confirm reachability only.
 
 The benign sibling test showed the Album only traverses `NINTENDO/ALBUM/YYYY/MM/DD`. The next image should keep the real Exif control and add a second, 255-character crafted filename in the same day directory, for example `..\` + 248 CJK + `.jpg` (255 characters). The path is `NINTENDO/ALBUM/2026/10/27/<name>`, about 27 + 751 UTF-8 bytes = ~778 bytes, just over `0x301`.
 
-The day directory must span two clusters to hold the 20 LFN entries plus the short entry. The benign length control uses the same name length with `AA\` instead of `..\`. If the Album filters the filename before `GetEntryType`, this variant will also be negative; the browser/download route is then the remaining free-surface candidate.
+The day directory must span two clusters to hold the 20 LFN entries plus the short entry. The benign length control uses the same name length with `AA\` instead of `..\`. If the Album filters the filename before `GetEntryType`, this variant will also be negative. The browser download and file-selection routes are already closed negative, and the applet is now blocked by the supernag, so the Album is the last remaining offline free surface (`E-120`, `E-121`, `E-136`).
 
-The current generator does not build a two-sector day directory. This variant needs new code, a new card write, and explicit approval. It has not been run.
+The generator now supports the two-sector day-directory variant:
+
+```sh
+python3 scripts/sdcard_lab.py --mbr --stamp 0045 \
+  --jpeg scripts/assets.local/real.jpg \
+  --valid-name '2026102700452400-57B4628D2267231D57E0FC1078C0596D.jpg' \
+  --anomaly album_date_file_long_benign --out h013-day-benign.img
+python3 scripts/sdcard_lab.py --mbr --stamp 0045 \
+  --jpeg scripts/assets.local/real.jpg \
+  --valid-name '2026102700452400-57B4628D2267231D57E0FC1078C0596D.jpg' \
+  --anomaly album_date_file_long_parent --out h013-day-parent.img
+```
+
+The day directory occupies clusters 7 and 8; the control screenshot is at cluster 9 and the crafted JPEG follows it. The crafted filename is `..\` + 248 CJK + `.jpg` (255 UTF-16 characters); the benign control is the same with `AA\`. The full path is 777 UTF-8 bytes, above the 0x301 buffer.
+
+| Image | Anomaly | Size | SHA-256 |
+|---|---|---|---|
+| `h013-day-benign.img` | `album_date_file_long_benign` | 71,303,168 bytes | `095462805f52d109754a42ce25037a2c68887c48364c5ac9a380f88294e40009` |
+| `h013-day-parent.img` | `album_date_file_long_parent` | 71,303,168 bytes | `c803e78d43757cd71874b37b7f6d02a08605bb398d9380888a9856bc989287ff` |
+
+Prepared locally under `scripts/assets.local/h013/` (ignored). The benign image must be written and run first; the parent image only after a clean benign run. The card write is destructive to the sacrificial card and must be run by the owner. The browser routes are closed and the supernag blocks the applet, so this is the only remaining offline free test; a confirmed crash would still not be code execution without the Switch 1 `fs` binary. This variant has **not** been run on the console (`E-141`).
 
 ## References
 
 - `H-013`, `H-004` — hypotheses.
 - `E-045` — the `ns2jb` `Path::Normalize` description.
 - `E-114`, `E-118` — the Switch 2-only package and the local `fs` artifact gap.
+- `E-120`, `E-121` — the closed browser download and file-selection routes.
+- `E-129`, `E-130` — the `23.5.0` `fs` fix and the `PathNormalizer::Normalize` details.
+- `E-136` — the supernag gate for the browser applet.
+- `E-141` — the prepared day-directory images and hashes.
 - `docs/PORTABILITY.md` — why the `fs` binary remains the gate.

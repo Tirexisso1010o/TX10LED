@@ -1,6 +1,6 @@
 # Entry Points
 
-> **Research snapshot: 2026-11-03.** No publicly documented, reproducible software-only entry point to fs-level native code was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. The closest public fs-level lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. CivSwitch is a new public Switch 1 stage-1 game-process primitive, but it is not fs-level and is untested on Switch 1 23.0.1. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.
+> **Research snapshot: 2026-11-25.** No publicly documented, reproducible software-only entry point to fs-level native code was found for an unmodified Switch OLED (Mariko) on firmware 23.0.1. The closest public fs-level lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. CivSwitch is a public Switch 1 stage-1 game-process primitive, but it is not fs-level and is untested on Switch 1 23.0.1. Firmware 23.5.0 now fixes the `fs` bug and updates the anti-downgrade fuses, and the target's browser applet is blocked by a persistent supernag. The November 2026 `fs` chains are Switch 2-only. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.
 
 This document is the readable companion to [`research/entry-points.json`](../research/entry-points.json). The JSON is the source of truth for the surface matrix; this page explains what each surface is, what access it requires, and why it does or does not change the conclusion.
 
@@ -15,7 +15,7 @@ Two axes are deliberately separate:
 1. **Firmware compatibility** — can Atmosphère and hekate operate on this system firmware?
 2. **Entry-point compatibility** — is there a way to execute unsigned code on this hardware at all?
 
-The answer is **yes** to the first and **no documented software-only method** for the second. Atmosphère 1.12.1 and hekate v6.5.4 support 23.0.1, but support for a firmware's system modules is not a way to run code on a patched bootROM.
+The answer is **yes** to the first and **no documented software-only method** for the second. Atmosphère 1.12.2 and hekate 6.5.5 support 23.0.1 and 23.5.0, but support for a firmware's system modules is not a way to run code on a patched bootROM.
 
 ## The chain, as stages
 
@@ -27,7 +27,7 @@ An entry point is only one link. Atmosphère needs a chain, and the links are no
 | **1. Initial code execution** | Arbitrary code in an ordinary userland process | Public stage-1 primitive exists (CivSwitch game-process ROP), but it is not fs-level and is untested on Switch 1 23.0.1 |
 | **2. Privilege escalation** | A sysmodule with useful permissions, or the kernel | Not publicly demonstrated on Switch 1 23.0.1 |
 | **3. Boot-stage execution** | Code at warmboot/package1, before Horizon verifies its modules | **Nothing public** |
-| **4. Launch and persistence** | Hand off to a payload or CFW | Solved: Atmosphère 1.12.1, hekate v6.5.4 |
+| **4. Launch and persistence** | Hand off to a payload or CFW | Solved: Atmosphère 1.12.2, hekate 6.5.5 |
 
 For the narrowed **fs-level** goal, stage 3 is **not required**; stages 0–2 are the target. Stage 3 remains the decisive link for Atmosphère. Atmosphère replaces verified system modules, so a kernel exploit that arrives after boot cannot make the boot chain load unsigned code. The historical proof that this is possible on patched hardware is **Caffeine**, a warmboot exploit for patched Erista on 4.0.0–4.1.0, which ran full CFW without Fusée Gelée. No Mariko equivalent is public for modern firmware.
 
@@ -309,11 +309,13 @@ Both are recorded in the JSON as `L-002` and `L-003`. They are useful for unders
 
 ## What this means
 
-As of **2026-11-03**, the reviewed public documentation supports this conclusion:
+As of **2026-11-25**, the reviewed public documentation supports this conclusion:
 
-> Firmware 23.0.1 is compatible with Atmosphère 1.12.1 and hekate v6.5.4, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to fs-level native code. The documented route to Atmosphère requires a hardware modchip, which is outside this project's scope.
+> Firmware 23.0.1 is compatible with Atmosphère 1.12.2 and hekate 6.5.5, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to fs-level native code. The documented route to Atmosphère requires a hardware modchip, which is outside this project's scope.
 
 The closest public fs-level lead is `ns2jb`. It is a genuine software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. It does not change the conclusion for the OLED. CivSwitch (`EP-012`) is the closest public Switch 1 stage-1 artifact, but it is native code in the Civilization VII game process, not fs-level, and it is untested on Switch 1 23.0.1.
+
+Two November 2026 developments sharpen the blockers. First, firmware **23.5.0** fixes the `fs` `PathNormalizer::Normalize` overflow on Switch 1 and Switch 2 and updates the anti-downgrade fuse list; `23.0.1` is the last vulnerable firmware and must be preserved. Second, the target's browser applet is blocked by a persistent **supernag** in system save `0x8000000000000049` and the `ns:vm` vulnerability setting; maintenance mode and console initialization do not clear it, and no stock-safe clearance is known (`E-129`, `E-130`, `E-136`, `E-138`). The public November 2026 `fs` chains (KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen) are Switch 2-only and do not supply the missing Switch 1 package (`E-131`). The only remaining offline free surface is the prepared `H-013` Album image (`E-141`).
 
 GameShare (`EP-011`) was reviewed as a receiver-side remote-input surface and recorded as `UNKNOWN`. It is reachable on the target, but no public vulnerability exists, hosting requires a Switch 2, and any compromise would stop at applet privileges. A second read-only review on 2026-10-29 found no public `splay`/GameShare vulnerability and no post-20.0.0 `splay` security fix; the local `splay` program NCA is blocked by key generation `0x17`, while its meta CNMT is readable (`E-102`, `E-103`). It does not change the conclusion either.
 
@@ -324,6 +326,8 @@ The conclusion would need to be revisited if any of the following became availab
 - A public, independently reproduced Mariko bootROM or pre-boot software vulnerability that works on 23.0.1.
 - A packaged, reproducible Switch 1 version of the `ns2jb` chain, with the model and firmware identified.
 - A CivSwitch reproduction on Switch 1 23.0.1 plus a Switch 1 `fs` payload or the missing `fs` binary.
+- A Switch 1 `fs` package, or a Switch 1 Seedsow/KaiHEN port with a save-delivery route; the November 2026 packages are Switch 2-only (`E-131`).
+- A stock-safe supernag clearance, or a new no-save entry point on `23.0.1` that does not need the browser (`E-136`, `E-138`).
 - A public chain that connects a userland/sysmodule primitive to kernel or bootROM access on Mariko, with reproducible steps and hardware evidence.
 - A public vulnerability in `splay` or the GameShare protocol, combined with a Mariko kernel or bootROM stage.
 - A documented software-only entry point from a maintained project that explicitly supports the OLED on 23.0.1.

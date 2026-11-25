@@ -12,6 +12,8 @@ The research conclusion is that an unmodified Switch OLED has no publicly docume
 
 The CivSwitch repository was inspected **read-only** on 2026-11-03. No cartridge was purchased, no Pico was flashed, and no payload was run on the console. A purchase or a loader test requires explicit approval and is covered by the risk table below.
 
+The November 2026 state changes the boundary. Firmware **23.5.0** fixes the fs `PathNormalizer::Normalize` overflow on Switch 1 and Switch 2, updates the anti-downgrade fuses, and is required by dauth; the target must remain on **23.0.1**. The target's web applets are blocked by a persistent **supernag** (system save `0x8000000000000049` plus the `ns:vm` vulnerability flag); maintenance mode and system initialization do not clear it, and the only documented clearances are CFW patches, a NAND restore, or updating to the cached version, which would remove the fs bug. The public fs chains released in November 2026 (KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen) are **Switch 2-only** and several carry brick warnings. The BigInt WebKit candidate is Switch 2 `20.4.0`-only, about 5% reliable, and can kernel-panic on failure. None is authorized on the OLED. See `E-129`-`E-144`.
+
 ## Prohibited actions
 
 Do not use this repository to:
@@ -31,7 +33,12 @@ Do not use this repository to:
 - download firmware or keys from a third party;
 - use the owner's keys against any console other than the owner's own;
 - collect or publish full serial numbers or tokens;
-- run the Switch 2 `ns2jb` package, `mac2jb`, or a fork against the OLED, or disable SIP / load an unsigned kernel extension to do so.
+- run the Switch 2 `ns2jb` package, `mac2jb`, or a fork against the OLED, or disable SIP / load an unsigned kernel extension to do so;
+- update the OLED to `23.5.0` or any other version, or accept an update prompt; `23.5.0` fixes the fs bug and burns the anti-downgrade fuses;
+- attempt to clear or patch the supernag save/setting on stock firmware, use maintenance mode or console initialization as a denag step, or follow a Switch 2 supernag workaround;
+- run KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen, or any other Switch 2 fs package on the OLED;
+- serve the BigInt WebKit exploit or any kernel-panic-capable page to the OLED without a Switch 1-specific port, a bounded protocol, and explicit approval;
+- use `luci-app-switch2-block` or a similar spoof to try to "enable" the captive portal; it suppresses the update check and does not clear an existing supernag.
 
 If a procedure requires any of these, it is outside the project's authorization boundary.
 
@@ -77,6 +84,11 @@ It binds the Mac's LAN address on UDP 53 and TCP 80 so the console's **Test Conn
 | Use JKSV on the modded 22.0.0 seed and Nintendo's official save transfer | Medium; touches the modded console, account/network, and save state | Not authorized; separate explicit approval; Nintendo requires the latest system version, so the 22.0.0 seed is blocked as-is (`E-124`) |
 | Update the modded 22.0.0 seed console to 23.0.1 | High; irreversible firmware change; may affect the modchip/CFW and the owner's prior no-update decision | Not authorized; separate explicit approval; currently prohibited |
 | Run the Switch 2 `ns2jb` package, `mac2jb`, or a fork on the OLED | High; the package is hardcoded for Switch 2 and would fail or crash, and `mac2jb` additionally requires disabling SIP and loading an unsigned kernel extension | Prohibited; the package is not a Switch 1 port. Read-only inspection is allowed (`E-114`, `E-115`) |
+| Update the OLED to `23.5.0` (or accept a system update) | High; fixes the fs bug, updates the anti-downgrade fuse list, and is irreversible | Prohibited; `23.0.1` is the preservation target (`E-129`) |
+| Attempt a stock supernag clearance (maintenance mode, initialization, DNS changes, failed update) | Medium-high; no known stock method, may trigger an update or destroy data, and does not clear the system save flag | Prohibited; the documented clearances are CFW, a NAND restore, or updating to the cached version (`E-136`, `E-138`) |
+| Run a Switch 2 fs chain (KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen) on the OLED | High; wrong platform, full-NAND/brick warnings, and no Switch 1 build | Prohibited; read-only review only (`E-131`) |
+| Serve the BigInt WebKit exploit to the OLED | Medium-high; Switch 2 `20.4.0`-only, about 5% success, and a failed attempt can kernel-panic with `2168-0002` | Not authorized; needs a Switch 1 port, a bounded page, and explicit approval (`E-133`, `E-134`) |
+| Write and run the `H-013` day-directory benign image | Medium; the Album or fs may hang or crash on the crafted path; the card is sacrificial | Prepared; benign image first; separate explicit approval (`E-141`) |
 
 ## Before any device interaction
 
@@ -133,6 +145,22 @@ The tool never requires RCM for identity inspection.
 - If a crash report or error code appears, copy it before rebooting and do not repeat the page load.
 - Record the page hash, the last portal log event, and whether the console rebooted. A crash is a signal to triage offline, not a jailbreak.
 
+### The console shows a supernag or an update prompt
+
+- Do **not** accept the update. Do not enter maintenance mode or initialize the console to try to clear it.
+- Keep the console offline. Changing DNS or using a spoofed LAN test does not clear an existing flag.
+- Record the exact prompt, the time, the applet or title involved, and whether the console had been online recently.
+- A supernag is a persistent local state in system save `0x8000000000000049` plus the `ns:vm` vulnerability setting. The documented clearances are CFW patches, a NAND restore, or updating to the cached version; all are outside this project (`E-136`, `E-138`).
+- Updating to `23.5.0` would clear the nag but also fix the fs bug and update the anti-downgrade fuses. Do not trade the vulnerability for the nag.
+
+### A Switch 2 fs tool or the BigInt WebKit page was run on the OLED
+
+- This should not happen; treat it as an incident. Stop the host, disconnect the console, and do not repeat the input.
+- If the console is unresponsive, hold the power button until it powers off, wait ten seconds, and boot normally.
+- Do not run `installer-creator`, a kaiHEN bootstrap, a Seedsow FS run, or a CivSwitchFS persistence step as a recovery action.
+- If a crash report or `2168-0002` appears, copy it before rebooting. A kernel panic is a failure signal, not progress.
+- Record the exact package, commit, page hash, and console behavior.
+
 ### The console is unresponsive after a CivSwitch loader test
 
 The CivSwitch loader is a game-process exploit. If the game crashes or the console hangs after the Pico types the payload, do not retry blindly. Hold the power button until the console powers off, wait ten seconds, and power it on normally. The game may have unsaved progress; do not run `installer-creator` as a recovery step. If the console boots but the game save is damaged, restore it only from a backup the owner made before the test. Record the observed screen, error code, and whether the console rebooted. Do not attempt fs escalation from a crashed state.
@@ -179,6 +207,8 @@ The CivSwitch loader is a game-process exploit. If the game crashes or the conso
 - Record the new firmware version.
 - Re-check Atmosphère and hekate compatibility.
 - Re-check whether the entry-point conclusion changes. A firmware update does not create an entry point on Mariko.
+- If the console reached `23.5.0`, the fs `PathNormalizer::Normalize` bug is fixed and the anti-downgrade fuse list is updated (`E-129`). `23.0.1` is the preservation target; do not attempt to restore the vulnerability by downgrading.
+- Treat a `23.5.0` update as the end of this software-only path for that console unless a new, independently verified entry point appears.
 
 ### A modchip was installed
 

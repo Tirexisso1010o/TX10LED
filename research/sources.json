@@ -1046,7 +1046,205 @@
       "snapshot": "Published 2026-11-01. Reports Gezine's CivSwitch release, quotes the README's physical 1.0.0 cartridge requirement and Pico installer, and notes the game was readily available in the UK for about \u00a330 at publication.",
       "license": "News article; cited, not redistributed.",
       "notes": "Used for release date, public reception, and the approximate used-cartridge price. The article frames the release for Switch 2 homebrew, but the quoted README is for the Switch 1 edition."
-    }
+    },
+{
+  "id": "switchbrew-23.5.0",
+  "title": "Nintendo Switch Brew: 23.5.0",
+  "publisher": "Nintendo Switch Brew",
+  "kind": "documentation",
+  "url": "https://switchbrew.org/wiki/23.5.0",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Page retrieved 2026-11-25. Release date 2026-11-10; the fs vuln is fixed; the anti-downgrade fuses were updated; dauth required 23.5.0 as of about 2026-11-16.",
+  "license": "Community wiki; cited, not redistributed.",
+  "notes": "Documents the fs fix, the FS KIP update, the anti-downgrade fuse update, and the system-title and IPC changes."
+},
+{
+  "id": "atmosphere-release-1.12.2",
+  "title": "Atmosphère 1.12.2",
+  "publisher": "Atmosphere-NX",
+  "kind": "release",
+  "url": "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.2",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Tag 1.12.2, published 2026-11-11. Basic support for 23.5.0; fusee was re-released on 2026-11-13 to fix a nogc patch failure on 23.5.0.",
+  "license": "GPL-2.0; cited, not redistributed.",
+  "notes": "Shows CFW support for 23.5.0; it does not create an entry point on Mariko."
+},
+{
+  "id": "hekate-release-v6.5.5",
+  "title": "hekate v6.5.5 & Nyx v1.9.5",
+  "publisher": "CTCaer",
+  "kind": "release",
+  "url": "https://github.com/CTCaer/hekate/releases/tag/v6.5.5",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Published 2026-11-11. Latest HOS supported: 23.5.0; a fat32 NOGC fix followed the same day.",
+  "license": "GPL-2.0; cited, not redistributed.",
+  "notes": "Supersedes the earlier 6.5.4 ceiling at 23.0.1."
+},
+{
+  "id": "kaihen-repository",
+  "title": "ouncebrew/kaihen: kaiHEN改変",
+  "publisher": "ouncebrew",
+  "kind": "repository",
+  "url": "https://github.com/ouncebrew/kaihen",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-11-24. README describes a Switch 2 homebrew environment and minimal CFW with full system/NAND access; kaiHEN 20261123 uses an sdcard/ release layout.",
+  "license": "GPL-2.0-only with exemptions; cited, not redistributed.",
+  "notes": "Switch 2 only; started by Switch 2 acquisition tools, not a Switch 1 entry point."
+},
+{
+  "id": "seedsow-fs-kaihen-repository",
+  "title": "Malev0/seedsow-fs-kaihen: Seedsow FS exploit",
+  "publisher": "Malev0",
+  "kind": "repository",
+  "url": "https://github.com/Malev0/seedsow-fs-kaihen",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-11-24. README describes PC-driven and console-only Seedsow save FS exploits that run kaiHEN on a retail Switch 2 23.0.1; warns of brick risk.",
+  "license": "No license file at retrieval; cited, not redistributed.",
+  "notes": "Switch 2 only; a free-game entry point, but it requires a Switch 2 and a Seedsow save."
+},
+{
+  "id": "civswitchfs-repository",
+  "title": "ItsNerisma/CivSwitchFS",
+  "publisher": "ItsNerisma",
+  "kind": "repository",
+  "url": "https://github.com/ItsNerisma/CivSwitchFS",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-11-24. MIT. Tested on Switch 2 23.0.1 with Civilization VII 1.0.0 physical cartridge; exposes a full fsp-srv handle; includes brick warnings.",
+  "license": "MIT; cited, not redistributed.",
+  "notes": "Switch 2 only; not a Switch 1 fs package."
+},
+{
+  "id": "civ7-fs-kaihen-repository",
+  "title": "s8n/civ7-fs-kaihen",
+  "publisher": "s8n",
+  "kind": "repository",
+  "url": "https://github.com/s8n/civ7-fs-kaihen",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-11-15. Boots kaiHEN on a Switch 2 at 23.0.1 through Civilization VII; README recommends CivSwitchFS-kaiHEN; paid cartridge and wired network required.",
+  "license": "No license file at retrieval; cited, not redistributed.",
+  "notes": "Switch 2 only; confirms the public fs chains remain console-specific."
+},
+{
+  "id": "switch2-webkit-exploit-repository",
+  "title": "jamesrover45/switch2-webkit-exploit",
+  "publisher": "jamesrover45",
+  "kind": "repository",
+  "url": "https://github.com/jamesrover45/switch2-webkit-exploit",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-11-25. BigInt structured-clone desync for the Switch 2 WifiWebAuthApplet; tested only on 20.4.0; about 5% success; a failed attempt can kernel-panic with 2168-0002.",
+  "license": "No license file at retrieval; cited, not redistributed.",
+  "notes": "Switch 2 20.4.0 only; not verified on 23.0.1; no Switch 1 port."
+},
+{
+  "id": "s2wkjb-repository",
+  "title": "CrimsonFlame-Official/s2wkjb: Web Hack",
+  "publisher": "CrimsonFlame-Official",
+  "kind": "repository",
+  "url": "https://github.com/CrimsonFlame-Official/s2wkjb",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-11-21. Switch 2 captive-portal WebKit research targeting 23.0.1; no exploit claimed; a Switch 1 port is only planned.",
+  "license": "No license file at retrieval; cited, not redistributed.",
+  "notes": "Research only; confirms the applet surface and the absence of a public chain."
+},
+{
+  "id": "project-zero-switch-mariko",
+  "title": "KriskoAdam/project-zero-switch-mariko",
+  "publisher": "KriskoAdam",
+  "kind": "repository",
+  "url": "https://github.com/KriskoAdam/project-zero-switch-mariko",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-10-31. Independent Mariko 23.0.1 research; a physical WifiWebAuthApplet test recorded the UA, DOM execution, Fetch/XHR HTTP 200, and a WebSocket echo; no vulnerability or jailbreak.",
+  "license": "NOASSERTION at retrieval; cited, not redistributed.",
+  "notes": "Independent corroboration of the browser surface; blocked on encrypted NCAs; no exploit."
+},
+{
+  "id": "luci-app-switch2-block-repository",
+  "title": "xbcyl813/luci-app-switch2-block",
+  "publisher": "xbcyl813",
+  "kind": "repository",
+  "url": "https://github.com/xbcyl813/luci-app-switch2-block",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Repository pushed 2026-11-23. OpenWrt dnsmasq/uHTTPd spoof of the Nintendo LAN test plus firewall blocking to prevent updates and supernag.",
+  "license": "No license file at retrieval; cited, not redistributed.",
+  "notes": "Suppresses the update check; it does not open the browser or clear an existing supernag."
+},
+{
+  "id": "gag-order-repository",
+  "title": "Adubbz/Gag-Order",
+  "publisher": "Adubbz",
+  "kind": "repository",
+  "url": "https://github.com/Adubbz/Gag-Order",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Archived 2019. Source mounts system save 0x8000000000000049, reads ns:vm NeedsUpdateVulnerability, checks the setsys vulnerability setting, and flips NAGGED_BYTES to UNNAGGED_BYTES.",
+  "license": "GPL-2.0; cited, not redistributed.",
+  "notes": "Requires CFW/homebrew; documents the supernag save and setting."
+},
+{
+  "id": "switch-sys-tweak-repository",
+  "title": "p-sam/switch-sys-tweak",
+  "publisher": "p-sam",
+  "kind": "repository",
+  "url": "https://github.com/p-sam/switch-sys-tweak",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "develop branch pushed 2024-11-24. README lists FEAT_NSVM_SAFE, which mitms ns:vm NeedsUpdateVulnerability to return 0 to enable web applets on outdated firmware.",
+  "license": "GPL-2.0; cited, not redistributed.",
+  "notes": "Requires CFW; no stock equivalent."
+},
+{
+  "id": "gbatemp-captive-portals-supernag",
+  "title": "Captive portals on supernagged HOS?",
+  "publisher": "GBAtemp",
+  "kind": "forum",
+  "url": "https://gbatemp.net/threads/captive-portals-on-supernagged-hos.681606/",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Thread started 2026-05-08. The first post reports that the browser is blocked by a system-update prompt on a supernagged EmuNAND and asks how to connect to a public Wi-Fi; there are no replies.",
+  "license": "Forum post; cited, not redistributed.",
+  "notes": "Independent report that supernag blocks the captive-portal browser; no clearance method."
+},
+{
+  "id": "gbatemp-ipatched-supernag",
+  "title": "PSA about IPATCHed Switches and supernag",
+  "publisher": "GBAtemp",
+  "kind": "forum",
+  "url": "https://gbatemp.net/threads/psa-about-ipatched-switches-and-supernag.541978/",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Thread started 2019-06-27. Posts state supernag is a system save flag that survives maintenance mode and system initialization, and that only CFW/NAND restore or updating to the cached version clears it.",
+  "license": "Forum posts; cited, not redistributed.",
+  "notes": "Historical but directly on point; explains why no stock clearance is known."
+},
+{
+  "id": "reddit-switch2hacks-supernag-2026",
+  "title": "Nintendo is blocking people from using SmileBASIC & Civilization 7 on 23.0.1",
+  "publisher": "r/switch2hacks",
+  "kind": "forum",
+  "url": "https://www.reddit.com/r/switch2hacks/comments/1xu2zdc/nintendo_is_blocking_people_from_using_smilebasic/",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Posted 2026-11-12. Reports multiple 23.0.1 users getting supernag on SmileBASIC 4 and Civilization VII; says Maintenance Mode does not clear it; advises offline or 90DNS.",
+  "license": "Community post; cited, not redistributed.",
+  "notes": "Switch 2 reports, but the ns:vm mechanism is shared; corroborates the 23.0.1 supernag wave after 23.5.0."
+},
+{
+  "id": "torrentfreak-picofly-dmca",
+  "title": "Nintendo Targets Picofly Switch Modchip Firmware in GitHub DMCA Takedown",
+  "publisher": "TorrentFreak",
+  "kind": "news",
+  "url": "https://torrentfreak.com/nintendo-targets-picofly-switch-modchip-firmware-in-github-dmca-takedown/",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "Published 2026-11-11. Nintendo's DMCA notice disabled 144 GitHub repositories of Picofly, SX Core, and HWFLY-related modchip firmware.",
+  "license": "News article; cited, not redistributed.",
+  "notes": "Context only; it does not change the target's firmware or the public fs research."
+},
+{
+  "id": "webkit-safari-613-ssv-source",
+  "title": "WebKit safari-613-branch: SerializedScriptValue.cpp",
+  "publisher": "WebKit/WebKit",
+  "kind": "source",
+  "url": "https://raw.githubusercontent.com/WebKit/WebKit/safari-613-branch/Source/WebCore/bindings/js/SerializedScriptValue.cpp",
+  "retrieved_at": "2026-11-25",
+  "snapshot": "safari-613-branch at retrieval; 4,624 lines. readTerminal dispatches BigIntTag to readBigInt and BigIntObjectTag to readBigInt plus BigIntObject::create.",
+  "license": "LGPL-2.1/BSD-style WebKit license; cited, not redistributed.",
+  "notes": "Used to check the public BigInt desync premise; Nintendo's NetFront build is not this source."
+}
   ],
-  "last_reviewed": "2026-11-03"
+  "last_reviewed": "2026-11-25"
 }

@@ -1,6 +1,6 @@
 # Gap Analysis: What a Software-Only Path Would Require
 
-> **Research snapshot: 2026-10-26.** This is read-only analysis. It describes which pieces are missing and why. It does not authorize executing an exploit, injecting a payload, changing firmware, spoofing a GameShare host, or writing save data to the console.
+> **Research snapshot: 2026-11-25.** This is read-only analysis. It describes which pieces are missing and why. It does not authorize executing an exploit, injecting a payload, changing firmware, spoofing a GameShare host, or writing save data to the console.
 
 ## Why this document exists
 
@@ -30,7 +30,7 @@ Atmosphère is a **boot-time** CFW. A runtime kernel exploit can patch a running
 | 1. Initial execution | **Public stage-1 primitive exists, but not on Switch 1 23.0.1** | CivSwitch 1.0: chat XSS → V8 arbitrary read/write → native ROP in the Civilization VII 1.0.0 game process. Switch 1 22.5.0 tested; Switch 1 23.0.1 claimed but untested; paid cartridge and Pico required (`E-127`, `E-128`). `ns2jb`'s SmileBASIC ROP remains Switch 1-unpackaged (`E-117`). |
 | 2. Privilege escalation | **Not publicly demonstrated on Switch 1 23.0.1** | `ns2jb`'s `fs` `Path::Normalize` overflow, packaged for Switch 2; no Switch 1 `fs` binary in the dump (`E-118`) |
 | 3. Boot stage | **Nothing public** | Caffeine, a warmboot exploit for **Erista 4.0.0–4.1.0 only**; not required for fs-level |
-| 4. Launch | Packages exist, launch path missing | Atmosphère 1.12.1 and hekate v6.5.4 support 23.0.1 |
+| 4. Launch | Packages exist, launch path missing | Atmosphère 1.12.2 and hekate 6.5.5 support 23.0.1 and 23.5.0; firmware support is not an entry point |
 
 Stage 4 is the only stage with maintained software behind it — Atmosphère and hekate exist and support 23.0.1 — but it has nothing to hand off to without stage 3. Stage 3 is empty.
 

@@ -45,6 +45,13 @@ UNICODE_BENIGN_DIR_1 = "AA\\" + "\u4e00" * 167
 UNICODE_DIR_2 = "\u4e00" * 170
 UNICODE_FILE = "\u4e00" * 170 + ".jpg"
 
+# H-013 next variant: a 255-character filename inside the traversed day
+# directory. The full UTF-8 path is 26 + 751 = 777 bytes, just over the
+# 0x301-byte Path::Normalize buffer. The control keeps the same length but
+# replaces the "..\" prefix with "AA\".
+LONG_FILE_PARENT = "..\\" + "\u4e00" * 248 + ".jpg"
+LONG_FILE_BENIGN = "AA\\" + "\u4e00" * 248 + ".jpg"
+
 ANOMALIES = {
     "none": "Valid control image with one 16-byte file.",
     "cluster_oob": "FAT chain for the file points far beyond the cluster count.",
@@ -59,6 +66,8 @@ ANOMALIES = {
     "album_dir_oob": "Nintendo/Album directory entry points at an out-of-range cluster.",
     "album_unicode_parent_backslash": "Album tree with a long Unicode parent-backslash path (H-013).",
     "album_unicode_benign_path": "Same long Unicode path with a benign first component (H-013 control).",
+    "album_date_file_long_parent": "Day-directory filename of 255 chars starting with '..\\' (H-013 next variant).",
+    "album_date_file_long_benign": "Same 255-char day-directory filename with 'AA\\' (H-013 control).",
 }
 
 
@@ -207,6 +216,18 @@ def _build_fs(
             chain[cluster] = cluster + 1 if cluster < control + 3 + count - 1 else EOC
         for cluster in (control, control + 1, control + 2):
             chain[cluster] = EOC
+    if anomaly in {"album_date_file_long_parent", "album_date_file_long_benign"}:
+        count = (len(JPEG) + SECTOR - 1) // SECTOR
+        control = 9
+        crafted = control + count
+        # The 10 directory is one cluster (6); its 27 entry points at the
+        # day directory, which spans two clusters (7 -> 8). The control and
+        # crafted JPEGs follow the day directory.
+        chain[7] = 8
+        for cluster in range(control, control + count):
+            chain[cluster] = cluster + 1 if cluster < control + count - 1 else EOC
+        for cluster in range(crafted, crafted + count):
+            chain[cluster] = cluster + 1 if cluster < crafted + count - 1 else EOC
     if anomaly == "cluster_oob":
         chain[FILE_CLUSTER] = 0x0FFFFFF0
     elif anomaly == "fat_loop":
@@ -225,6 +246,10 @@ def _build_fs(
     data_offset = layout.data_start * SECTOR
     if anomaly == "album_date_file_oob":
         _album_date_tree(image, layout)
+    elif anomaly == "album_date_file_long_parent":
+        _album_date_long_tree(image, layout, LONG_FILE_PARENT)
+    elif anomaly == "album_date_file_long_benign":
+        _album_date_long_tree(image, layout, LONG_FILE_BENIGN)
     elif anomaly == "album_unicode_parent_backslash":
         _album_unicode_backslash_tree(image, layout, UNICODE_DIR_1)
     elif anomaly == "album_unicode_benign_path":
@@ -392,6 +417,66 @@ def _album_date_tree(image: bytearray, layout: Layout) -> None:
     )
     image[at(7) : at(7) + SECTOR] = day
     image[at(8) : at(8) + len(JPEG)] = JPEG
+
+
+def _album_date_long_tree(
+    image: bytearray, layout: Layout, long_name: str
+) -> None:
+    """Day-directory variant: the control and a 255-char crafted filename.
+
+    The day directory occupies clusters 7 and 8, so the 20 LFN entries plus
+    the short entry for the crafted name are not truncated at the first
+    cluster boundary. The control JPEG starts at cluster 9, the crafted JPEG
+    after it.
+    """
+    data = layout.data_start * SECTOR
+
+    def at(cluster: int) -> int:
+        return data + (cluster - 2) * SECTOR
+
+    # Root -> NINTENDO -> ALBUM -> 2026 -> 10 -> 27 (day directory at 7/8).
+    for cluster, name, attr, target in (
+        (2, b"NINTENDO   ", 0x10, 3),
+        (3, b"ALBUM      ", 0x10, 4),
+        (4, b"2026       ", 0x10, 5),
+        (5, b"10         ", 0x10, 6),
+        (6, b"27         ", 0x10, 7),
+    ):
+        sector = bytearray(SECTOR)
+        _dir_entry(sector, 0, name, attr, target, 0, STAMP)
+        image[at(cluster) : at(cluster) + SECTOR] = sector
+
+    count = (len(JPEG) + SECTOR - 1) // SECTOR
+    control_start = 9
+    crafted_start = control_start + count
+
+    valid_name = VALID_NAME or (
+        f"{NAME_STAMP}-{hashlib.md5(JPEG).hexdigest().upper()}.jpg"
+    )
+    day = bytearray(2 * SECTOR)
+    offset = _dir_entry_long(
+        day,
+        0,
+        valid_name,
+        1,
+        0x20,
+        control_start,
+        len(JPEG),
+        STAMP,
+    )
+    _dir_entry_long(
+        day,
+        offset,
+        long_name,
+        2,
+        0x20,
+        crafted_start,
+        len(JPEG),
+        STAMP,
+    )
+    image[at(7) : at(7) + 2 * SECTOR] = day
+    image[at(control_start) : at(control_start) + len(JPEG)] = JPEG
+    image[at(crafted_start) : at(crafted_start) + len(JPEG)] = JPEG
 
 
 def _album_unicode_backslash_tree(

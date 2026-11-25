@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-10-31",
+  "last_reviewed": "2026-11-25",
   "purpose": "Falsifiable research hypotheses for a software-only Atmosph\u00e8re path on Mariko firmware 23.0.1. Each record states what would confirm or kill it, so a negative result is recorded instead of being rediscovered.",
   "status_legend": [
     {
@@ -155,8 +155,8 @@
       "surface": "EP-008",
       "component": "fs sysmodule, IFileSystem GetEntryType and Path::Normalize",
       "hypothesis": "Because the documented filesystem API is largely unchanged between Switch 1 and Switch 2, the path-normalization buffer overflow described in the ns2jb write-up may also exist in the Switch 1 fs sysmodule on 23.0.1.",
-      "status": "UNVERIFIED",
-      "confidence": "medium",
+      "status": "VERIFIED",
+      "confidence": "high",
       "applies_to_target": true,
       "prerequisites": [
         "A stage-1 userland primitive on Switch 1 23.0.1. CivSwitch 1.0 provides a public game-process ROP primitive for Civilization VII 1.0.0, but Switch 1 23.0.1 is untested and the game is not owned (E-127, E-128).",
@@ -167,7 +167,7 @@
       "expected_signal": "Presence of the same normalize-and-copy sequence with a fixed 0x301-byte allocation and no length check.",
       "kill_criteria": "The Switch 1 implementation uses a different normalization path, bounds the copy, or is absent.",
       "risks": "Testing on hardware would require a paid game, a Pico, and a stage-1 primitive that is untested on 23.0.1. Static inspection is passive.",
-      "blocked_by": "Stage 1 is no longer blocked on SmileBASIC: CivSwitch 1.0 is a public Switch 1 game-process ROP primitive. It is blocked in practice on a paid Civilization VII 1.0.0 physical cartridge, a Pico USB HID, and an untested Switch 1 23.0.1 configuration (E-127, E-128). Stage 2 is blocked because the public ns2jb package is Switch 2-only (E-114), the owner's 23.0.1 dump has no fs NCA and every system program in scope is key generation 0x17 (E-118), and the supplied keys stop at 0x14. No public fs payload or CivSwitch-to-fs chain exists.",
+      "blocked_by": "Existence is verified, but the exploit chain is blocked on stage 1 and the Switch 1 fs binary. No public Switch 1 fs package exists: the November 2026 fs chains (KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen) are Switch 2-only (E-131), the public ns2jb package is Switch 2-only (E-114), the owner's 23.0.1 dump has no fs NCA and every system program in scope is key generation 0x17 (E-118), and the supplied keys stop at 0x14. CivSwitch provides a paid, untested Switch 1 stage-1 primitive but no fs escalation (E-127, E-128). 23.5.0 fixes the bug and updates the anti-downgrade fuses; updating the target would remove the vulnerability (E-129).",
       "evidence": [
         "E-045",
         "E-052",
@@ -176,7 +176,12 @@
         "E-117",
         "E-118",
         "E-127",
-        "E-128"
+        "E-128",
+        "E-129",
+        "E-130",
+        "E-131",
+        "E-132",
+        "E-142"
       ],
       "sources": [
         "pepsipu-ns2jb-blog",
@@ -188,13 +193,21 @@
         "mac2jb-repository",
         "civswitch-repository",
         "civswitch-core-js",
-        "civswitch-installer-readme"
+        "civswitch-installer-readme",
+        "switchbrew-23.5.0",
+        "switchbrew-system-flaws",
+        "kaihen-repository",
+        "seedsow-fs-kaihen-repository",
+        "civswitchfs-repository",
+        "civ7-fs-kaihen-repository",
+        "atmosphere-release-1.12.2",
+        "hekate-release-v6.5.5"
       ],
-      "last_reviewed": "2026-11-03",
+      "last_reviewed": "2026-11-25",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "A port is technically credible: the author says the SmileBASIC trigger and ROP stage were developed on a Switch 1, and that the exploit was tested there (E-117). It is not reproducible from public materials. The public package has only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets and 11 Switch 2 fs content hashes (E-114). The owner's local 23.0.1 dump contains no fs NCA, and every system program NCA in the 01000000000000xx range is key generation 0x17, which the supplied keys cannot decrypt (E-118). On 2026-11-03 the stage-1 gap gained a public candidate: CivSwitch 1.0 provides native ROP in the Civilization VII game process via a chat XSS and a V8 exploit (E-127). It is not fs-level, the public code has no fs payload, and Switch 1 23.0.1 is claimed but untested; Switch 1 22.5.0 is the only tested Switch 1 firmware (E-128). The fs bug itself remains unverified on Switch 1 23.0.1.",
-      "uncertainties": "The author's Switch 1 model and firmware are unstated, so applicability to 23.0.1 is unknown. Whether CivSwitch works on Switch 1 23.0.1 is untested. Whether the Civilization VII process has an fs session and can reach GetEntryType is unverified. Whether the 23.0.1 Switch 1 fs still contains the 0x301-byte Path::Normalize buffer and missing length check is unverified. Whether the loader/ExeFS behavior and payload would transfer to Switch 1 is also unverified.",
+      "results": "Existence is now verified by public flaw documentation: Switchbrew describes the fs PathNormalizer::Normalize overflow (0x301-byte buffer, 0x800-byte pointer buffer, up to 0x4FF bytes) and says the result is arbitrary read/write including on Switch 2, and 23.5.0 fixes it by sizing the buffer to the source path up to 0x600 (E-129, E-130). Pepsipu says the exploit was tested on Switch 1 (E-117). The public package still has only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets and 11 Switch 2 fs content hashes (E-114). The owner's local 23.0.1 dump contains no fs NCA, and every system program NCA in the 01000000000000xx range is key generation 0x17, which the supplied keys cannot decrypt (E-118). On 2026-11-03 the stage-1 gap gained a public candidate: CivSwitch 1.0 provides native ROP in the Civilization VII game process via a chat XSS and a V8 exploit (E-127), but it is not fs-level, the public code has no fs payload, and Switch 1 23.0.1 is claimed but untested (E-128). In November 2026 the public fs chains moved to Switch 2 only: KaiHEN, Seedsow FS, CivSwitchFS, and civ7-fs-kaihen all target Switch 2 23.0.1, and none provides a Switch 1 fs package (E-131). 23.5.0 now fixes the bug and updates the anti-downgrade fuses, so the target must stay on 23.0.1 (E-129).",
+      "uncertainties": "The author's Switch 1 model and firmware are unstated. Whether CivSwitch works on Switch 1 23.0.1 is untested. Whether the Civilization VII process has an fs session and can reach GetEntryType is unverified. The exact Switch 1 23.0.1 fs offsets, anchors, and heap layout are unpublished. Whether the loader/ExeFS behavior and payload would transfer to Switch 1 is also unverified.",
       "resolution": "blocked"
     },
     {
@@ -217,7 +230,7 @@
       "expected_signal": "A browser build old enough to match a published, exploitable n-day, plus a reachable applet invocation.",
       "kill_criteria": "The browser build is patched for all matching public advisories, or no applet invocation can be reached without a modified console.",
       "risks": "Captive-portal testing changes the console's temporary network settings, which are reversible. Exploit development is out of scope and untested.",
-      "blocked_by": "The exploratory W2 run produced no Stage 1 trigger; no clean repeat is planned without a new hypothesis and approval. The public PoC did not produce a crash in 16-58 s per mode. The reported ns2jb WebKit port is Switch 2-only and unpublished (E-116), so it is not a Switch 1 chain. A browser compromise would be applet-level only.",
+      "blocked_by": "The applet is unreachable on the target because of the local supernag, and no stock clearance is known; maintenance mode and system initialization do not clear it (E-136, E-138). The only new browser candidate is a Switch 2 20.4.0-only BigInt desync, unverified on 23.0.1, with about 5% success and a kernel-panic failure mode; upstream 613 handles BigIntTag, so a Switch 1 port is not a constant swap (E-133, E-134). W2 remains an inconclusive exploratory run. A browser compromise would be applet-level only.",
       "evidence": [
         "E-026",
         "E-028",
@@ -230,7 +243,15 @@
         "E-111",
         "E-112",
         "E-113",
-        "E-116"
+        "E-116",
+        "E-133",
+        "E-134",
+        "E-135",
+        "E-136",
+        "E-137",
+        "E-138",
+        "E-139",
+        "E-144"
       ],
       "sources": [
         "switchbrew-internet-browser",
@@ -245,13 +266,23 @@
         "github-uaf-2023-28205",
         "nvd-cve-2022-32893",
         "webkit-bugzilla-243557",
-        "onejailbreak-ns2jb-webkit"
+        "onejailbreak-ns2jb-webkit",
+        "switch2-webkit-exploit-repository",
+        "webkit-safari-613-ssv-source",
+        "project-zero-switch-mariko",
+        "gag-order-repository",
+        "switch-sys-tweak-repository",
+        "gbatemp-captive-portals-supernag",
+        "gbatemp-ipatched-supernag",
+        "reddit-switch2hacks-supernag-2026",
+        "luci-app-switch2-block-repository",
+        "s2wkjb-repository"
       ],
-      "last_reviewed": "2026-10-31",
+      "last_reviewed": "2026-11-25",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "Originally closed negative on 2026-10-26 after the timing probe found no JIT warm-up and no public non-JIT proof of concept was found. Reopened on 2026-10-30: a read-only review found CVE-2023-28205, a JavaScriptCore SerializedScriptValue/CloneDeserializer use-after-free that does not require a JIT and is reachable through postMessage with Map/Date objects. The public MIT-licensed PoC targets WebKit-613.1.17.1; the applet's feature set brackets Safari 15.4-15.6 and its UA token is AppleWebKit/613.0. At the time of the 2026-10-30 review, the PoC had not been run on the console. The local captive-portal harness and probe were prepared. W1 (reachability) passed on 2026-10-31: the applet loaded the local probe page and round-tripped a Map/Date graph through postMessage (ok=true, mapSize=1, dateValue=0), with postMessage, MessageChannel, BroadcastChannel, Worker, structuredClone, localStorage, and ES modules present. No error event occurred and the console behaved normally. This confirmed the reachability gate only. W2 exploratory run on 2026-10-31: the pinned public PoC was served in four modes (crash, probe=1, probe=2) over 227 s. The module graph loaded on every page load, but the page logged only Attempt lines and produced no Stage 1 trigger, alert, crash, reboot, or hang. The owner reverted DNS. The run deviated from the approved single-page protocol and is not a clean negative for CVE-2023-28205. A 2026-10-31 check found that the reported WebKit port of ns2jb is Switch 2-specific and has no public download or write-up, so it does not reopen this hypothesis.",
-      "uncertainties": "Whether a longer single run would reach Stage 1; the highest Attempt count is unknown. Whether Nintendo backported the MarkedVector fix into the 2026 NetFront build; whether the public PoC's PlayStation crash translates to the Switch; whether a crash would be controllable or only a denial of service. A browser compromise remains applet-level and cannot reach Atmosph\u00e8re without a separate kernel or boot-stage chain.",
+      "results": "Originally closed negative on 2026-10-26 after the timing probe found no JIT warm-up and no public non-JIT proof of concept was found. Reopened on 2026-10-30: a read-only review found CVE-2023-28205, a JavaScriptCore SerializedScriptValue/CloneDeserializer use-after-free that does not require a JIT and is reachable through postMessage with Map/Date objects. The public MIT-licensed PoC targets WebKit-613.1.17.1; the applet's feature set brackets Safari 15.4-15.6 and its UA token is AppleWebKit/613.0. At the time of the 2026-10-30 review, the PoC had not been run on the console. The local captive-portal harness and probe were prepared. W1 (reachability) passed on 2026-10-31: the applet loaded the local probe page and round-tripped a Map/Date graph through postMessage (ok=true, mapSize=1, dateValue=0), with postMessage, MessageChannel, BroadcastChannel, Worker, structuredClone, localStorage, and ES modules present. No error event occurred and the console behaved normally. This confirmed the reachability gate only. W2 exploratory run on 2026-10-31: the pinned public PoC was served in four modes (crash, probe=1, probe=2) over 227 s. The module graph loaded on every page load, but the page logged only Attempt lines and produced no Stage 1 trigger, alert, crash, reboot, or hang. The owner reverted DNS. The run deviated from the approved single-page protocol and is not a clean negative for CVE-2023-28205. A 2026-10-31 check found that the reported WebKit port of ns2jb is Switch 2-specific and has no public download or write-up, so it does not reopen this hypothesis. On 2026-11-25 the public WebKit picture was rechecked. The only new browser candidate is jamesrover45/switch2-webkit-exploit, a BigInt structured-clone desync that reaches addrof/RW in the Switch 2 WifiWebAuthApplet (E-133). It is tested only on Switch 2 20.4.0, is explicitly not verified on 23.0.1, succeeds about 5% of the time, and a failed attempt can kernel-panic with 2168-0002; its ROP is PS5/x86_64-derived, not a Switch 1 ARM64 chain. A source check found that upstream WebKit safari-613-branch handles BigIntTag/BigIntObjectTag in the deserializer, so the exploit's stated premise does not match that branch; Nintendo's NetFront 3.12.11 build may differ (E-134). Independent project-zero-switch-mariko research confirms that the Mariko 23.0.1 WifiWebAuthApplet executes pages with DOM, Fetch/XHR, and WebSocket but found no vulnerability or jailbreak (E-135). On the target, the supernag now blocks the applet: system save 0x8000000000000049 and the setsys vulnerability flag block web applets, and no stock clearance is known; maintenance mode and system initialization do not clear it (E-136, E-138). The 2026-11-17 local attempt reached only NX NIFM/00 requests and never loaded the applet, consistent with that gate (E-137). A November 2026 report describes the same 23.0.1 supernag wave for SmileBASIC 4 and Civilization VII (E-144). For prevention, luci-app-switch2-block spoofs the LAN test and blocks outbound traffic, but it does not open the browser or clear an existing flag (E-139).",
+      "uncertainties": "Whether Nintendo's NetFront 3.12.11 build has the BigInt pool divergence despite upstream 613's BigInt support; whether a Switch 1 port of the BigInt chain is feasible under PAC/CFI; whether the supernag can be cleared without updating or CFW; whether any other no-save applet surface remains. A browser compromise remains applet-level and cannot reach fs without a separate fs payload and binary.",
       "resolution": "blocked"
     },
     {
@@ -577,11 +608,11 @@
         "The Switch 1 fs binary to turn a confirmed crash into code execution"
       ],
       "expected_capability": "At most a crash or memory corruption in the fs sysmodule. It would be a stage-1-to-stage-2 trigger, not code execution by itself; exploiting the overflow still requires the Switch 1 fs binary and heap grooming.",
-      "test_procedure": "Build a FAT32 image with the real Exif control image and a crafted long filename containing a '..\\' component inside the traversed NINTENDO/ALBUM/YYYY/MM/DD directory (the sibling-directory variant was negative: the Album did not display the AA\\<CJK> directory). The day directory must span two clusters to hold the 255-character LFN. If the Album filters the name before GetEntryType, the test is negative; then try the browser/download route.",
+      "test_procedure": "Build or use the prepared FAT32 images with the real Exif control image and a 255-character crafted filename containing a '..\\' component inside the traversed NINTENDO/ALBUM/YYYY/MM/DD directory (the sibling-directory variant was negative). The day directory spans two clusters. Write the benign image first and run it; write the parent image only after a clean benign run. If the Album filters the name before GetEntryType, the test is negative; the browser/download route is closed and the supernag blocks the applet.",
       "expected_signal": "The console crashes, hangs, or reboots while the applet enumerates or opens the crafted path, or fs returns an unexpected error. Clean enumeration and normal behavior are a negative.",
       "kill_criteria": "The applet rejects or sanitizes the path, does not call GetEntryType on it, or the console remains normal through the bounded test.",
       "risks": "The console may hang or crash in an applet or in fs. Recovery is a reboot; the SD card is sacrificial and no console data is written. Do not run without approval.",
-      "blocked_by": "The browser download and file-selection routes are closed negative; no approved day-directory card test. A confirmed trigger would still need the Switch 1 fs binary and heap-grooming exploit to reach code execution.",
+      "blocked_by": "Prepared but not run; needs a sacrificial-card write and explicit approval. The browser download and file-selection routes are closed negative, and the supernag blocks the applet, so the Album is the remaining offline free surface (E-136). A confirmed trigger would still need the Switch 1 fs binary and heap-grooming exploit to reach code execution.",
       "evidence": [
         "E-045",
         "E-075",
@@ -590,18 +621,23 @@
         "E-118",
         "E-119",
         "E-120",
-        "E-121"
+        "E-121",
+        "E-129",
+        "E-130",
+        "E-141"
       ],
       "sources": [
         "pepsipu-ns2jb-blog",
         "switchbrew-filesystem",
-        "switchbrew-nca"
+        "switchbrew-nca",
+        "switchbrew-23.5.0",
+        "switchbrew-system-flaws"
       ],
-      "last_reviewed": "2026-10-31",
+      "last_reviewed": "2026-11-25",
       "hardware": "HEG-001 (Mariko)",
       "firmware": "23.0.1",
-      "results": "The benign sibling-directory image displayed the real Exif control with no error and no AA\\<CJK> folder (E-119). The browser download probe showed no download attribute, no save/open/directory picker, and no storage/caches API (E-120). The file-picker probe then displayed 'ready; choose a file', but pressing Browse produced 'The file selection is not supported' (E-121). The browser download and file-selection routes are closed negative. The day-directory SD-card filename variant remains untested; the fs binary is still required for code execution.",
-      "uncertainties": "Whether any free applet calls GetEntryType on a user-controlled path; whether the 23.0.1 Switch 1 fs contains the same 0x301-byte Path::Normalize overflow; whether a confirmed crash can be developed into code execution without the fs binary.",
+      "results": "The benign sibling-directory image displayed the real Exif control with no error and no AA\\<CJK> folder (E-119). The browser download probe showed no download attribute, no save/open/directory picker, and no storage/caches API (E-120). The file-picker probe then displayed 'ready; choose a file', but pressing Browse produced 'The file selection is not supported' (E-121). The browser download and file-selection routes are closed negative. The day-directory SD-card filename variant remains untested; the fs binary is still required for code execution. On 2026-11-25 the day-directory variant is prepared as two 71,303,168-byte FAT32 images: benign SHA-256 095462805f52d109754a42ce25037a2c68887c48364c5ac9a380f88294e40009 and parent SHA-256 c803e78d43757cd71874b37b7f6d02a08605bb398d9380888a9856bc989287ff. Both mount read-only and the test suite passes; neither has been written to a card or run (E-141). Public flaw documentation now confirms the fs overflow exists on Switch 1 and is fixed in 23.5.0 (E-129, E-130). The browser routes are closed negative and the supernag blocks the applet, so the Album is the remaining offline free surface. A confirmed crash would still need the Switch 1 fs binary.",
+      "uncertainties": "Whether the Album calls GetEntryType on a user-controlled path and whether it filters the crafted name; whether the 23.0.1 Switch 1 fs contains the same 0x301-byte buffer (public flaw documentation says the family bug is fixed in 23.5.0, but the exact Switch 1 build is unpublished); whether a confirmed crash can be developed into code execution without the fs binary.",
       "resolution": "blocked"
     },
     {
@@ -625,23 +661,27 @@
       "expected_signal": "The editor/Lua runs on the OLED and can read/write the game save; no fs or sd access.",
       "kill_criteria": "The demo is unavailable, the transfer is refused, the save is incompatible, or the editor fails to run.",
       "risks": "Console software install and state change; official save transfer and account use; seed console update; no fs exploit; the game may be updated or delisted.",
-      "blocked_by": "No hacked 23.0.1 seed; the only modded Switch 1 is 22.0.0 and the 23.0.1 source console is gone. Nintendo's official save transfer requires the latest system version (E-124), so the 22.0.0 seed cannot transfer to the 23.0.1 OLED as-is. The modded 22.0.0 console is off-limits by prior decision, and the Artemis/FS bootstrap is not public. The SD card is not a direct save-delivery path: its NCA/save content is NAX0/console-encrypted and the seed is internal (E-125).",
+      "blocked_by": "No hacked 23.0.1 seed; the only modded Switch 1 is 22.0.0 and the 23.0.1 source console is gone. Nintendo's official save transfer requires the latest system version (E-124), and the new Seedsow FS exploit is Switch 2-only (E-131). The modded 22.0.0 console is off-limits by prior decision, and no Switch 1 Artemis/FS bootstrap is public.",
       "evidence": [
         "E-122",
         "E-123",
         "E-124",
-        "E-125"
+        "E-125",
+        "E-131",
+        "E-133"
       ],
       "sources": [
         "seedsow-lua-editor-repo",
         "ns2-savekit-results",
-        "onejailbreak-seedsow"
+        "onejailbreak-seedsow",
+        "seedsow-fs-kaihen-repository",
+        "kaihen-repository"
       ],
-      "last_reviewed": "2026-10-31",
+      "last_reviewed": "2026-11-25",
       "hardware": "HEG-001 (Mariko) target; modded 22.0.0 seed",
       "firmware": "23.0.1 target; 22.0.0 seed",
-      "results": "Not tested on the OLED. Public repos report game-level Lua on Switch 1/2; no OLED 23.0.1 test. The seed console/current-firmware transfer is blocked and the Artemis/FS bootstrap is not public.",
-      "uncertainties": "Whether the official save transfer works across 22.0.0 and 23.0.1; whether the demo remains available in the owner's region; whether the save format matches the OLED's demo version; whether a future Artemis/FS bootstrap will be released.",
+      "results": "Not tested on the OLED. Public repos report game-level Lua on Switch 1/2; no OLED 23.0.1 test. The seed console/current-firmware transfer is blocked and the Artemis/FS bootstrap is not public. On 2026-11-25 the Seedsow FS exploit (Malev0/seedsow-fs-kaihen) is public: it drives kaiHEN on a retail Switch 2 23.0.1 from a Seedsow save, with a PC-driven and a console-only mode, and warns of brick risk. It is Switch 2-only and does not provide a Switch 1 Artemis/FS bootstrap (E-131). The Switch 1 route remains blocked on the seed console/current-firmware transfer.",
+      "uncertainties": "Whether the official save transfer works across 22.0.0 and 23.0.1; whether the demo remains available in the owner's region; whether the save format matches the OLED's demo version; whether a Switch 1 Seedsow FS port will be released.",
       "resolution": "blocked"
     }
   ]

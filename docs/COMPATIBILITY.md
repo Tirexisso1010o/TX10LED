@@ -25,8 +25,9 @@ The answer here is **yes** to the first and **no documented software-only method
 
 ```mermaid
 flowchart LR
-    A["Firmware 23.0.1"] --> B["Atmosphère 1.12.1: supported"]
-    A --> C["hekate v6.5.4: supported"]
+    A["Firmware 23.0.1 (last vulnerable)"] --> B["Atmosphère 1.12.2: supported"]
+    A --> C["hekate 6.5.5: supported"]
+    A --> D["Firmware 23.5.0: fs bug fixed; do not update"]
     B --> D["Can run after CFW is launched"]
     C --> D
     E["Mariko bootROM"] --> F["Fusée Gelée: patched"]
@@ -42,6 +43,7 @@ Atmosphère's release notes describe support for the firmware's kernel, system m
 |---|---|---|---|
 | E-001 | Atmosphère 1.12.1 supports firmware 23.0.1. | **VERIFIED** | Atmosphère 1.12.1 release notes; changelog; NH Switch Guide; issue #2883 |
 | E-002 | hekate v6.5.4 supports Horizon OS 23.0.1. | **VERIFIED** | hekate v6.5.4 release notes |
+| E-132 | Atmosphère 1.12.2 and hekate 6.5.5 support 23.5.0; 23.5.0 fixes the `fs` bug and updates the anti-downgrade fuses. | **VERIFIED** | Atmosphère 1.12.2 release notes; hekate 6.5.5 release notes; Switchbrew 23.5.0 |
 | E-003 | The OLED uses Mariko/Tegra X1+ on an ODNX10-A1 board. | **VERIFIED** | Switchbrew hardware; Nintendo support |
 | E-004 | CVE-2018-6242 is a Tegra BootROM RCM buffer overflow affecting pre-2016 Tegra processors. | **VERIFIED** | NVD |
 | E-005 | Patched/Mariko consoles can enter RCM but cannot receive a payload. | **VERIFIED** | NH Switch Guide, Entering RCM |
@@ -178,8 +180,8 @@ See [`USB_INTEGRATION.md`](USB_INTEGRATION.md) for the implementation and its li
 
 ## Bottom line
 
-As of **2026-11-03**, the reviewed public documentation supports this conclusion:
+As of **2026-11-25**, the reviewed public documentation supports this conclusion:
 
-> Firmware 23.0.1 is compatible with Atmosphère 1.12.1 and hekate v6.5.4, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to fs-level native code. The documented route to Atmosphère requires a hardware modchip, which is outside this project's scope. The closest public fs-level lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. CivSwitch is a public Switch 1 stage-1 game-process primitive, but it is not fs-level and is untested on Switch 1 23.0.1.
+> Firmware 23.0.1 is compatible with Atmosphère 1.12.2 and hekate 6.5.5, but an unmodified Switch OLED has no publicly documented, reproducible software-only path to fs-level native code. The documented route to Atmosphère requires a hardware modchip, which is outside this project's scope. The closest public fs-level lead is `ns2jb`, a real software-only userland/sysmodule chain, but it is packaged for Switch 2, is not packaged for Switch 1, and does not provide kernel, bootROM, or CFW access. CivSwitch is a public Switch 1 stage-1 game-process primitive, but it is not fs-level and is untested on Switch 1 23.0.1. Firmware 23.5.0 fixes the `fs` bug and updates the anti-downgrade fuses, and the target's browser applet is blocked by a persistent supernag; the November 2026 `fs` chains are Switch 2-only (`E-129`, `E-131`, `E-136`).
 
 This is an absence-of-documented-method finding. It is not proof that no undisclosed exploit exists. See [`research/known-limitations.md`](../research/known-limitations.md).

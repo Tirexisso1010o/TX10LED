@@ -19,26 +19,30 @@
   },
   "summary": {
     "question": "Is there a publicly documented, reproducible, software-only path to fs-level native code execution on an unmodified Switch OLED (HEG-001) running firmware 23.0.1?",
-    "answer": "No publicly documented, reproducible software-only path to fs-level native code execution was found in the reviewed public sources as of 2026-11-03. A public Switch 1 stage-1 game-process primitive now exists (CivSwitch), but it is not fs-level and is untested on Switch 1 23.0.1.",
+    "answer": "No publicly documented, reproducible software-only path to fs-level native code execution was found in the reviewed public sources as of 2026-11-25. A public Switch 1 stage-1 game-process primitive exists (CivSwitch), but it is not fs-level and is untested on Switch 1 23.0.1. The fs bug is confirmed on Switch 1 23.0.1 and fixed in 23.5.0; the public November 2026 fs chains are Switch 2-only, and the target's browser applet is blocked by a persistent supernag.",
     "status": "DISPROVEN",
-    "scope": "Public documentation reviewed on 2026-11-03. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
+    "scope": "Public documentation reviewed through 2026-11-25. This is an absence-of-documented-method finding, not proof that no undisclosed method exists.",
     "software_only_public_chain_on_target": false,
     "documented_route": "No public software-only route to fs-level native code on the OLED. The closest public fs-level artifact is ns2jb on Switch 2; the closest public Switch 1 stage-1 artifact is CivSwitch (game-process ROP). A hardware modchip remains the documented route to Atmosph\u00e8re, which is no longer required for this goal.",
     "closest_public_lead": "L-001",
     "closest_public_lead_name": "ns2jb",
-    "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1: the repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets. The macOS wrapper and maintained forks are also Switch 2-only and still require SmileBASIC. It does not provide kernel or bootROM access and is not documented on OLED/Mariko 23.0.1. Its fs-level ceiling matches the narrowed goal.",
+    "closest_public_lead_note": "A real software-only userland/sysmodule chain on Switch 2 system software 23.0.1. The author says it was also tested on Switch 1, but it is not packaged for Switch 1: the repository contains only engine/switch2, run.cjs hardcodes platform 2, and bootstrap.bas validates Switch 2 offsets. The macOS wrapper and maintained forks are also Switch 2-only and still require SmileBASIC. The November 2026 packages (KaiHEN, Seedsow FS, CivSwitchFS, civ7-fs-kaihen) are also Switch 2-only. It does not provide kernel or bootROM access and is not documented on OLED/Mariko 23.0.1. Its fs-level ceiling matches the narrowed goal.",
     "closest_stage1_lead": "L-008",
     "closest_stage1_lead_name": "CivSwitch",
-    "closest_stage1_lead_note": "A public MIT-licensed Switch 1 game-process ROP chain for Civilization VII 1.0.0 physical cartridge. It is native code in the game process, not fs-level, and it requires a paid cartridge, a Pico USB HID, and a local-wireless lobby. Switch 1 22.5.0 is tested; Switch 1 23.0.1 is claimed but untested.",
+    "closest_stage1_lead_note": "A public MIT-licensed Switch 1 game-process ROP chain for Civilization VII 1.0.0 physical cartridge. It is native code in the game process, not fs-level, and it requires a paid cartridge, a Pico USB HID, and a local-wireless lobby. Switch 1 22.5.0 is tested; Switch 1 23.0.1 is claimed but untested. It does not supply the missing Switch 1 fs binary, and the target's browser is supernag-gated.",
     "undisclosed_method_status": "UNKNOWN",
     "notes": [
-      "Firmware compatibility is a separate axis: Atmosph\u00e8re 1.12.1 and hekate v6.5.4 support 23.0.1, but neither provides an entry point.",
+      "Firmware compatibility is a separate axis: Atmosph\u00e8re 1.12.2 and hekate 6.5.5 support 23.0.1 and 23.5.0, but neither provides an entry point.",
       "The only documented route for patched/Mariko consoles is a hardware modchip, which is outside this project's scope.",
       "The surface matrix records what is publicly documented; it does not claim that any surface is unexploitable.",
       "GameShare is a documented flow in which a nearby device sends data that a system applet on the target parses without the user launching a game. It is recorded as EP-011 / L-006; no public vulnerability exists for it.",
       "Success criterion narrowed on 2026-10-31: native code execution as fs (tethered) is sufficient; boot-stage CFW is not required.",
       "Seedsow Lullaby (Artemis engine) is recorded as L-007/H-014: a free-demo save Lua primitive that runs game-level code on Switch 1/2 without SmileBASIC. It is not fs-level, the Artemis/FS bootstrap is not public, and the OLED route is blocked by the seed console/current-firmware transfer.",
-      "CivSwitch 1.0 is recorded as L-008/EP-012: a public Switch 1 game-process exploit for Civilization VII 1.0.0 physical cartridge. It provides native ROP in the game process, not fs-level code. It requires a paid cartridge and a Pico USB HID, and Switch 1 23.0.1 is claimed but untested. The optional installer wipes save:/saves/Single/."
+      "CivSwitch 1.0 is recorded as L-008/EP-012: a public Switch 1 game-process exploit for Civilization VII 1.0.0 physical cartridge. It provides native ROP in the game process, not fs-level code. It requires a paid cartridge and a Pico USB HID, and Switch 1 23.0.1 is claimed but untested. The optional installer wipes save:/saves/Single/.",
+      "Firmware compatibility is a separate axis: Atmosph\u00e8re 1.12.2 and hekate 6.5.5 support 23.0.1 and 23.5.0, but neither provides an entry point.",
+      "Firmware 23.5.0 fixes the fs PathNormalizer::Normalize overflow on Switch 1 and Switch 2 and updates the anti-downgrade fuses; 23.0.1 is the last vulnerable firmware and the preservation target (E-129, E-130).",
+      "The target's web applets are blocked by a persistent supernag in system save 0x8000000000000049 and the ns:vm vulnerability setting; maintenance mode and console initialization do not clear it (E-136, E-138).",
+      "The only remaining offline free surface is the prepared H-013 Album image; it needs a sacrificial-card write and explicit approval (E-141)."
     ]
   },
   "field_notes": {
