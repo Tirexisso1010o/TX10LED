@@ -1,6 +1,6 @@
 # H-013 — SD-card free-trigger test plan
 
-> **Status: benign control run 2026-10-31; sibling-directory route closed negative; day-directory variant prepared 2026-11-25, not run.** The crafted sibling image was not written. The card/album setup is valid, but the Album does not traverse non-date directories under `NINTENDO/ALBUM`, so the crafted `..\<CJK>` sibling would be ignored. The next variant places the crafted name inside the traversed day directory; it needs a sacrificial-card write and explicit approval. See the result below and the prepared images at the end.
+> **Status: benign control run 2026-10-31; sibling-directory route closed negative; day-directory variant prepared 2026-11-25, parked at owner request, not run.** The crafted sibling image was not written. The card/album setup is valid, but the Album does not traverse non-date directories under `NINTENDO/ALBUM`, so the crafted `..\<CJK>` sibling would be ignored. The next variant places the crafted name inside the traversed day directory; it needs a sacrificial-card write and explicit approval. See the result below and the prepared images at the end.
 
 ## Result (2026-10-31)
 
@@ -148,7 +148,7 @@ The day directory occupies clusters 7 and 8; the control screenshot is at cluste
 | `h013-day-benign.img` | `album_date_file_long_benign` | 71,303,168 bytes | `095462805f52d109754a42ce25037a2c68887c48364c5ac9a380f88294e40009` |
 | `h013-day-parent.img` | `album_date_file_long_parent` | 71,303,168 bytes | `c803e78d43757cd71874b37b7f6d02a08605bb398d9380888a9856bc989287ff` |
 
-Prepared locally under `scripts/assets.local/h013/` (ignored). The benign image must be written and run first; the parent image only after a clean benign run. The card write is destructive to the sacrificial card and must be run by the owner. The browser routes are closed and the supernag blocks the applet, so this is the only remaining offline free test; a confirmed crash would still not be code execution without the Switch 1 `fs` binary. This variant has **not** been run on the console (`E-141`).
+Prepared locally under `scripts/assets.local/h013/` (ignored). The benign image must be written and run first; the parent image only after a clean benign run. The card write is destructive to the sacrificial card and must be run by the owner. The browser routes are closed and the supernag blocks the applet, so this is the only remaining offline free test; a confirmed crash would still not be code execution without the Switch 1 `fs` binary. The owner **parked this test on 2026-11-25**; it has **not** been run on the console (`E-141`).
 
 ## References
 

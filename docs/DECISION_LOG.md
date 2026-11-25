@@ -647,3 +647,13 @@ Decisions are dated and recorded with the reason and the alternatives considered
 **Alternatives considered:** Run a Switch 2 package on the OLED to test compatibility (rejected: wrong platform, full-NAND/brick warnings); port the BigInt exploit by changing constants (rejected: no Switch 1 build, no fs binary, and the upstream premise differs); run the `H-013` parent image immediately (rejected: the benign image must run first, and a card write needs explicit approval); declare the search failed (rejected: the vulnerability remains on `23.0.1`; the entry point and Switch 1 `fs` package are missing).
 
 **Consequences:** `E-129`-`E-135`, `E-141`-`E-143`; `research/hypotheses.json` (`H-004` verified/blocked, `H-005` blocked, `H-013`/`H-014` updated), `docs/PORTABILITY.md`, `docs/WEBKIT-NDAY-PLAN.md`, `docs/SAFETY_AND_RECOVERY.md`, `research/CHECKPOINT.md`, and `README.md` record the state. The target remains on `23.0.1`; no console state was changed. The next offline test is the benign `H-013` image, with the parent image only after a clean benign run and explicit approval.
+
+## 2026-11-25 — Park the H-013 card test for later
+
+**Decision:** Keep the prepared `H-013` day-directory benign and parent images parked. Do not write the sacrificial card or run the Album test now. No active console work; read-only monitoring may continue.
+
+**Reason:** The owner chose to save the test for later. It is the only remaining offline free surface, but it is a crash-only data point: even a positive result would not produce fs-level code execution without the Switch 1 `fs` binary, and the browser entry point is supernag-gated. The `fs` bug is confirmed and fixed in `23.5.0`, and the public `fs` packages are Switch 2-only (`E-129`, `E-131`, `E-136`, `E-141`). Running the card test now would add console risk without closing the fs-level gap.
+
+**Alternatives considered:** Run the benign image now (declined by the owner: save for later); run the parent image directly (rejected: the benign control must run first and no card write is authorized); discard the prepared images (rejected: they are ready and may be useful later); keep pushing active console tests (rejected: no full path remains).
+
+**Consequences:** `H-013` remains `UNVERIFIED`/`blocked`; the images, hashes, and runbook remain in `docs/H-013-SD-TRIGGER-PLAN.md`; no card write or console state change. Resume only with explicit approval and the benign image first. The project remains in read-only monitoring mode.
